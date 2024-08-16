@@ -3,6 +3,9 @@
 **/quarto/
 **/.vscode/
 **/private/
+*.gif
+*.mp4
+*.mov
 package-lock.json
 package.json
 
