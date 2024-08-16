@@ -1,0 +1,15 @@
+video_metadata_keep_keys:
+  - 'snippet.channelTitle'
+  - 'id'
+  - 'snippet.title'
+  - 'contentDetails.licensedContent'
+  - 'status.privacyStatus'
+  - 'status.license'
+  - 'status.publicStatsViewable'
+  - 'statistics.viewCount'
+  - 'statistics.likeCount'
+  - 'statistics.favoriteCount'
+  - 'statistics.commentCount'
+remove_substrings:
+  EuroPythonConference_videos_data:
+    - "This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License"

@@ -1,0 +1,19 @@
+!!python/object:pdpp.tasks.standard_task.StandardTask
+dep_files:
+  _import_: !!python/object:pdpp.templates.dep_dataclass.dep_dataclass
+    dir_list: []
+    file_list:
+    - config.yaml
+    task_name: _import_
+    task_out: ./
+  process_channel_data: !!python/object:pdpp.templates.dep_dataclass.dep_dataclass
+    dir_list: []
+    file_list:
+    - channels_processed.csv
+    task_name: process_channel_data
+    task_out: output
+enabled: true
+language: Python
+src_files:
+- collect_comment_data.py
+target_dir: collect_comment_data

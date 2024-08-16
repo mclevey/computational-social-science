@@ -1,0 +1,26 @@
+!!python/object:pdpp.tasks.standard_task.StandardTask
+dep_files:
+  label_comment_entities: !!python/object:pdpp.templates.dep_dataclass.dep_dataclass
+    dir_list: []
+    file_list:
+    - comments_entities.csv
+    task_name: label_comment_entities
+    task_out: output
+  label_comment_sentiment: !!python/object:pdpp.templates.dep_dataclass.dep_dataclass
+    dir_list: []
+    file_list:
+    - comments_sentiment.csv
+    task_name: label_comment_sentiment
+    task_out: output
+  label_comment_topics: !!python/object:pdpp.templates.dep_dataclass.dep_dataclass
+    dir_list: []
+    file_list:
+    - comments_topics.csv
+    - comments_topic_info.csv
+    task_name: label_comment_topics
+    task_out: output
+enabled: true
+language: Python
+src_files:
+- merge_labelled_comment_data.py
+target_dir: merge_labelled_comment_data

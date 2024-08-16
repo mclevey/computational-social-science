@@ -1,0 +1,10 @@
+edge_threshold: 2
+bipartite_edge_threshold: 1
+topic_representation: 'KeyBERT'
+# TOPIC REPRESENTATION OPTIONS:
+# 'Topic'
+# 'Name'
+# 'Representation'
+# 'KeyBERT'
+# 'MMR'
+# 'POS'

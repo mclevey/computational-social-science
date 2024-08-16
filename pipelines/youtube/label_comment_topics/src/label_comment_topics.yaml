@@ -1,0 +1,72 @@
+DEFAULT_PARAMS:
+  topic_model:
+    umap_n_neighbors: 100
+    umap_n_components: 5
+    hdbscan_min_cluster_size: 36
+    hdbscan_min_samples: 5
+    mmr_model_diversity: 0.3
+  representation_model:
+    vectorizer_min_df: 0.1
+    vectorizer_max_df: 0.85
+    ngram_upper_limit: 2
+    top_n_words: 10
+PyData:
+  topic_model:
+    umap_n_neighbors: 20
+    umap_n_components: 5
+    hdbscan_min_cluster_size: 36
+    hdbscan_min_samples: 5
+    mmr_model_diversity: 0.3
+  representation_model:
+    vectorizer_min_df: 0.1
+    vectorizer_max_df: 0.85
+    ngram_upper_limit: 2
+    top_n_words: 10
+EuroPythonConference:
+  topic_model:
+    umap_n_neighbors: 20
+    umap_n_components: 5
+    hdbscan_min_cluster_size: 36
+    hdbscan_min_samples: 5
+    mmr_model_diversity: 0.3
+  representation_model:
+    vectorizer_min_df: 0.1
+    vectorizer_max_df: 0.85
+    ngram_upper_limit: 2
+    top_n_words: 10
+datasocietyresearchinstitu1085:
+  topic_model:
+    umap_n_neighbors: 10
+    umap_n_components: 5
+    hdbscan_min_cluster_size: 15
+    hdbscan_min_samples: 5
+    mmr_model_diversity: 0.3
+  representation_model:
+    vectorizer_min_df: 0.1
+    vectorizer_max_df: 0.85
+    ngram_upper_limit: 2
+    top_n_words: 10
+MicrosoftResearch:
+  topic_model:
+    umap_n_neighbors: 25
+    umap_n_components: 5
+    hdbscan_min_cluster_size: 60
+    hdbscan_min_samples: 10
+    mmr_model_diversity: 0.2
+  representation_model:
+    vectorizer_min_df: 0.1
+    vectorizer_max_df: 0.85
+    ngram_upper_limit: 2
+    top_n_words: 10
+talksatgoogle:
+  topic_model:
+    umap_n_neighbors: 25
+    umap_n_components: 5
+    hdbscan_min_cluster_size: 60
+    hdbscan_min_samples: 10
+    mmr_model_diversity: 0.2
+  representation_model:
+    vectorizer_min_df: 0.1
+    vectorizer_max_df: 0.85
+    ngram_upper_limit: 2
+    top_n_words: 10
