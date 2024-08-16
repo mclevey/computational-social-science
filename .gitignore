@@ -3,7 +3,8 @@
 **/quarto/
 **/.vscode/
 **/private/
-
+package-lock.json
+package.json
 
 
 # Environment variables (api keys, etc.)
