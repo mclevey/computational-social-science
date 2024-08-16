@@ -1,3 +1,14 @@
+.DS_Store
+**/.jupyter_cache/
+**/quarto/
+**/.vscode/
+**/private/
+
+
+
+# Environment variables (api keys, etc.)
+.env
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

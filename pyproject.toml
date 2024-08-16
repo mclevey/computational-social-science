@@ -1,0 +1,62 @@
+[tool.poetry]
+name = "icsspy"
+version = "0.1.0"
+description = "Python package for John McLevey's courses and workshops in computational social science and data science."
+authors = ["John McLevey <john.mclevey@uwaterloo.ca>"]
+packages = [{ include = "icsspy" }]
+license = "CC BY-SA 4.0"
+readme = "README-pypi.md"
+
+[tool.poetry.dependencies]
+bertopic = { version = "^0.16.2", extras = ["spacy"] }
+bs4 = "^0.0.2"
+click = "^8.1.7"
+google-api-python-client = "^2.137.0"
+graphviz = "^0.20.3"
+huggingface-hub = "^0.21"                              # known issue with 0.24
+jupyter-cache = "^1.0.0"
+matplotlib = "^3.9.0"
+mesa = "^2.3.1"
+nbclient = "^0.10.0"
+networkx = "^3.3"
+pandas = "^2.2.2"
+pdpp = "^0.5.1"
+pre-commit = "^3.7.1"
+pydot = "^2.0.0"
+pyprojroot = "^0.3.0"
+pyreadr = "^0.5.0"
+python = "^3.11"
+python-dotenv = "^1.0.1"
+requests = "^2.32.3"
+rich = "^13.7.1"
+seaborn = "^0.13.2"
+sentence-transformers = "^3.0.1"
+span-marker = "^1.5.0"
+tokenizers = "^0.19.1"
+debugpy = "^1.8.3"
+numpy = "^1.26.4"                                      # "^2.0.1" is not compatible with bertopic
+pyyaml = "^6.0.1"
+arviz = "^0.19.0"
+python-louvain = "^0.16"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.2"
+flake8 = "^7.1.0"
+black = "^24.4.2"
+isort = "^5.13.2"
+pre-commit = "^3.7.1"
+sphinx = "^7.3.7"
+
+[tool.poetry.scripts]
+collect-configs = "scripts.collect_configs:main"
+render-slides = "scripts.render_slides:main"
+download-models = "scripts.download_models:download_small_spacy_model"
+enter-docker = "scripts.enter_docker:run_docker"
+draw-graphical-models = "scripts.draw_graphical_models:draw_models"
+fetch-course-outputs = "scripts.fetch_course_outputs:fetch_course_outputs"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+include = ["icsspy/data/*.csv", "icsspy/mplstyles/*.mplstyle"]

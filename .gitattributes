@@ -1,0 +1,4 @@
+*.csv filter=lfs diff=lfs merge=lfs -text
+*.html filter=lfs diff=lfs merge=lfs -text
+docs/day-4.html filter=lfs diff=lfs merge=lfs -text
+*.gt filter=lfs diff=lfs merge=lfs -text
