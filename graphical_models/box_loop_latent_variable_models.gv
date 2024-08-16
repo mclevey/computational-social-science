@@ -1,0 +1,30 @@
+
+digraph box {
+    rankdir = TD;
+    // splines=ortho;
+    ratio="fill";
+    size="9,4!";
+    dpi=600; // for exporting, bad with preview in VSCode
+    {
+        node [shape=plaintext]
+        "infer hidden quantities", "criticize model", "build model", "apply model"
+        data [shape=box3d]
+    }
+
+    {
+        data -> "infer hidden quantities"
+        data -> "criticize model"
+
+        "infer hidden quantities" -> "apply model"
+        "infer hidden quantities" -> "criticize model"
+
+        "criticize model" -> "build model"
+
+        "build model" -> "infer hidden quantities" [taillabel=<<I>revise model</I>> labeldistance=6 color=crimson fontcolor=crimson]
+
+    }
+
+    {rank = same; data}
+    {rank = same; "infer hidden quantities", "criticize model", "build model"}
+    {rank = same; "apply model"}
+}

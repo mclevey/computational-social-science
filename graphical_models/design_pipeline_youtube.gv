@@ -1,0 +1,58 @@
+
+digraph box {
+    rankdir = TD;
+    ratio="fill";
+    size="9,4!";
+    dpi=600;
+
+    // NODES
+    {
+        node [shape=plaintext]
+        CCI [label="collect channel ids"]
+        CChD [label="collect channel data"]
+        PChD [label="process channel data"]
+        CCoD [label="collect comment data"]
+        PCoD [label="process comment data"]
+        INE [label="identify named entities"]
+        LSSEC [label="label sentiment, stance, and emotion concepts"]
+        ASSEC [label="analyze sentiment, stance, and emotion concepts"]
+        LLT [label="label latent topics"]
+        ALT [label="analyze latent topics"]
+        CNET [label="construct networks"]
+        MNET [label="model networks"]
+        MERGE [label="merge datasets"]
+
+        // import [label="_import_" shape=box3d]
+        // export [label="_export_" shape=box3d]
+    }
+
+    // EDGES
+    {
+        CCI -> CChD
+        CChD -> PChD
+        PChD -> CCoD
+        CCoD -> PCoD
+
+        PCoD -> INE
+        PCoD -> LSSEC
+        PCoD -> LLT
+
+        PChD -> INE
+        PChD -> LSSEC
+        LSSEC -> ASSEC
+        PChD -> LLT
+
+        LLT -> ALT
+
+        INE -> MERGE
+        LSSEC -> MERGE
+        LLT -> MERGE
+
+        MERGE -> CNET
+        CNET -> MNET
+    }
+
+    // {rank = same; Data}
+    // {rank = same; "(Re)build a model", "Explore the data"}
+    // {rank = same; "apply model"}
+}
