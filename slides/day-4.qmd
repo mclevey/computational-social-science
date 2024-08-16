@@ -23,7 +23,7 @@ format:
     slide-number: false
     chalkboard: false
     preview-links: auto
-    smaller: truesub
+    smaller: true
     fig-align: left
     fig-format: svg
     lightbox: true
