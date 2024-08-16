@@ -1,0 +1,19 @@
+## SNA Origins
+[@freeman2004development]{.nord-light}
+
+:::: {.columns}
+::: {.column width="45%"}
+![](media/Simmel.png){width=41.5%} ![](media/jacob_moreno.jpg){width=41%}<br>[Left, Georg **Simmel** (1858-1918)<br>Right, Jacob **Moreno** (1889-1974)]{.nord-footer}
+
+**Simmel**'s [[-@simmel2010conflict]]{.nord-light} "The Web of Group Affiliations" and **Moreno**'s [[-@moreno1934shall]]{.nord-light} *Who Shall Survive?* are generally considered to be the intellectual beginnings of SNA.
+:::
+
+::: {.column width="10%"}
+:::
+
+::: {.column width="45%"}
+![](media/who_shall_survive.gif){width=100%}
+
+*Who Shall Survive?* Helen Hall **Jennings** co-authored this classic without credit.
+:::
+::::

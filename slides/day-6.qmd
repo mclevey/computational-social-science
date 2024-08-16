@@ -1,0 +1,44 @@
+---
+title: "Conclusion"
+subtitle: "[DAY SIX]{.kn-pink} [GESIS Fall Seminar in Computational Social Science]{.kn-blue}"
+author:
+  - name: John McLevey
+    affiliations:
+      - name: University of Waterloo
+  - name: Johannes B. Gruber
+    affiliations:
+      - name: VU Amsterdam
+output-dir: "../docs/"
+format:
+  revealjs:
+    theme: [default, custom.scss]
+    width: 1600
+    height: 900
+    embed-resources: true
+    execute:
+      echo: true
+      warning: false
+      cache: true
+      freeze: true
+    slide-number: false
+    chalkboard: false
+    preview-links: auto
+    smaller: true
+    fig-align: left
+    fig-format: svg
+    lightbox: true
+    scrollable: true
+    code-overflow: scroll
+    code-fold: false
+    code-line-numbers: true
+    code-copy: hover
+    reference-location: document
+    tbl-cap-location: margin
+    logo: media/logo_gesis.png
+    footer: "[CC BY-SA 4.0]{.nord-footer}"
+    email-obfuscation: javascript
+highlight-style: "nord"
+bibliography: references.bib
+---
+
+## Coming soon...

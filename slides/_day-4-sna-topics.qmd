@@ -1,0 +1,28 @@
+##
+
+:::: {.columns}
+::: {.column width="45%"}
+![The vertical line marks the publication of the first edition of the<br>*Sage Handbook of Social Network Analysis* [[@scott2011sage]]{.nord-light}.<br>Figure reproduced from [[@mclevey2023sage]]{.nord-light}.](media/social_networks_over_time.png){#fig-social_networks_over_time width=80%}
+:::
+
+::: {.column width="55%"}
+![](media/SHSNA-Contents.png){width=100%}
+:::
+::::
+
+##
+
+![Latent topics in all articles published in *Social Networks*.<br>Reproduced from [@mclevey2023sage]{.nord-light}.](media/mclevey_scott_carrington_sna_topic_bipartite.png){#fig-mclevey_scott_carrington_sna_topic_bipartite width=80%}
+
+::: {.notes}
+This is a **bipartite network** of documents [(left side of @fig-mclevey_scott_carrington_sna_topic_bipartite)]{.nord-light} and words [(right side of @fig-mclevey_scott_carrington_sna_topic_bipartite)]{.nord-light}.
+
+It's a type of network-based topic model that exploits the shared mathematical foundations of [LDA-style generative topic models]{.kn-blue} on the one hand and [generative models of network structure]{.kn-pink} on the other [[@gerlach2018network]]{.nord-light}. I'll have more to say about this later.
+:::
+
+
+##
+
+![Latent topics in *Social Networks* over time. Reproduced from [@mclevey2023sage]{.nord-light}.](media/mclevey_scott_carrington_sna_topic_heatmap.png){#fig-mclevey_scott_carrington_sna_topic_heatmap}
+
+Contemporary social network analysis (and network science more generally) is [increasingly computational]{.kn-pink} [[see also @tindall2022big]]{.nord-light}. Subgroup analysis, clustering, multilevel models, statistical modelling, Bayesian inference, and social influence are especially important topics.

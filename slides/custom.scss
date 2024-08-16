@@ -1,0 +1,220 @@
+/*-- scss:defaults --*/
+
+$nord-dark-bg: #2e3440;
+$kn-pink: #ff42a1;
+$kn-blue: #00a1ff;
+$kn-yellow: #feae00;
+$kn-green: #60d937;
+$kn-red: #ed220d;
+
+$link-color: $nord-dark-bg;
+
+@import url("https://fonts.googleapis.com/css2?family=Hack:wght@400;700&display=swap");
+
+$presentation-heading-font: "Helvetica", sans-serif;
+$font-family-sans-serif: "Helvetica", sans-serif;
+$font-family-monospace: "Hack", monospace;
+
+/*-- scss:rules --*/
+
+// STYLE LINE HEIGHTS
+
+body {
+  line-height: 2;
+}
+
+h1, h2, h3, h4, h5 {
+  line-height: 1.3;
+}
+
+p {
+  line-height: 2;
+}
+
+
+
+// STYLE TITLE SLIDE
+
+// #title-slide {
+//   text-align: left;
+//   padding-left: 20;
+
+//   .quarto-title-authors {
+//     justify-content: left;
+
+//     .quarto-title-author {
+//       padding-left: 0;
+//       width: 100%;
+//     }
+//   }
+// }
+
+// STYLE HEADINGS
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  color: $nord-dark-bg !important;
+}
+
+// STYLE INLINE CODE
+
+code {
+  background-color: $nord-dark-bg !important;
+  padding: 5px 12px !important;
+  border-radius: 6px !important;
+  font-size: 0.8em !important;
+}
+
+// STYLE CODE BLOCKS: NORD, FULL WIDTH
+
+.reveal pre code {
+  background-color: $nord-dark-bg !important;
+  color: #ffffff !important;
+  text-align: left !important;
+}
+
+.reveal div.sourceCode pre code {
+  padding: 25px !important;
+  background-color: $nord-dark-bg !important;
+  color: #ffffff !important;
+  text-align: left !important;
+  font-size: 1.5em !important;
+}
+
+.reveal div.sourceCode {
+  border: none !important;
+  border-radius: 5px !important;
+  margin-bottom: 10px !important;
+  width: auto !important;
+  margin: 0 !important;
+}
+
+code span.er {
+  color: $nord-dark-bg !important;
+  text-decoration: none !important;
+}
+
+// STYLE QUARTO OUTPUT FROM CODE BLOCKS
+
+.cell-output {
+  margin-top: 0.5em; // Add space between the code block and rendered output
+  margin-bottom: 0.5em;
+}
+
+.cell-output pre {
+  background-color: $nord-dark-bg !important; // Same background color as the code block
+  color: #ffffff !important; // Same text color as the code block
+  padding: 25px !important; // Add padding to output blocks
+  border-radius: 5px !important; // Round the corners of output blocks
+  font-size: 0.5em !important; // Adjust the font size for code output
+  opacity: 0.6; // Only way I can get it grey (WTF?)
+}
+
+// STYLE TABLES
+
+.scrollable-table {
+  overflow-x: auto !important;
+  display: block !important;
+  white-space: nowrap !important;
+}
+
+table {
+  font-size: 0.9em !important; // Reduce the font size
+  width: auto !important; // Ensure the table takes the width of its content
+  border-collapse: collapse !important; // Ensure the borders are collapsed
+  margin: 20px 0 !important; // Add margin to the table
+}
+
+th,
+td {
+  padding: 8px !important; // Add padding to table cells
+  text-align: left !important; // Align text to the left
+  border: 1px solid #ddd !important; // Add border to table cells
+}
+
+th {
+  background-color: #f2f2f2 !important; // Add background color to table headers
+  font-weight: bold !important; // Make table headers bold
+}
+
+td {
+  background-color: #ffffff !important; // Ensure the table cells have a white background
+}
+
+table caption {
+  font-size: 0.9em !important; // Reduce the font size for captions slightly
+  margin-top: -10px !important; // Adjust the top margin for captions
+  margin-bottom: 10px !important; // Add some bottom margin for captions
+  text-align: left !important; // Align captions to the left
+  color: #666 !important; // Change caption text color
+}
+
+// CHANGE TEXT SIZE
+
+.small-text {
+  font-weight: normal;
+  font-size: 0.65em !important;
+  line-height: 0.7 !important;
+}
+
+.large-text {
+  font-weight: normal;
+  font-size: 1.5em;
+}
+
+// STYLE FOOTER
+
+.nord-footer {
+  color: $nord-dark-bg;
+  font-weight: normal;
+  font-size: 0.75em;
+  opacity: 0.6;
+}
+
+// FOR EMPHASIS
+
+.nord-light {
+  color: $nord-dark-bg;
+  font-weight: normal;
+  opacity: 0.6;
+}
+
+.nord {
+  color: $nord-dark-bg;
+  font-weight: bold;
+}
+
+.kn-pink {
+  color: $kn-pink;
+  font-weight: bold;
+}
+
+.kn-blue {
+  color: $kn-blue;
+  font-weight: bold;
+}
+
+.kn-yellow {
+  color: $kn-yellow;
+  font-weight: bold;
+}
+
+.kn-green {
+  color: $kn-green;
+  font-weight: bold;
+}
+
+.kn-red {
+  color: $kn-red;
+  font-weight: bold;
+}
+
+// STYLE IMAGES
+
+.shadow-img {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}

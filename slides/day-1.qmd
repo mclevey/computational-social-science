@@ -1,0 +1,779 @@
+---
+title: "Introduction to<br>Computational Social Science"
+subtitle: "<br>GESIS Fall Seminar in Computational Social Science<br>[DAY ONE]{.kn-pink} [INTRODUCTION]{.kn-blue}"
+author:
+  - name: John McLevey
+    affiliations:
+      - name: University of Waterloo
+  - name: Johannes B. Gruber
+    affiliations:
+      - name: VU Amsterdam
+output-dir: "../docs/"
+format:
+  revealjs:
+    theme: [default, custom.scss]
+    width: 1600
+    height: 900
+    embed-resources: true
+    execute:
+      echo: true
+      warning: false
+      cache: true
+      freeze: true
+    slide-number: false
+    chalkboard: false
+    preview-links: auto
+    smaller: true
+    fig-align: left
+    fig-format: svg
+    lightbox: true
+    scrollable: true
+    code-overflow: scroll
+    code-fold: false
+    code-line-numbers: true
+    code-copy: hover
+    reference-location: document
+    tbl-cap-location: margin
+    logo: media/logo_gesis.png
+    footer: "[CC BY-SA 4.0]{.nord-footer}"
+    email-obfuscation: javascript
+highlight-style: "nord"
+bibliography: references.bib
+---
+
+##
+
+<!-- TITLE SLIDE SPEAKER NOTES
+- **John**: Hello and welcome to the GESIS Fall Seminar “Introduction to Computational Social Science”.
+- Johannes: I’m Johannes
+- **John**: And I’m John
+- Johannes: This course has an R and a Python version. But since the topics are essentially the same, - John and I decided to give the lectures in the course together.
+-->
+
+### Course Schedule
+
+<br>
+
+|                   | Session                                |
+|:------------------|:---------------------------------------|
+| [Day 1]{.kn-pink} | Introduction                           |
+| Day 2             | Obtaining Data                         |
+| Day 3             | Computational Text Analysis            |
+| Day 4             | Computational Network Analysis         |
+| Day 5             | Social Simulation & Agent-based Models |
+| Day 6             | Project Work Day and Outlook           |
+
+::: {.notes}
+- **John**: This has the advantage that you will hear about obtaining data and text analysis in session 2 and 3 from Johannes, who is an expert in both
+- Johannes: And you will hear about network analysis and agent-based Models in sessions 4 and 5 from John who is an expert in these two topics
+- **John**: Of course you will see the code demonstrations in the language that you selected.
+- Johannes: So I will walk you through the R code for network analysis
+- **John**: And I will show you how to do text analysis in Python
+:::
+
+## Who is Johannes?
+
+:::: {.columns}
+
+::: {.column width="60%"}
+- PostDoc at Department of Language, Literature and Communication at Vrije Universiteit Amsterdam and University of Amsterdam
+- Interested in:
+  - Computational Social Science
+  - Automated Text Analysis
+  - Hybrid Media Systems and Information Flows
+  - Protest and Democracy
+- Experience:
+  - R user since 2015 years
+  - R package developer since 2017
+  - Worked on several packages for text analysis, API access and web scraping (spacyr, quanteda.textmodels, LexisNexisTools, paperboy, traktok, rollama, amcat4-r, and more)
+:::
+
+::: {.column width="40%"}
+Contact:
+
+- [j.b.gruber@vu.nl](mailto:j.b.gruber@vu.nl)
+- [\@jbgruber.bsky.social](https://bsky.app/profile/jbgruber.bsky.social)
+- [\@JohannesBGruber](https://twitter.com/JohannesBGruber)
+:::
+
+::::
+
+::: {.notes}
+(Johannes introduces himself)
+:::
+
+
+## Who is John?
+
+:::: {.columns}
+
+::: {.column width="60%"}
+John McLevey (he / him)<br>
+Associate Professor, University of Waterloo<br>
+PI, [Computational Social Science Lab]{.kn-pink}<br>
+[john.mclevey@uwaterloo.ca](mailto:john.mclevey@uwaterloo.ca)
+
+<br>
+I first got into computational social science via natural language processing and probabilistic topic modelling as a PhD student ~ 2009.
+
+<br>
+Within computational social science, my interests and expertise are primarily in network science, computational text analysis, generative modelling, bayesian data analysis, causal inference, and scientific computing. I also work in cognitive social science, political sociology, sociology of science, and environmental sociology.
+:::
+
+::: {.column width="40%"}
+![](media/DCSS.png){width=70%}
+:::
+
+::::
+
+::: {.notes}
+And I'm an Associate Professor at the University of Waterloo in Ontario Canada, where I direct the Computational Social Science Research Lab, formerly known as Netlab. I was first introduced to computational social science in 2009, when I was a new PhD student interested in using natural language processing and probabilistic topic modelling in research on social movements and contentious politics.
+
+Since then, my interests in computational social science have evolved to include a wide variety of approaches to computational text analysis, as well as network science, Bayesian data analysis and generative modelling, causal inference, and scientific computing. All of these areas, including several others, are introduced in my book *Computational Social Science*, which was published by Sage in 2022.
+
+Substantively, I work primarily in the areas of cognitive social science, political sociology, sociology of science, and environmental sociology.
+:::
+
+
+## What is computational social science?
+
+:::: {.columns}
+
+::: {.column width="60%"}
+> "Anything that's cool."<br>
+> - [Matt Salganik](https://www.princeton.edu/~mjs3/) (Author of [Bit by Bit](https://www.bitbybitbook.com))
+
+<br>
+Computational social science is diverse and multi-paradigmatic
+
+::: {.incremental}
+- often involves working with "found" / "readymade" data [[@salganik2019bit]]{.nord-footer}
+- often employs machine learning frameworks, computational experiments, and/or *generative* models [[@edelmann2020computational; @centola2018behavior; @bail2022breaking; @mcelreath2018statistical; @grimmer2022text; @kitts2023rethinking; @smaldino2023modeling]]{.nord-footer}
+- involves difficult interpretative work [[@grigoropoulou2022data; @nelson2020computational]]{.nord-footer}
+- generally requires scientific computing and software development skills to develop data processing and modelling *pipelines* [[@cssbook; @mclevey2022doing; @mclevey2021reproducibility]]{.nord-footer}
+- should meet a higher bar for privacy protection, research ethics, transparency, and accountability [[@o2017weapons]]{.nord-footer}
+- is computational **and** social scientific
+:::
+:::
+
+::: {.column width="40%"}
+![](media/super-straho-CPtKXzwGKiw-unsplash.jpg){width=70%}
+
+[Photo by <a href="https://unsplash.com/@superstraho?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Super Straho</a> on <a href="https://unsplash.com/photos/purple-and-pink-love-neon-light-signage-CPtKXzwGKiw?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>]{.nord-footer}
+:::
+
+::::
+
+
+# What computational know and skills will we cover in this course?
+
+## [DAY 2]{.kn-pink} Data
+
+:::: {.columns}
+::: {.column width="35%"}
+#### Core Learning Objectives
+
+- how to scrape the web and work with APIs
+- how to clean, process, and explore web data
+
+<br>
+
+#### Examples
+
+- *The Guardian*
+- YouTube
+:::
+
+::: {.column width="10%"}
+:::
+
+
+::: {.column width="55%"}
+#### The YouTube API
+
+Start with a list of seed channels:
+
+```yaml
+channels:
+  - 'EuroPythonConference'
+  - 'PyDataTV'
+  - 'datasocietyresearchinstitu1085'
+  - 'MicrosoftResearch'
+  - 'talksatgoogle'
+```
+
+<br>
+
+Retrieve their unique IDs from the API:
+
+| Channel                        | ChannelID                |
+|:-------------------------------|:-------------------------|
+| EuroPythonConference           | UC98CzaYuFNAA_gOINFB0e4Q |
+| PyDataTV                       | UCOjD18EJYcsBog4IozkF_7w |
+| datasocietyresearchinstitu1085 | UCMBHW1nUr5AoUW1zScTqGew |
+| MicrosoftResearch              | UCCb9_Kn8F_Opb3UCGm-lILQ |
+| talksatgoogle                  | UCbmNph6atAoGfqLoCL_duAg |
+
+:::
+::::
+
+
+## [DAY 2]{.kn-pink} Data
+
+<br>
+
+YouTube returns JSON data about public videos posted by the channels in our list
+
+```json
+{
+        "kind": "youtube#video",
+        "etag": "AjtwL3eJWTIs4Vw8yY495JuTP2M",
+        "id": "VD6SfFw2PGg",
+        "snippet": {
+            "publishedAt": "2016-11-29T15:56:25Z",
+            "channelId": "UCMBHW1nUr5AoUW1zScTqGew",
+            "title": "danah boyd, algorithmic accountability and transparency",
+            "description": "Description: danah boyd prepared remarks for a public roundtable in the European Parliament on algorithmic accountability and transparency in the digital economy (https://www.marietjeschaake.eu/en/event-07-11-algorithmic-accountability-and-transparency). Remarks were recorded on November 2, 2016. The roundtable took place on November 7, 2016, and was organized by MEP Marietje Schaake. danah\u2019s remarks have also been adapted as a short essay on Data & Society\u2019s Points: https://points.datasociety.net/transparency-accountability-3c04e4804504",
+            "thumbnails": {
+                "default": {
+                    "url": "https://i.ytimg.com/vi/VD6SfFw2PGg/default.jpg",
+                    "width": 120,
+                    "height": 90
+                },
+                "medium": {
+                    "url": "https://i.ytimg.com/vi/VD6SfFw2PGg/mqdefault.jpg",
+                    "width": 320,
+                    "height": 180
+                },
+                "high": {
+                    "url": "https://i.ytimg.com/vi/VD6SfFw2PGg/hqdefault.jpg",
+                    "width": 480,
+                    "height": 360
+                },
+                "standard": {
+                    "url": "https://i.ytimg.com/vi/VD6SfFw2PGg/sddefault.jpg",
+                    "width": 640,
+                    "height": 480
+                },
+                "maxres": {
+                    "url": "https://i.ytimg.com/vi/VD6SfFw2PGg/maxresdefault.jpg",
+                    "width": 1280,
+                    "height": 720
+                }
+            },
+            "channelTitle": "Data & Society Research Institute",
+            "categoryId": "27",
+            "liveBroadcastContent": "none",
+            "localized": {
+                "title": "danah boyd, algorithmic accountability and transparency",
+                "description": "Description: danah boyd prepared remarks for a public roundtable in the European Parliament on algorithmic accountability and transparency in the digital economy (https://www.marietjeschaake.eu/en/event-07-11-algorithmic-accountability-and-transparency). Remarks were recorded on November 2, 2016. The roundtable took place on November 7, 2016, and was organized by MEP Marietje Schaake. danah\u2019s remarks have also been adapted as a short essay on Data & Society\u2019s Points: https://points.datasociety.net/transparency-accountability-3c04e4804504"
+            },
+            "defaultAudioLanguage": "en"
+        },
+        "contentDetails": {
+            "duration": "PT5M36S",
+            "dimension": "2d",
+            "definition": "hd",
+            "caption": "false",
+            "licensedContent": false,
+            "contentRating": {},
+            "projection": "rectangular"
+        },
+        "status": {
+            "uploadStatus": "processed",
+            "privacyStatus": "public",
+            "license": "creativeCommon",
+            "embeddable": true,
+            "publicStatsViewable": true,
+            "madeForKids": false
+        },
+        "statistics": {
+            "viewCount": "1879",
+            "favoriteCount": "0"
+        },
+        "player": {
+            "embedHtml": "<iframe width=\"480\" height=\"270\" src=\"//www.youtube.com/embed/VD6SfFw2PGg\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" referrerpolicy=\"strict-origin-when-cross-origin\" allowfullscreen></iframe>"
+        },
+        "topicDetails": {
+            "topicCategories": [
+                "https://en.wikipedia.org/wiki/Society"
+            ]
+        },
+        "recordingDetails": {}
+    },
+    {
+        "kind": "youtube#video",
+        "etag": "rHYS14CKJbIjFIFQ1ZbDwie_ZXA",
+        "id": "MfThopD7L1Y",
+        "snippet": {
+            "publishedAt": "2016-11-28T17:26:33Z",
+            "channelId": "UCMBHW1nUr5AoUW1zScTqGew",
+            "title": "Databite No. 90: Kristian Lum",
+            "description": "Kristian Lum presents Predictive Policing: Bias In, Bias Out:\n\nPredictive policing systems are increasingly used by law enforcement to try to prevent crime before it occurs. But what happens when these systems are trained using biased data? Machine learning algorithms are designed to learn and reproduce patterns in data, but if biased data is used to train these predictive models, the models will reproduce and in some cases amplify those same biases. At best, this renders the predictive models ineffective. At worst, it results in discriminatory policing.\n\n    In this talk, Kristian will elaborate on the concept of \u201cbias in, bias out\u201d in machine learning with a simple, non-technical example.  She will then demonstrate how applying machine learning to police records can result in the over-policing of historically over-policed communities. Using a case study from Oakland, CA, she will show one specific case of how predictive policing not only perpetuates the biases that were previously encoded in the police data, but \u2013 under some circumstances \u2013 actually amplifies those biases.\n\nKristian Lum is the Lead Statistician at HRDAG. Kristian\u2019s research focus has been on furthering the statistical methodology most commonly used by HRDAG\u2014population estimation or multiple systems estimation\u2014with a particular emphasis on Bayesian methods and model averaging. She is the primary author of the dga package, open source software for population estimation for the R computing environment. More recently, her research has expanded to include agent-based modeling and simulation-based analysis, through which has made contributions to understanding incarceration in the United States as a contagion. She is currently leading the HRDAG project on policing in the United States and has contributed to HRDAG projects in Colombia, Guatemala, and Kosovo.\n\nKristian received an MS and a PhD from the Department of Statistical Science at Duke University and a BA in Mathematics and Statistics from Rice University.\n\nYou can find Kristian on Twitter @KLdivergence.",
+            "thumbnails": {
+                "default": {
+                    "url": "https://i.ytimg.com/vi/MfThopD7L1Y/default.jpg",
+                    "width": 120,
+                    "height": 90
+                },
+                "medium": {
+                    "url": "https://i.ytimg.com/vi/MfThopD7L1Y/mqdefault.jpg",
+                    "width": 320,
+                    "height": 180
+                },
+                "high": {
+                    "url": "https://i.ytimg.com/vi/MfThopD7L1Y/hqdefault.jpg",
+                    "width": 480,
+                    "height": 360
+                },
+                "standard": {
+                    "url": "https://i.ytimg.com/vi/MfThopD7L1Y/sddefault.jpg",
+                    "width": 640,
+                    "height": 480
+                },
+                "maxres": {
+                    "url": "https://i.ytimg.com/vi/MfThopD7L1Y/maxresdefault.jpg",
+                    "width": 1280,
+                    "height": 720
+                }
+            },
+            "channelTitle": "Data & Society Research Institute",
+            "categoryId": "27",
+            "liveBroadcastContent": "none",
+            "localized": {
+                "title": "Databite No. 90: Kristian Lum",
+                "description": "Kristian Lum presents Predictive Policing: Bias In, Bias Out:\n\nPredictive policing systems are increasingly used by law enforcement to try to prevent crime before it occurs. But what happens when these systems are trained using biased data? Machine learning algorithms are designed to learn and reproduce patterns in data, but if biased data is used to train these predictive models, the models will reproduce and in some cases amplify those same biases. At best, this renders the predictive models ineffective. At worst, it results in discriminatory policing.\n\n    In this talk, Kristian will elaborate on the concept of \u201cbias in, bias out\u201d in machine learning with a simple, non-technical example.  She will then demonstrate how applying machine learning to police records can result in the over-policing of historically over-policed communities. Using a case study from Oakland, CA, she will show one specific case of how predictive policing not only perpetuates the biases that were previously encoded in the police data, but \u2013 under some circumstances \u2013 actually amplifies those biases.\n\nKristian Lum is the Lead Statistician at HRDAG. Kristian\u2019s research focus has been on furthering the statistical methodology most commonly used by HRDAG\u2014population estimation or multiple systems estimation\u2014with a particular emphasis on Bayesian methods and model averaging. She is the primary author of the dga package, open source software for population estimation for the R computing environment. More recently, her research has expanded to include agent-based modeling and simulation-based analysis, through which has made contributions to understanding incarceration in the United States as a contagion. She is currently leading the HRDAG project on policing in the United States and has contributed to HRDAG projects in Colombia, Guatemala, and Kosovo.\n\nKristian received an MS and a PhD from the Department of Statistical Science at Duke University and a BA in Mathematics and Statistics from Rice University.\n\nYou can find Kristian on Twitter @KLdivergence."
+            },
+            "defaultAudioLanguage": "en"
+        },
+        "contentDetails": {
+            "duration": "PT56M9S",
+            "dimension": "2d",
+            "definition": "hd",
+            "caption": "false",
+            "licensedContent": false,
+            "contentRating": {},
+            "projection": "rectangular"
+        },
+        "status": {
+            "uploadStatus": "processed",
+            "privacyStatus": "public",
+            "license": "creativeCommon",
+            "embeddable": true,
+            "publicStatsViewable": true,
+            "madeForKids": false
+        },
+        "statistics": {
+            "viewCount": "3936",
+            "likeCount": "47",
+            "favoriteCount": "0"
+        },
+        "player": {
+            "embedHtml": "<iframe width=\"480\" height=\"270\" src=\"//www.youtube.com/embed/MfThopD7L1Y\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" referrerpolicy=\"strict-origin-when-cross-origin\" allowfullscreen></iframe>"
+        },
+        "topicDetails": {
+            "topicCategories": [
+                "https://en.wikipedia.org/wiki/Knowledge"
+            ]
+        },
+        "recordingDetails": {}
+    },
+```
+
+## [DAY 2]{.kn-pink} Data
+
+<br>
+
+We can parse and clean this data to set the stage for more data collection.
+
+In this case, we will use data in the `video_id` column for another API query.
+
+<br>
+
+| id          | snippet.title      | snippet.chan... | contentDetai... | status.priv... | status.lic... | status.publ... | statistics.v... | statistics.l... | statistics.f... | statistics.c... | processed_text  | video_id    | channel |
+|:------------|:-------------------|:----------------|:----------------|:---------------|:--------------|:---------------|:----------------|:----------------|:----------------|:----------------|:----------------|:------------|:--------|
+| JdgIH-zfZ5Q | PyData Chicago ... | PyData          | False           | public         | youtube       | True           | 528             | 12              | 0               | 1               | PyData Chica... | JdgIH-zfZ5Q | PyData  |
+| prPLAxYF1bU | Ivan Moshkov &...  | PyData          | False           | public         | youtube       | True           | 622             | 14              | 0               | 1               | Ivan Moshko...  | prPLAxYF1bU | PyData  |
+| iMiFA_rITHI | Alejandro Sauce... | PyData          | False           | public         | youtube       | True           | 524             | 10              | 0               | 0               | Alejandro S...  | iMiFA_rITHI | PyData  |
+| FYhcHNzZDJ4 | Shagun Sodhani ... | PyData          | False           | public         | youtube       | True           | 286             | 5               | 0               | 0               | Shagun Sodh...  | FYhcHNzZDJ4 | PyData  |
+
+
+## [DAY 2]{.kn-pink} Data
+
+<br>
+
+The comment data (with a `video_id` column):
+
+<br>
+
+| video_id    | comment_id       | text             | author            | author_channel_url         | like_count | published_at         | updated_at           |
+|:------------|:-----------------|:-----------------|:------------------|:---------------------------|:-----------|:---------------------|:---------------------|
+| JdgIH-zfZ5Q | Ugx0BQIc07D_Y... | 😊😊😊😊😊😊😊...       | \@B_knows_A_R_... | http://www.youtube.com/... | 0          | 2024-07-26T15:20:23Z | 2024-07-26T15:20:23Z |
+| prPLAxYF1bU | UgzmHAPlguetM... | refreshing       | \@B_knows_A_R_... | http://www.youtube.com/... | 0          | 2024-07-26T08:00:43Z | 2024-07-26T08:00:43Z |
+| CtBdUd2LWLk | Ugzn-Lc_8xrTS... | Wow, I'm sure... | \@not_a_human_... | http://www.youtube.com/... | 0          | 2024-07-25T23:24:16Z | 2024-07-25T23:24:16Z |
+| 66ndJeFeaXw | UgyTMtosbmBx5... | And now ther...  | \@elioventocil... | http://www.youtube.com/... | 0          | 2024-07-26T14:53:51Z | 2024-07-26T14:53:51Z |
+| 66ndJeFeaXw | UgyiMxWfEWiPa... | Metrics cool...  | \@user-yj3mf1d... | http://www.youtube.com/... | 0          | 2024-07-25T23:25:27Z | 2024-07-25T23:28:20Z |
+
+## [DAY 2]{.kn-pink} Data
+
+<br>
+
+The final result of our API queries
+
+Note that not all channels have comments enabled!
+
+<br>
+
+
+| Channel                           | Video Count | Comment Count |
+|:----------------------------------|:------------|:--------------|
+| Data & Society Research Institute | 227         | 0             |
+| EuroPython Conference             | 1,944       | 1,757         |
+| Microsoft Research                | 9,231       | 33,794        |
+| PyData                            | 3,437       | 2,957         |
+| Talks at Google                   | 5,574       | 218,599       |
+
+
+
+## [DAY 3]{.kn-pink} Text Analysis
+
+:::: {.columns}
+::: {.column width="40%"}
+
+<br>
+
+#### Core Learning Objectives
+
+- process and quantify text data
+- classify text using supervised and/or semi-supervised approaches
+- perform iterative model-based exploratory analysis with unsupervised, semi-supervised, or probabilistic approaches
+  - analyze latent topics and sentiment
+  - identify named entities
+  - construct relational data from text
+- interpret computational text analyses
+:::
+
+::: {.column width="10%"}
+:::
+
+
+::: {.column width="50%"}
+
+<br>
+
+Text analysis is fundamentally **iterative** and **interpretive**.
+
+<br>
+
+![Box's loop (see also Hadley Wickam's EDA loop).<br>Figure reproduced from @mclevey2022doing](media/box_loop.png)
+
+:::
+::::
+
+
+
+
+## [DAY 3]{.kn-pink} Text Analysis
+
+<br>
+
+#### What language are these comments in?
+
+We can use a transformer model for language classification.
+
+<br>
+
+| comment_id                 | predicted_language | confidence_score   |
+|:---------------------------|:-------------------|:-------------------|
+| Ugx0BQIc07D_YflQeoR4AaABAg | hi                 | 0.6513246297836304 |
+| UgzmHAPlguetM9HFhaB4AaABAg | en                 | 0.9867847561836243 |
+| Ugzn-Lc_8xrTSrQMcsB4AaABAg | en                 | 0.9925290942192078 |
+| UgyTMtosbmBx59TCA3Z4AaABAg | en                 | 0.7660853862762451 |
+| UgyiMxWfEWiPaASq-m14AaABAg | en                 | 0.9941768646240234 |
+
+
+## [DAY 3]{.kn-pink} Text Analysis
+
+| Channel                           | Video Count | Comment Count | No. English Comments | Proportion English |
+|:----------------------------------|:------------|:--------------|:---------------------|-------------------:|
+| Data & Society Research Institute | 227         | 0             | 0                    |                  0 |
+| EuroPython Conference             | 1,944       | 1,757         | 1,591                |              90.55 |
+| Microsoft Research                | 9,231       | 33,794        | 30,755               |              91.01 |
+| PyData                            | 3,437       | 2,957         | 2,790                |              94.35 |
+| Talks at Google                   | 5,574       | 218,599       | 196,319              |              89.81 |
+
+<br>
+
+We could:
+
+- translate to one language,
+- filter to one language,
+- use multiple single language models, or
+- use multi-lingual models.
+
+In this example, I will filter to English language comments.
+
+## [DAY 3]{.kn-pink} Text Analysis
+
+<br>
+
+Modelling Latent Topics with BERTopic & KeyBERT Representation Model
+
+**EuroPython Conference**, Video Titles + Descriptions
+
+<div class="scrollable-table">
+{{< include tables/_EuroPythonConference_topic_table.md >}}
+<br>
+</div>
+
+## [DAY 3]{.kn-pink} Text Analysis
+
+<br>
+
+Modelling Latent Topics with BERTopic & KeyBERT Representation Model
+
+**EuroPython Conference**, Comments on Videos
+
+<div class="scrollable-table">
+{{< include tables/_EuroPythonConference_comments_topic_table.md >}}
+<br>
+</div>
+
+
+## [DAY 3]{.kn-pink} Text Analysis
+
+<br>
+
+Modelling Latent Topics with BERTopic & KeyBERT Representation Model
+
+**PyData**, Video Titles + Descriptions
+
+<div class="scrollable-table">
+{{< include tables/_PyData_topic_table.md >}}
+<br>
+</div>
+
+## [DAY 3]{.kn-pink} Text Analysis
+
+<br>
+
+Modelling Latent Topics with BERTopic & KeyBERT Representation Model
+
+**PyData**, Comments on Videos
+
+<div class="scrollable-table">
+{{< include tables/_PyData_comments_topic_table.md >}}
+<br>
+</div>
+
+
+
+
+## [DAY 3]{.kn-pink} Text Analysis
+
+<br>
+
+Modelling Latent Topics with BERTopic & KeyBERT Representation Model
+
+**Microsoft Research**, Video Titles + Descriptions
+
+<div class="scrollable-table">
+{{< include tables/_MicrosoftResearch_topic_table.md >}}
+<br>
+</div>
+
+## [DAY 3]{.kn-pink} Text Analysis
+
+<br>
+
+Modelling Latent Topics with BERTopic & KeyBERT Representation Model
+
+**Microsoft Research**, Comments on Videos
+
+<div class="scrollable-table">
+{{< include tables/_MicrosoftResearch_comments_topic_table.md >}}
+<br>
+</div>
+
+
+
+## [DAY 3]{.kn-pink} Text Analysis
+
+<br>
+
+Modelling Latent Sentiment (RoBERTa) and Latent Topics
+
+**Microsoft Research**, Comments on Videos
+
+Sentiment Scores = $P(SNeg)$, $P(SNeu)$, $P(SPos)$
+
+<br>
+
+![](media/topic_sentiment_google_talks_forest_plot.png){width=100%}
+
+## [DAY 3]{.kn-pink} Text Analysis
+
+<br>
+
+Named Entity Recognition with Transformer-based Model<br>[tomaarsen/span-marker-bert-base-fewnerd-fine-super]{.nord-footer}
+
+**PyData**, Video Titles + Descriptions
+
+<br>
+
+Entity Labels with Scores
+
+<div class="scrollable-table">
+{{< include tables/_pydata_ner_table_1.md >}}
+<br>
+</div>
+
+
+
+## [DAY 3]{.kn-pink} Text Analysis
+
+<br>
+
+Named Entity Recognition with Transformer-based Model<br>[tomaarsen/span-marker-bert-base-fewnerd-fine-super]{.nord-footer}
+
+**PyData**, Video Titles + Descriptions
+
+<br>
+
+Entity Label Counts
+
+<div class="scrollable-table">
+{{< include tables/_pydata_ner_table_2.md >}}
+<br>
+</div>
+
+
+## [DAY 3]{.kn-pink} Text Analysis
+
+<br>
+
+Named Entity Recognition with Transformer-based Model<br>[tomaarsen/span-marker-bert-base-fewnerd-fine-super]{.nord-footer}
+
+**PyData**, Video Titles + Descriptions
+
+<br>
+
+Span Counts for Software Entities
+
+<div class="scrollable-table">
+{{< include tables/_pydata_ner_table_3.md >}}
+<br>
+</div>
+
+
+
+## [DAY 3]{.kn-pink} Network Analysis
+
+:::: {.columns}
+::: {.column width="40%"}
+
+<br>
+
+#### Core Learning Objectives
+
+- learn core network concepts and relational thinking
+- construct networks from text data
+- compare descriptive and inferential approaches to clustering network data
+- estimate, assess, and interpret inferential network models
+  - Planted Partition Models (PPMs)
+  - Hierarchical Stochastic Blockmodels (HSBMs)
+- visualize network structure
+:::
+
+::: {.column width="10%"}
+:::
+
+
+::: {.column width="50%"}
+<br>
+For this example, I'll construct networks of named entities are mentioned together in the same video titles + descriptions and model network structure with Hierarchical Stochastic Blockmodels [[@holland1983stochastic; @peixoto2019bayesian; @browne2023inferential; @mclevey2022doing]]{.nord-footer}
+
+<br>
+(We'll create many other types of networks in the course.)
+:::
+::::
+
+
+## [DAY 4]{.kn-pink} Network Analysis
+
+Visualizations of **entity-entity co-mention networks** with probabilistic block memberships (via BHSBMs)
+
+:::: {.columns}
+::: {.column width="50%"}
+![EuroPython](media/channels_EuroPythonConference_entity_entity_[videos]_hbsbm.png){width=80%}
+:::
+
+::: {.column width="50%"}
+![PyData](media/channels_PyData_entity_entity_[videos]_hbsbm.png){width=80%}
+:::
+::::
+
+
+## [DAY 4]{.kn-pink} Network Analysis
+
+Visualizations of **entity-entity co-mention networks** with probabilistic block memberships (via BHSBMs)
+
+:::: {.columns}
+::: {.column width="50%"}
+![Microsoft Research Talks](media/channels_MicrosoftResearch_entity_entity_[videos]_hbsbm.png){width=80%}
+:::
+
+::: {.column width="50%"}
+![Talks at Google](media/channels_talksatgoogle_entity_entity_[videos]_hbsbm.png){width=80%}
+:::
+::::
+
+
+## [DAY 5]{.kn-pink} Agent-based Modelling
+
+:::: {.columns}
+
+::: {.column width="40%"}
+
+<br>
+
+#### Core Learning Objectives
+
+- understand the foundations of agent-based modelling
+- describe the tradeoffs of different model designs
+- create and interpret agent-based models of opinion dynamics
+  - threshold models
+  - bounded confidence models
+:::
+
+::: {.column width="10%"}
+:::
+
+::: {.column width="50%"}
+
+<br>
+
+![@centola2018behavior is an excellent example of theory-driven<br>agent-based computational experiments on social networks.](media/centola.jpg){width=50%}
+:::
+
+::::
+
+::: {.notes}
+On Day 5, we'll introduce the foundations of agent-based modelling. ABMs have been central to computational social science since the earliest days of the field, in part because they enable us to simulate and intervene in systems and processes that are difficult to observe and intervene in in the real world. Damon Centola's work, for example the book *How Behaviour Spreads*, is a great example of how to use ABMs to do theory-oriented computational experiments on how information, beliefs, and behaviours spread on social networks, and which factors accelerate or slow down diffussion.
+
+We'll learn how to setup the kinds of experiements that Centola runs, as well as similar models that fall under the umbrella of "opinion dynamics;" specifiucally threshold and bounded-confidence models.
+:::
+
+
+## [DAY 6]{.kn-pink} Project Work
+
+An opportunity to
+
+- learn more deeply and durably
+- get deeper into any area that interests (or benefits) you most
+- get help from John, Johannes, and your peers
+
+
+# References
+
+##

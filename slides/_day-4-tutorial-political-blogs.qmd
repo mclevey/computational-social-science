@@ -1,0 +1,187 @@
+# `graph-tool` basics<br>[with the political blogs data [@adamic2005political]]{.nord-light .small-text}
+
+##
+
+```python
+import pandas as pd
+import graph_tool.all as gt
+
+import matplotlib
+import matplotlib.pyplot as plt
+
+from icsspy.networks import rotate_positions
+# add rotate ^ to package to keep code clean here
+
+print(f'Using graph-tool version {gt.__version__}')
+```
+
+> Using graph-tool version 2.77 (commit , )
+
+<!-- set up Quarto variables -->
+
+<br>
+
+We can load the political blogs data directly from the `graph-tool` data repository.
+
+```python
+g = gt.collection.data["polblogs"]
+print(g)
+```
+
+> <Graph object, directed, with 1490 vertices and 19090 edges, 4 internal vertex properties, 2 internal graph properties, at 0x105df7740>
+
+##
+
+```python
+print(g.gp.readme)
+```
+
+> Political blogosphere Feb. 2005<br>
+> Data compiled by Lada Adamic and Natalie Glance<br>
+> <br>
+> Node "value" attributes indicate political leaning according to:<br>
+> <br>
+>   0 (left or liberal)<br>
+>   1 (right or conservative)<br>
+> <br>
+> Data on political leaning comes from blog directories as indicated. Some blogs were labeled manually, based on incoming and outgoing links and posts around the time of the 2004 presidential election.  Directory-derived labels are prone to error; manual labels even more so.
+>
+> Links between blogs were automatically extracted from a crawl of the front page of the blog.
+>
+> These data should be cited as Lada A. Adamic and Natalie Glance, "The political blogosphere and the 2004 US Election", in Proceedings of the WWW-2005 Workshop on the Weblogging Ecosystem (2005).
+
+##
+
+:::: {.columns}
+::: {.column width="65%"}
+
+As a first step, let's recreate the political blogs figures we've seen so far (including those based on the nested SBM). We'll assign node positions using the **stable force directed placement** function, `sfdp_layout()`. This will more-or-less recreate the force directed layout from the original.
+
+<br>
+
+```python
+pos = gt.sfdp_layout(g)
+
+gt.graph_draw(
+    g, pos,
+    vertex_fill_color=g.vp.value, vcmap=matplotlib.cm.coolwarm,
+    vcnorm=matplotlib.colors.Normalize(vmin=0, vmax=1),
+    output="../output/polblogs_1.png",
+    output_size=(1200, 1200)
+)
+```
+
+<br>
+
+Let's just focus on the giant component for a cleaner visualization. We'll also rotate the graph's position to match the figures more closely.
+
+:::
+
+::: {.column width="3%"}
+:::
+
+::: {.column width="32%"}
+![We could ignore isolates and rotate the graph's position.](../course-materials/day-4-networks/output/polblogs_1.png){width=100%}
+:::
+::::
+
+
+##
+
+:::: {.columns}
+::: {.column width="65%"}
+```python
+giant = gt.extract_largest_component(g, directed=True)
+
+pos = gt.sfdp_layout(giant)
+# pos = rotate_positions(pos, 160)
+
+gt.graph_draw(
+    giant, pos,
+    vertex_fill_color=g.vp.value, vcmap=matplotlib.cm.coolwarm,
+    vcnorm=matplotlib.colors.Normalize(vmin=0, vmax=1),
+    output="../output/polblogs_2.png",
+    output_size=(1200, 1200)
+)
+```
+
+:::
+
+::: {.column width="3%"}
+:::
+
+::: {.column width="32%"}
+![](../course-materials/day-4-networks/output/polblogs_2.png){width=100%}
+:::
+::::
+
+
+##
+
+Next, we fit an SBM and color the nodes based on their estimated block membership.
+
+```python
+blockstate = gt.minimize_nested_blockmodel_dl(giant)
+blockstate_level_0 = blockstate.levels[0]
+blockstate_level_0
+```
+
+> <BlockState object with 793 blocks (18 nonempty), degree-corrected, for graph <GraphView object, directed, with 793 vertices and 15841 edges, 4 internal vertex properties, 2 internal graph properties, edges filtered by (<EdgePropertyMap object with value type 'bool', for Graph 0x17f9fd6d0, at 0x30299f1a0>, False), vertices filtered by (<VertexPropertyMap object with value type 'bool', for Graph 0x17f9fd6d0, at 0x302903470>, False), at 0x17f9fd6d0>, at 0x3029612e0>
+
+
+
+##
+
+We can use the `.draw()` method for blockstate objects.
+
+```python
+blockstate_level_0.draw(pos=pos, output="../output/polblogs_3.png", output_size=(1200, 1200))
+```
+
+![Getting there!](../course-materials/day-4-networks/output/polblogs_3.png){width=50%}
+
+
+##
+
+Another figure more-or-less recreated! Two more to go. Let's modify the force directed layout to add attractive forces for block membership.
+
+```python
+pos_refined = gt.sfdp_layout(g, groups=blockstate_level_0.b, gamma=.04)
+pos_refined = rotate(pos_refined, 125) # make it horizontal
+
+blockstate_level_0.draw(
+    pos=pos_refined,
+    edge_gradient=[],
+    edge_color="#33333322",
+    output="../output/polblogs_4.png",
+    output_size=(1200, 1200)
+)
+```
+
+##
+
+![](../course-materials/day-4-networks/output/polblogs_4.png){width=60%}
+
+
+
+##
+
+And let's do a chordal layout with hierarchical edge bundling. This is the default, **and it's hierarchical** (so not just level 0), so all we need is:
+
+```python
+blockstate.draw(output="../output/polblogs_5.png", output_size=(1200, 1200))
+```
+
+![](../course-materials/day-4-networks/output/polblogs_5.png){width=40%}
+
+
+
+##
+
+At this point, we've fit our first nested SBM and recreated the visualizations. Before we move on to Enron, let's learn a bit about how to work with `graph-tool`.
+
+- iterate over nodes and edges
+- property map basics
+- etc.
+
+##

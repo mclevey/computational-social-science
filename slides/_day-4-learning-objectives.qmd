@@ -1,0 +1,24 @@
+## Learning Objectives
+
+[This is not an introduction to network analysis in general! We will focus on computational approaches to a few important topics.]{.nord-light}
+
+<br>
+
+#### understand pitfalls and problems with heuristic network analysis
+
+🔴 community detection via modularity-maximization^[I am focusing on modularity-based approaches here because (1) modularity-maximization is currently the most common way of identifying subgroups [@moody2023cohesion] and (2) it's a particularly bad approach that we should stop using.] [(Louvain, Leiden)]{.nord-light}<br>
+🔴 implicit model-based visualization [(force-directed)]{.nord-light}
+
+<br>
+
+#### understand how a generative approach overcomes these and other problems
+
+🟢 generative modelling and Bayesian Data Analysis (BDA)<br>
+🟢 nested Stochastic Blockmodels (SBMs)<br>
+🟢 explicit model-based visualization
+
+<br>
+
+#### develop nested SBMs
+
+🟢 fit, refine, assess, interpret, visualize, and compare models

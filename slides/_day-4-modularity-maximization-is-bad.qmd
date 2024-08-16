@@ -1,0 +1,276 @@
+##
+
+<br><br>
+
+![](media/heuristic.png){width=40% .shadow-img}
+
+### pitfalls and other problems <br>with [heuristic]{.kn-pink} network analysis
+
+<br>
+
+🔴 community detection via modularity-maximization [(Louvain, Leiden)]{.nord-light}<br>
+🔴 implicit model-based [(force-directed)]{.nord-light} visualization
+
+##
+
+:::: {.columns}
+::: {.column width="50%"}
+![](media/divided_they_blog.png){#fig-divided_they_blog width="100%" .shadow-img}
+
+### Divided They Blog
+:::
+
+::: {.column width="50%"}
+$\longleftarrow$<br>This famous figure from @adamic2005political shows a conservative-liberal divide in the American political blogosphere circa 2004.
+
+- Nodes: political blogs
+- Edges: links [("citations")]{.nord-light} to other blogs
+- Color: liberal (blue), conservative (red)
+- Size: indegree
+- Layout: force directed
+
+<br>
+
+[Is the network structure<br>[[self-evident]{.kn-pink}]{.large-text}<br>here?]{.fragment}
+
+:::
+::::
+
+
+##
+
+:::: {.columns}
+::: {.column width="55%"}
+![Wickham's loop.](media/data-science.png){#fig-data-science width=60%}
+
+<br>
+
+### Common First Steps
+
+- simplify network [(detect subgroup structure, compute centrality)]{.nord-light}
+- visualize network [(usually force-directed layouts)]{.nord-light}
+- interpret and ...
+
+When do we exit the loop?
+
+Can we trust intuition?
+:::
+
+::: {.column width="5%"}
+:::
+
+::: {.column width="40%"}
+![Box's loop.](media/box_loop.png){#fig-box_loop width=60%}
+
+<br>
+
+![](media/divided_they_blog.png){width=60% .shadow-img}
+:::
+::::
+
+##
+
+:::: {.columns}
+::: {.column width="50%"}
+![](media/divided_they_blog.png){width=100% .shadow-img}
+
+### How sure are you?
+:::
+
+::: {.column width="50%"}
+<br><br>
+
+#### Common pitfalls and other problems
+
+[@peixoto2021modularity; @peixoto2023descriptive; @peixoto2021hairball]{.nord-footer}
+
+(Implicitly?) believing that network structure will be self-evident and our intuitions will hold up when reasoning about high-dimensional network structure
+
+<br>
+
+- using heuristic approaches [(esp. modularity-maximization)]{.nord-light} to simplify and partition networks into subgroups
+- using network visualizations [(esp. force-directed)]{.nord-light} for insight into network structure without sufficient consideration and criticism of implicit models
+:::
+::::
+
+##
+
+![These loops encourage us to explicate, criticize, and refine **models** in order to be confident in our inferences.](media/box_loop.png){width=80% .shadow-img}
+
+
+##
+
+### Heuristic Community Detection<br>via Modularity Maximization
+
+<br><br>
+
+:::: {.columns}
+::: {.column width="55%"}
+
+The Louvain [[@blondel2008fast]]{.nord-light} algorithm purports to detect communities in networks by maximizing a "modularity" score $Q$ [[@newman2004finding]]{.nord-light}, where higher $Q$ values indicate more modular networks.
+
+![](media/Louvain.png){width=100%}
+:::
+
+::: {.column width="5%"}
+:::
+
+::: {.column width="40%"}
+![Figure reproduced from [@blondel2008fast]{.nord-light}](media/Louvain_alg.png){.shadow-img width=100%}
+:::
+::::
+
+::: {.notes}
+It starts by assuming that every node in a network is in it's own community and calculates a modularity score $Q$ for the network. Nodes are then randomly moved into different groups and $Q$ is re-calculated. If it increased, the community assignment is retained. This process continues until the node assignments have maximized $Q$ at the level of the observed network.
+
+Next, a simplified network is created by aggregating nodes into their assigned communities and the modularity maximization process is repeated. Communities are merged with other communities, and the mergers are retained if $Q$ increases. This process continues iteratively until $Q$ has been maximized.
+:::
+
+
+##
+
+:::: {.columns}
+::: {.column width="55%"}
+
+[😲😰😰😰]{.large-text}
+
+Some **well-known problems**:
+
+- the resolution limit
+- getting stuck in local optima
+- creating disconnected communities
+- can only identify assortative structure
+- finds "communities" in random networks
+- the illusion of greater objectivity<br>[[see @moody2023cohesion]]{.nord-footer}
+- simultaneously over- and under-fit<br>[[see @peixoto2023descriptive]]{.nord-footer}
+- often has a degenerate solution space<br>[[see @peixoto2023descriptive]]{.nord-footer}
+
+<br>
+
+[There have been some improvements to modularity-maximization approaches [[e.g., @traag2019louvain]]{.nord-light}, but these only go so far. There are **fundamental problems** with the modularity-maximization idea.]{.fragment}
+:::
+::: {.column width=45%}
+:::
+::::
+
+::: {.notes}
+...
+
+There are well-known problems with the Louvain algorithm, including **the resolution limit**, which prevents Louvain from detecting meaningful small communities due to inappropriate merging at higher levels. Louvain can also get **stuck in local optima**, causing it to stop looking for better partitions because it "thinks" (incorrectly) that $Q$ has been maximized. And sometimes it **creates disconnected communities**!
+:::
+
+
+##
+
+
+### What is $Q$?
+
+[[@newman2004finding; @blondel2008fast]]{.nord-footer}
+
+<br>
+
+:::: {.columns}
+::: {.column width="45%"}
+$$
+Q(A, b) = \frac{1}{2E} \sum_{ij} \left( A_{ij} - \gamma \frac{k_i k_j}{2E} \right) \delta_{b_i, b_j}
+$$
+:::
+
+::: {.column width=10%}
+:::
+
+::: {.column width=45%}
+$A$ is the binary adjacency matrix for an observed network and $b$ is a vector of node community assignments, so $Q(A,b)$ is the modularity score we would obtain for matrix $A$ given a proposed vector of community assignments $b$.
+
+<br>
+
+The goal is to find $\hat{b}$, the vector $b$ that maximizes $Q$.
+
+$$
+\hat{b} = \mathop{\mathrm{argmax}}_{b} \, Q(A, b)
+$$
+
+<!-- $$
+More recent version include a [resolution parameter]{.kn-pink} $\gamma$ that determines how the algorithm considers within community edges relative to a null model. Larger $\gamma$ values tend to result in a larger number of smaller communities. In the original equation ($\longleftarrow$), this was set to 1 by default, which **gave the impression** that researchers could find the optimal community partition with little subjective judgement. -->
+:::
+
+::::
+
+
+
+
+##
+
+
+### What is $Q$?
+
+[[@newman2004finding; @blondel2008fast]]{.nord-footer}
+
+<br>
+
+:::: {.columns}
+::: {.column width="40%"}
+
+$$
+Q(A, b) = \frac{1}{2E} \sum_{ij} \left( A_{ij} - \gamma \frac{k_i k_j}{2E} \right) \delta_{b_i, b_j}
+$$
+
+$$
+\hat{b} = \mathop{\mathrm{argmax}}_{b} \, Q(A, b)
+$$
+:::
+
+::: {.column width=10%}
+:::
+
+::: {.column width=50%}
+- $E$ is the total weight of edges in the network.
+- $A_{ij}$ is a specific entry in $A$ [($A_{ij} \in \{0, 1\}$ if $A$ is binary)]{.nord-light}.
+- $\gamma$ is a resolution parameter [(more recent addition)]{.nord-light} that governs the size and number of communities detected.
+- $\frac{k_i k_j}{2E}$ is a null model for baseline expectations [(next slide)]{.nord-light}.
+- $\delta(c_i, c_j)$ is an indicator function that equals 1 if $i$ and $j$ are in the same community and 0 if not. This limits the summation to within-community edges.
+- Normalizing with $\frac{1}{2E}$ constrains the maximum modularity score to 1.
+- $\hat{b}$ is the vector of community assignments $b$ with the maximum $Q$ score.
+:::
+::::
+
+
+
+##
+
+
+### What is $Q$?
+
+[[@newman2004finding; @blondel2008fast]]{.nord-footer}
+
+<br>
+
+:::: {.columns}
+::: {.column width="40%"}
+
+$$
+Q(A, b) = \frac{1}{2E} \sum_{ij} \left( A_{ij} - \gamma \frac{k_i k_j}{2E} \right) \delta_{b_i, b_j}
+$$
+
+$$
+\hat{b} = \mathop{\mathrm{argmax}}_{b} \, Q(A, b)
+$$
+:::
+
+::: {.column width=5%}
+:::
+
+::: {.column width=55%}
+$\frac{k_i k_j}{2E}$ represents the edges expected under a **null model with no community structure at all**, in which the probability of an edge is proportional to node degrees ($k_i k_j$) and otherwise random.
+
+<br>
+
+The resolution parameter $\gamma$ varies the number and size of clusters identified by weighting the comparison of observed edges with edges expected under this [entirely implausible and inappropriate]{.nord-light} null model.
+
+$$
+\sum_{ij} \left( A_{ij} - \gamma \frac{k_i k_j}{2E} \right)
+$$
+
+This is not good inference.
+:::
+::::

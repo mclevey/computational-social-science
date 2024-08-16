@@ -1,0 +1,13 @@
+eza
+git
+git-lfs
+graphviz
+micromamba
+pandoc
+pipx
+ripgrep
+zsh
+zsh-autosuggestions
+zsh-syntax-highlighting
+quarto
+docker

@@ -1,0 +1,255 @@
+## Rethinking Subgroup Structure & Visualization
+
+:::: {.columns}
+::: {.column width="30%"}
+<br>
+
+![Tiago Peixoto is the developer of `graph-tool` and has made many important contributions to network science, primarily the nested stochastic blockmodel.](media/tiago.png){.shadow-img width=70%}
+:::
+
+::: {.column width="5%"}
+:::
+
+::: {.column width="65%"}
+<br><br>
+
+> "The remedy to this problem is to **think probabilistically**. We need to ascribe to each possible explanation of the data a probability that it is correct, which takes into account modeling assumptions, the statistical evidence available in the data, as well as any source of prior information we may have. Imbued in the whole procedure must be the principle of parsimony -- or **Occam's razor** -- where a simpler model is preferred if the evidence is not sufficient to justify a more complicated one."
+>
+> Tiago @peixoto2019bayesian, page 291
+:::
+::::
+
+::: {.notes}
+NOTES
+:::
+
+
+##
+
+<br><br>
+
+### taking a generative approach
+
+<br>
+
+🟢 generative modelling and Bayesian Data Analysis (BDA)<br>
+🟢 nested Stochastic Blockmodels (SBMs)<br>
+🟢 explicit model-based visualization
+
+
+
+## Why do we need a generative model of networks for inference?
+
+- need to include this!
+
+
+##
+
+[Thinking probabilistically about networks]{.nord-light}
+
+### Generative Modelling, BDA, & Stochastic Blockmodels
+
+:::: {.columns}
+::: {.column width="45%"}
+<br>
+
+[First]{.kn-blue}, we'll focus on understanding latent variables and the generative logic of Bayesian data analysis (**BDA**).
+
+![Several people have translated SR2's base R code into tidyverse R code, Julia, and **Python** using `PyMC` and `bambi`. See [xcelab.net/rm/](https://xcelab.net/rm/) for links.](media/statistical_rethinking.png){.shadow-img width=90%}
+:::
+
+::: {.column width="10%"}
+:::
+
+::: {.column width="45%"}
+<br>
+
+[Second]{.kn-blue}, we'll learn about stochastic blockmodelling as a principled **application of BDA** to networks.
+
+![McElreath's 2023 lecture series (YouTube) features new content on modelling networks that will be part of SR3. I recommend the entire playlist!](media/statistical_rethinking_2023_yt_networks.png){.shadow-img width=100%}
+:::
+::::
+
+
+
+
+
+
+
+
+
+
+##
+
+[Thinking probabilistically about networks]{.nord-light}
+
+### Bayesian Data Analysis (BDA) in a nutshell
+
+:::: {.columns}
+::: {.column width="45%"}
+<br>
+
+![Box's loop for iterative model-based data analysis.](media/box_loop.png){#fig-box_loop width=85%}
+
+![Hadley Wickham's framework for iterative data science.](media/data-science.png){#fig-data-science width=85%}
+:::
+
+::: {.column width="10%"}
+:::
+
+::: {.column width="45%"}
+<br>
+
+@blei2014build "Build, Compute, Critique, Repeat"
+
+> [(...) Here, we take the perspective -- inspired by the work of George Box -- that **models are developed in an iterative process: we formulate a model, use it to analyze data, assess how the analysis succeeds and fails, revise the model, and repeat**. With this view, we describe how new research in statistics and machine learning has transformed each of these essential activities. (...)]{.small-text}
+
+<br>
+
+@gelman2020bayesian "Bayesian Workflow"
+
+> [(...) Beyond inference, the workflow also includes **iterative model building**, model checking, validation and troubleshooting of computational problems, model understanding, and model comparison. We review all these aspects of workflow in the context of several examples, keeping in mind that in practice we will be **fitting many models** for any given problem, even if only a subset of them will ultimately be relevant for our conclusions.]{.small-text}
+:::
+::::
+
+
+
+##
+
+[Thinking probabilistically about networks]{.nord-light}
+
+### Bayesian Data Analysis (BDA) in a nutshell
+
+<br><br>
+
+Bayes' theorem
+
+$$
+P(A|B)=\frac{P(B|A)P(A)}{P(B)}
+$$
+
+<br>
+
+is not really "Bayesian!" It's ubiquitous in statistics, including in Frequentism. It becomes "Bayesian" when we use it to compare the relative plausibility of different hypotheses [[@mcelreath2018statistical]]{.nord-light}. The **BDA** version of Bayes' theorem is often presented as
+
+$$
+P(H|E)=\frac{P(E|H)P(H)}{P(E)}
+$$
+
+<br>
+
+where $H$ represents our hypotheses and $E$ represents the observed evidence.
+
+##
+
+[Thinking probabilistically about networks]{.nord-light}
+
+### Bayesian Data Analysis (BDA) in a nutshell
+<br>
+
+:::: {.columns}
+::: {.column width="25%"}
+$$
+P(H|E)=\frac{P(E|H)P(H)}{P(E)}
+$$
+:::
+
+::: {.column width="5%"}
+:::
+
+::: {.column width="70%"}
+$P(H|E)$ is the **posterior probability** of a given hypothesis conditional upon the observed evidence. [This is what we want to learn.]{.kn-pink}
+
+<br>
+
+$P(E|H)$ is the **likelihood**, or 'sampling probability.' As in Frequentism, it measures the probability of observing the evidence we observed under the assumption that the hypothesis is true.
+
+<br>
+
+$P(H)$ is the **prior**. It represents our extant knowledge about the hypothesis before observing the data. Bayesian models treat priors as latent variables whose probability distributions are logically determined by the information available to the researcher [[see @cox1946probability; @jaynes2003probability]]{.nord-light}.
+
+<br>
+
+$P(E)$ is the **unconditional probability of the evidence** and is sometimes referred to as the 'Bayes Denominator' or 'Marginal Probability of the Data.' It's often analytically intractable, so we approximate it with stochastic sampling (e.g., MCMC).
+:::
+::::
+
+##
+
+[Thinking probabilistically about networks]{.nord-light}
+
+### Bayesian Data Analysis (BDA) in a nutshell
+<br><br>
+
+Bayesian SBMs (BSBMs) apply the inferential logic of BDA to network analysis. We have:
+
+- **observed data**^[Although, [as Richard McElreath argues](https://www.youtube.com/watch?v=hnYhJzYAQ60) we can't literally observe a network, so it doesn't really make sense to talk about network "data." From this perspective, all network "data" are latent variables in some sense. The main implication is that we need more generative thinking and Bayesian data analysis.] in the form of an adjacency matrix describing connections among nodes, and
+- **unobserved latent variables** for our block or community memberships.
+
+We want to **infer the distributions of the latent variables** (i.e. the assignment of nodes into latent blocks) conditional on the observed data and our model. In other words, we want to learn $P(b|A)$, which is the **posterior probability** of a latent block partition $b$ conditional on the adjacency matrix $A$ of the network we observed.
+
+<br>
+
+$$
+P(b|A) = \frac{P(A|b)P(b)}{P(A)}
+$$
+
+##
+
+<br><br><br><br>
+
+This BSBM is still rather limited.
+
+For example, like most approaches it requires us to pre-specify the number of blocks.
+
+<br>
+
+### The [nested]{.kn-pink} SBM overcomes this problem.
+
+##
+
+[Thinking probabilistically about networks]{.nord-light}
+
+### The Nested Stochastic Blockmodel
+:::: {.columns}
+::: {.column width="45%"}
+![Reproduced from @peixoto2014hierarchical.](media/nested_sbm.png){#fig-nested_sbm width=80%}
+:::
+
+::: {.column width="55%"}
+<br>
+
+The [nested]{.kn-pink} SBM extends the SBM by modelling block structure **hierarchically**. It puts the SBM at the bottom of this nested structure, where it partitions nodes in the observed network based on their probability of connecting to other nodes. Those blocks are then grouped into other blocks as you move up the hierarchy. The number of blocks and their connections are also latent variables. It:
+
+- is not limited to assortative structure
+- can be applied to nearly any type of network
+- does not require pre-specifying the number of blocks
+- does not detect spurious communities
+- can be easily evaluated, refined, and compared
+- scales to large networks well
+:::
+::::
+
+
+##
+
+[Thinking probabilistically about networks]{.nord-light}
+
+### The Nested Stochastic Blockmodel
+
+:::: {.columns}
+::: {.column width=55%}
+![](media/mind_blown.gif){.shadow-img width=100%}
+:::
+
+::: {.column width=10%}
+:::
+
+::: {.column width=35%}
+![](media/nested_sbm.png){width=90%}
+:::
+::::
+
+There's a lot to wrap your head around here!
+
+😌 Let's take a break before jumping into some code.

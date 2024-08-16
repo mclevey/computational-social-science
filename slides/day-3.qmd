@@ -1,0 +1,71 @@
+---
+title: "Computational Text Analysis"
+subtitle: "[DAY THREE]{.kn-pink} [GESIS Fall Seminar in Computational Social Science]{.kn-blue}"
+author:
+  - name: John McLevey
+    affiliations:
+      - name: University of Waterloo
+  - name: Johannes B. Gruber
+    affiliations:
+      - name: VU Amsterdam
+output-dir: "../docs/"
+format:
+  revealjs:
+    theme: [default, custom.scss]
+    width: 1600
+    height: 900
+    embed-resources: true
+    execute:
+      echo: true
+      warning: false
+      cache: true
+      freeze: true
+    slide-number: false
+    chalkboard: false
+    preview-links: auto
+    smaller: true
+    fig-align: left
+    fig-format: svg
+    lightbox: true
+    scrollable: true
+    code-overflow: scroll
+    code-fold: false
+    code-line-numbers: true
+    code-copy: hover
+    reference-location: document
+    tbl-cap-location: margin
+    logo: media/logo_gesis.png
+    footer: "[CC BY-SA 4.0]{.nord-footer}"
+    email-obfuscation: javascript
+highlight-style: "nord"
+bibliography: references.bib
+---
+
+<!-- LECTURE VIDEO 1 -->
+
+# 3.1
+
+Foundations of<br>
+natural language processing<br>
+and computational text analysis<br>
+
+<!-- LECTURE VIDEO 2 -->
+
+# 3.2
+
+Labelling sentiment<br>
+and emotion concepts in text data
+
+<!-- LECTURE VIDEO 3 -->
+
+# 3.3
+
+Three generations of topic modelling<br>
+LSA, LDA, and BERTopic
+
+<!-- LECTURE VIDEO 4 -->
+
+# 3.4
+
+Identifying<br>
+named entities in text data
