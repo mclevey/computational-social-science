@@ -7,6 +7,8 @@ root: Path = pyprojroot.find_root(pyprojroot.has_dir(".git"))
 
 data: Path = root / "icsspy/data"
 enron: Path = root / "icsspy/data/enron"
+copenhagen_networks_study: Path = root / "icsspy/data/copenhagen_networks_study"
+
 slides_qmd: Path = root / "slides"
 slides_html: Path = root / "docs"
 course_materials: Path = root / "notebooks"

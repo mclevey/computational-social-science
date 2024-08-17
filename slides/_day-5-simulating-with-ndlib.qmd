@@ -1,0 +1,740 @@
+## Agent-based Modelling in Python
+
+`NDLib`
+
+<br>
+
+:::: {.columns}
+::: {.column width="40%"}
+![Don't forget about your conda environment!](media/chatgpt_dependency_hell.png){width=100%}
+:::
+
+::: {.column width="5%"}
+:::
+
+::: {.column width="55%"}
+With the `gt` conda environment still activated, import the packages.
+
+```{python}
+import random
+import networkx as nx
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+import ndlib.models.ModelConfig as mc
+import ndlib.models.epidemics as ep
+from ndlib.utils import multi_runs
+
+import icsspy
+import icsspy.simulations as sims
+
+icsspy.set_style()
+random.seed(36)
+```
+:::
+::::
+
+
+##
+
+```{python}
+population_size = 300
+G = nx.watts_strogatz_graph(population_size, 4, 0.15)
+G.name = "A Simulated Small World"
+
+layout = nx.nx_pydot.graphviz_layout(G)
+
+fig, ax = plt.subplots(figsize=(12, 12))
+nx.draw(G, pos=layout, node_color='gray', edge_color='gray', node_size=100, width=.5)
+plt.show()
+```
+
+::: {.notes}
+To get started with modelling diffusion processes, we’ll simulate a simple network with 300 nodes. The particular type of network we are simulating here is a ‘small-world’ network (i.e. low average shortest paths and high clustering coefficients). Each node in this simulated network, shown in Figure 16.2, will be connected to four other nodes. Obviously, this network differs substantially from just about any existing social network that we might observe empirically, but it’s a useful starting point. Once we’ve developed some intuition of how these types of models work, we’ll switch over to using empirical data on interaction networks.
+:::
+
+## The SIR Model
+
+SIR is a **compartmental model** of disease spread that partitions a population into three compartments: 
+
+- **susceptible** people, who may become infected in the future, 
+- **infected** people are people who may spread the disease, and 
+- **recovered/removed** people, who, depending on the model have either died or recovered and developed immunity.
+
+$$
+\begin{align}
+\frac{dS}{dt} &= - \left( \frac{a}{N}\right)  I S \\
+\frac{dI}{dt} &= \left( \frac{a}{N}\right)  I S - b I \\
+\frac{dR}{dt} &= bI
+\end{align}
+$$
+
+Subject to $R_0 = \frac{a}{b}$
+
+Where: 
+
+* $\frac{dS}{dt}$, $\frac{dI}{dt}$, and $\frac{dR}{dt}$ represents the *rate of change* in the relevant population compartment 
+* $N$ is the total population
+* $R_0$ represents the ability of a single infected individual to infect others, the **basic reproduction rate**
+* $a$ and $b$ are parameters that can be related to the typical time between contacts and the typical time until an Infected becomes Recovered. 
+
+::: {.notes}
+Traditional SIR models describe transitions between these compartments using a set of differential equations. Note that the equation for each population takes into account other population compartments. As one changes, the others will change. 
+
+The Susceptible population will become infected at a rate proportional to **the number of Infected and Susceptible** (the more there are of one or the other, the faster a disease will spread), but slowed down by the total population size, a kind of proxy for population density. 
+
+The Infected population will increase at the same rate that the Susceptible population decreases, as people move from one compartment to the other, but it will also decrease at a rate relative to its size and how quickly people recover from the disease. 
+
+Similarly, the Recovered compartment will increase at the same rate that the Infected compartment is losing population. We'll see this in happen in the simulations that follow.
+
+While powerful in its simplicity, the differential equation SIR model pays for that simplicity by **assuming that there is homogenous mixing between populations**. Human agency and behaviour is abstracted away until people act like atoms bouncing into each other. This is where network SIR models have made their contribution. 
+:::
+
+##
+
+As we are interested in epidemic spread of contagions through networks, we won't be using differential equations. We will be using NDLib to produce our **simulations**. 
+
+There is a few differences in how NDLib handles SIR models compared to the above differential equations, that arise out of the fact that NDLib works on networks rather than equations. The above equations are continuous, while NDLib uses strict integer counts of nodes for each status/compartment and time steps. The differential equation SIR model is deterministic, but NDLib uses probabilistic infection and recovery. 
+
+NDLib uses **status** instead of compartment, and **removed** instead of recovered. These last two differences are purely semantic and you can use whichever is most appropriate for your particular model. 
+
+##
+
+The parameters governing how the simulation will unfold are stored in a special model configuration object. As just described, the SIR model takes two parameters. For the sake of clarity, I have used $a$ and $b$ in the differential equation model and the more traditional $\beta$ and $\gamma$ for the probabilistic NDLib parameters:
+
+- `beta` ($\beta$) is the probability of infection, and
+- `gamma` ($\gamma$) is the probability of recovery.
+
+- probability of infection at 5% 
+- the probability of recovery at 1%, and 
+- by randomly infecting 10% of the network. 
+
+```{python}
+def sir_model(network, beta, gamma, fraction_infected):
+  config = mc.Configuration()
+  config.add_model_parameter('beta', beta)
+  config.add_model_parameter('gamma', gamma)
+  config.add_model_parameter("fraction_infected", fraction_infected)
+
+  model = ep.SIRModel(network)
+  model.set_initial_status(config)
+  return model
+
+sir_model_1 = sir_model(G, beta=0.05, gamma=0.01, fraction_infected=0.1)
+```
+
+::: {.notes}
+In addition to these two parameters, we have to specify the percentage of nodes that are activated / infected at the start the start of our simulation -- the dawn of time for our simulated society. We'll start by setting the probability of infection at 5% and the probability of recovery at 1%, and by randomly infecting 10% of the network. 
+
+Since we'll be executing multiple simulations, we'll define a custom function that let's us simplify the process of configuring new SIR models.
+:::
+
+
+##
+
+And run our first SIR model!
+
+```{python}
+sir_1_iterations = sir_model_1.iteration_bunch(200, node_status=True)
+```
+
+`iteration_bunch()` returns a list containing data on each of the 200 iterations in our simulation. The data pertaining to each individual iteration is provided in the form of a dictionary with the following key-value pairings:
+    
+- **iteration**, which tells us which iteration of the simulation the data pertain to.
+- **status** is another dictionary. Each key in this dictionary is a node ID and the corresponding value indicates their status at that particular iteration. The length of this dictionary is therefore equal to the number of nodes in the population. 
+- **node_count** is another dictionary where the keys represent node states and the values indicate the cumulative sum of nodes with that state, up to and including the present iteration.
+- **status_delta** is yet another dictionary, this time providing information about how the number of nodes in each of the status categories has changed since the previous iteration. For example, a delta of 2 for the 'Infected' status would indicate that 2 additional people were infected in this iteration. A value of -3 for the 'Susceptible' status would indicate that three nodes switched from susceptible in the previous iteration to a different state in the present iteration. 
+
+```python
+[iteration['node_count'] for iteration in sir_1_iterations][:10]
+```
+
+    [{0: 270, 1: 30, 2: 0},
+     {0: 270, 1: 30, 2: 0},
+     {0: 265, 1: 35, 2: 0},
+     {0: 255, 1: 44, 2: 1},
+     {0: 248, 1: 50, 2: 2},
+     {0: 242, 1: 55, 2: 3},
+     {0: 240, 1: 56, 2: 4},
+     {0: 233, 1: 62, 2: 5},
+     {0: 230, 1: 65, 2: 5},
+     {0: 219, 1: 76, 2: 5}]
+
+::: {.notes}
+NDLib offers two different methods for executing the simulations. The `.iteration()` method executes a single iteration (1 step through time) and `.iteration_bunch()` executes $n$ iterations. 
+
+Here, we'll execute 200 iterations, which means we will step through 200 moments in time, executing the probabilistic model's rules, and assessing node states at each step. 
+
+We'll set the argument `node_status` to `True` so that the method returns information about the status of each node in each iteration, rather than just summary statistics for the overall population.
+
+- DISCUSS BULLETS
+
+In other words, most of the data returned by `.iteration_bunch()` is in the form of dictionaries nested inside other dictionaries, organized as a list. The innermost dictionaries are what tell us what has happened in any particular point in time during the simulation process. For example, to get data that can be used to plot the trend line for each status, we could iterate over the list and extract the `'node_count'` data for each iteration. Below we preview the first 10. 
+:::
+
+##
+
+```{python}
+sir_1_trends, sir_1_deltas = sims.simulation_df(sir_1_iterations, G)
+sir_1_trends.head(10)
+```
+
+##
+
+```{python}
+fig, ax = plt.subplots()
+sns.lineplot(data=sir_1_trends)
+ax.set(xlabel='Iteration / step in time', ylabel='Proportion of nodes')
+sns.despine()
+plt.legend()
+plt.show()
+```
+
+::: {.notes}
+From here, we can plot (1) trends in the number of susceptible, infected, and removed nodes; and (2) the compartment deltas. 
+
+This plot offers a high-level summary of what has happened to our simulated society over time. In this particular case, we can see the proportion of infected nodes increases dramatically, infecting more than 70% of the population in fewer than 50 iterations (when you factor in those who had already recovered by iteration 50, about 90% of the population had been infected, but some had already recovered). At the same time, the number of susceptible nodes decreases (which we should expect, given the zero-sum and unidirectional nature of the SIR model). Over time, there is a fairly steady increase in the number of nodes who are removed from the simulation due to immunity or death.
+:::
+
+##
+
+```{python}
+fig, (ax1, ax2, ax3) = plt.subplots(3,1, figsize=(8,8), sharex=True)
+sns.lineplot(ax = ax1, data=sir_1_deltas['Susceptible'], color='gray')
+sns.lineplot(ax = ax2, data=sir_1_deltas['Infected'], color='gray')
+sns.lineplot(ax = ax3, data=sir_1_deltas['Removed'], color='gray')
+## EMPHASIZE DEVIATIONS FROM 0
+ax1.axhline(0, color='crimson')
+ax2.axhline(0, color='crimson')
+ax3.axhline(0, color='crimson')
+ax3.set(xlabel='Iteration')
+plt.show()
+```
+
+::: {.notes}
+This plot offers a high-level summary of what has happened to our simulated society over time. In this particular case, we can see the proportion of infected nodes increases dramatically, infecting more than 70% of the population in fewer than 50 iterations (when you factor in those who had already recovered by iteration 50, about 90% of the population had been infected, but some had already recovered). At the same time, the number of susceptible nodes decreases (which we should expect, given the zero-sum and unidirectional nature of the SIR model). Over time, there is a fairly steady increase in the number of nodes who are removed from the simulation due to immunity or death.
+
+Let's also take a quick look at the deltas for each state
+:::
+
+
+##
+
+![The same simulated small-world network as before, displayed 20 times –
+once for each of the first 20 time steps in the simulation of epidemic spread through the network](media/small_world_epidemic.png){width=100% #fig-small_world_epidemic}
+
+::: {.notes}
+This plots shows how the number of nodes in each of the three possible node states changes from one iteration to the next, and is not cumulative. It should make some intuitive sense: in the SIR model, a susceptible node can either stay susceptible or become infected, an infected node can either stay infected or become removed, and a removed node cannot change state. Therefore, the susceptible population should always decrease, the infected population can increase or decrease, and the recovered population always increases.
+:::
+
+
+## Let's do that 500 more times
+
+That was just one simulation. We need to simulate a *whole lot more* and look at aggregate patterns across all of those simulations. Let's do that now. 
+
+- col 1
+
+```{python}
+trends = multi_runs(
+  sir_model_1,
+  execution_number=500,
+  iteration_number=200,
+  infection_sets=None,
+  nprocesses=4
+)
+```
+
+```{python}
+sims.visualize_trends(trends, network=G, proportion=True, return_data=False)
+```
+
+- col 2 plot (like networks stuff)
+
+- caption: "A plot featuring many simulated lines tracing the proportion of nodes susceptible, infected, and ‘removed’ as a function of time; the thicker, more pronounced lines represent the mean values across each iteration of the simulation. The infection spikes rapidly and then tapers off."
+
+::: {.notes}
+NDLib's `multi_runs()` function enables us to easily execute many simulations from the same model, and because each simulation is independent of the others, they can be executed efficiently in parallel. This time, let's use `multi_runs()` to execute 500 simulations, each with 200 iterations. 
+
+The result is the figure on the right. It conveys the same type of information as the first trend plot we produced, only this time it does so for 500 simulations with 200 iterations rather than 1 simulation with 200 iterations. Each thin gray line represents the trend for one of the three possible states across the iterations of a single simulation, and the three more prominent lines represent the median trend across all 500. As you can see, there are a few simulations that deviate from the pack, but for the most part the patterns are very clear, and things don't fluctuate wildly across runs. 
+
+Now that we've seen the logic of how to develop diffusion models in NDLib, and we've seen how to parse the results of the simulations and visualize their results, we're ready to start using actual empirical network data. 
+:::
+
+
+
+## Let's add CNS
+
+- Copenhagen Networks Study [@sapiezynski2019interaction; @stopczynski2014measuring]
+
+- multilayer temporal network made up of more than 700 university students in Copenhagen
+- smartphones, 3rd party APIs, and online questionnaires
+- The layers consist of a physical proximity network using Bluetooth signal strength, phone calls, text-messages, and Facebook friendships
+
+```{python}
+bluetooth_contact = icsspy.load_data('cns_bluetooth_filtered') 
+bluetooth_contact.head()
+```
+
+- update 
+
+       # timestamp  user_a  user_b  rssi
+    0      1217400      55      52   -57
+    1      1217400      58      37   -58
+    2      1217400     111      58   -48
+    3      1217400     578     176   -36
+    4      1217700      55      52   -55
+
+```{python}
+g_bluetooth_contact = nx.from_pandas_edgelist(
+    bluetooth_contact, 
+    'user_a', 
+    'user_b', 
+    create_using=nx.Graph()
+)
+```
+
+::: {.notes}
+For the rest of this chapter, we will make use of network data collected as part of the Copenhagen Networks Study [see @sapiezynski2019interaction; @stopczynski2014measuring]. This dataset is a multilayer temporal network made up of more than 700 university students in Copenhagen. It was collected using smartphones, 3rd party APIs, and online questionnaires. The layers consist of a physical proximity network using Bluetooth signal strength, phone calls, text-messages, and Facebook friendships. Each of these network types has additional information regarding the relations, including time stamps, phone call duration, and so on. I recommend reading @sapiezynski2019interaction to learn more about this dataset in general.
+
+The data we'll use here is a subset of the bluetooth physical co-location network data that I've filtered to include interactions that occurred over a roughly 24 hour period. 
+:::
+
+
+##
+
+```{python}
+infect_sets = [
+    sims.rand_infection_set(g_bluetooth_contact, 0.3)
+    for x in range(500)
+]
+
+sir_model_2 = sir_model(
+    g_bluetooth_contact, 
+    beta=0.05, 
+    gamma=0.01, 
+    fraction_infected=0.1
+)
+
+sir_model_2_trends = multi_runs(
+    sir_model_2, 
+    execution_number=500, 
+    iteration_number=300, 
+    infection_sets=infect_sets, 
+    nprocesses=4
+)
+```
+
+::: {.notes}
+Now we're ready to develop our second SIR model. 
+
+We'll keep the same `beta` ($\beta$) and `gamma` ($\gamma$) parameters, and the same proportion of initially infected nodes. Unlike last time, we'll let our simulations run for 300 iterations, and we'll execute a batch of 500. In order to compare our results against future models, we're going to set the initially infected nodes so we can isolate the effects of changing parameters. 
+:::
+
+##
+
+```{python}
+sims.visualize_trends(
+    sir_model_2_trends,
+    network=g_bluetooth_contact,
+    proportion=True, 
+    return_data=False
+)
+```
+
+::: {.notes}
+We see the same general pattern we saw before, with an early spike of infections that spreads rapidly through the population, accompanied by a decline in the proportion of susceptible nodes. And as before, we see a fairly steady increase over time in the number of nodes that are removed by immunity or death. 
+
+By the 100th iteration, nearly every susceptible individual has been infected, and all that remains is the recovery process. Note, however, that if we had more isolated components in the network, rather than one large one, some simulations might have hade very different results. Since contagions cannot spread without an interaction, each component would need to have at least one infected node at T0 for infection to be a possibility. In general, the higher the number of components in a network, the more important the number and distribution of initial infections will be. 
+
+Another thing to note from these visualizations is that the trends across all simulations are usually more tightly clustered together right at the dawn of simulated time than they are as the simulation progress. Since each simulation starts with the same conditions, they have little room to diverge from each other. As the infection spreads with some random chance at each time point, different parts of the network may open up at different rates, and different initially infected nodes may be more conducive to faster or slower transmissions through the network.
+:::
+
+##
+
+```{python}
+sir_model_3 = sir_model(
+    g_bluetooth_contact,
+    beta=0.01,
+    gamma=0.01,
+    fraction_infected=0.1
+)
+
+sir_model_3_trends = multi_runs(
+    sir_model_3,
+    execution_number=500,
+    iteration_number=300,
+    infection_sets=infect_sets,
+    nprocesses=4
+)
+
+sims.visualize_trends(
+    sir_model_3_trends,
+    network=G,
+    proportion=True,
+    return_data=False
+)
+```
+
+::: {.notes}
+Now let's model a simple contagion with $\beta = 0.01$, dramatically dropping the probability of transmitting an infection. 
+
+Notice that lowering the probability that an infected person transmits the contagion to a neighbour has produced several noticable differences. First, the initial spike of infections is much less sharp, and its effects are more spread out over time. Public health interventions during a pandemic will often focus on reducing the disease's $\beta$ because it helps "flatten the curve." A region's healthcare facilities usually operate close to their maximum capacity during non-pandemic times for the sake of efficiency, but that means that sudden spikes can overwhelm the available resources. Reducing the rate of infection, by mandating wearing masks for example, can help buffer the system against rapid shocks. 
+
+You may also notice that Susceptible populations in the simulations tend to settle at a higher point than in the previous model, roughly in 5-10% range. This is because individuals are spreading the contagion less before recovering, resulting in the recovered/removed individuals forming a barrier around small portions of the network and preventing further spread into those areas. 
+:::
+
+
+# Threshold Models of Complex Contagions
+
+::: {.notes}
+In the last video we looked at the epidemic spread of simple contagions though networks, focusing on simple epidemiological models of disease spread. 
+
+Many people use analogies to infectious diseases to describe how other types of things spread through networks, such as beliefs and behaviours. To do so is a mistake with potentially negative impacts. 
+
+To understand why, I'll introduce the idea of complex contagions and compare them to simple contagions. We'll also break down some of the most important differences in the mechanisms and network structures that govern their spread. Then I'll introduce threshold models for complex contagions, and show you how to configure, execute, and interpret them using NDLib. 
+:::
+
+- illustrative figure from book here (![](../figures/contagion_complex.pdf))
+
+## FROM SIMPLE TO COMPLEX CONTAGIONS
+
+1. **Strategic complementarity** comes into play when a contagion becomes more useful as the number of other adopters increases. Using an open source end-to-end encrypted messaging app like Signal is a *great* idea, but it's not very useful if you're the only one using it. It becomes much more valuable if the people you want to communicate with are also using it. 
+2. **Credibility** comes into play when a contagion is unknown, untested, or considered risky, and therefore nodes are unlikely to activate until they have seen several neighbours do so without negative consequences, or prove the value of activating (again, "social proof").
+3. **Legitimacy** comes into play when the perception of **social** risk or value of a behaviour depends on the number of activated neighbours. If a dramatic new fashion trend puts you at the edge of your comfort zone, seeing multiple neighbours wearing that style may make you more comfortable adopting it. 
+4. **Emotional contagion** comes into play when the excitement of adopting the contagion in influenced by, or influences, the excitement of neighbours. 
+
+::: {.notes}
+Whereas simple contagions can spread easily with exposure from even a single contact with a single alter, **complex contagions** require multiple exposures from multiple *sources* to spread. The ultimate difference comes down to whether one *chooses* to become activated, or to "**adopt**" the contagion. For example, you don't "choose" to catch a cold from your cousin's kid; exposure is sufficient. But you can choose whether to sign up for the latest social media platform, to wear the same style of clothes in 2021 that my parents wore in 1991 (which, inexplicably, is a thing), or to join a violent far-right mob and storm the US capitol building. In all of these case *and many others*, there is some sort of cost or risk involved in activation, which may range from small ("My Millennial friends will tease me for dressing like their parents did in 1991") to large ("Things might end poorly for me if I join a violent far-right mob and storm the US capitol building"). 
+
+@centola2018behavior pointed out that  **social confirmation**, or **social proof**, is much more important when there is a lot at stake, or when there is a lot of risk and uncertainty involved. More specifically, he proposes four social mechanisms that shape the spread of complex contagions in ways that differ profoundly from simple contagions. 
+
+1. **Strategic complementarity** comes into play when a contagion becomes more useful as the number of other adopters increases. Using an open source end-to-end encrypted messaging app like Signal is a *great* idea, but it's not very useful if you're the only one using it. It becomes much more valuable if the people you want to communicate with are also using it. 
+2. **Credibility** comes into play when a contagion is unknown, untested, or considered risky, and therefore nodes are unlikely to activate until they have seen several neighbours do so without negative consequences, or prove the value of activating (again, "social proof").
+3. **Legitimacy** comes into play when the perception of **social** risk or value of a behaviour depends on the number of activated neighbours. If a dramatic new fashion trend puts you at the edge of your comfort zone, seeing multiple neighbours wearing that style may make you more comfortable adopting it. 
+4. **Emotional contagion** comes into play when the excitement of adopting the contagion in influenced by, or influences, the excitement of neighbours. 
+
+Credibility and legitimacy may seem closely related, or even the same, as they both relate to perceptions of risk. The distinction arises out of where the risk is perceived. Credibility relates to the risk of the contagion: "this technique is new and potentially dangerous to my patients." Legitimacy relates to the *social* risks of being activated. The risk (or the perception of risk) comes from one's neighbors. Ensuring a contagion is credible may require only a few positive examples. Ensuring a contagion is legitimate may require a certain portion of one's neighbours be activated. This will come up in our discussion of **thresholds** later. A complex contagion may be driven by any combination of the above mechanisms.
+
+<!-- KEEP OR DELETE THIS EXAMPLE? -->
+
+Consider, then, what complex contagions need to spread. The basic idea is illustrated in this illustrative image. In this scenario, let's say Eric is considering signing up for a new fitness app that he heard about on a podcast. The app is free to use as long as you complete the workouts you say you're going to complete, but if you skip a workout without a good reason the app charges your card and donates £10 to a cause you find morally and politically objectionable. Ouch. What a gut punch that would be. 
+
+Eric's friend Chitra is already using the app. She loves the idea and enthusiastically promotes it to everyone she knows, including Eric. (The size of the arrow reflects her energetic promotion of the app.) But most of Eric's good friends don't use the app and Chitra's enthusiasm alone is just not enough to tip Eric into adopting. Then Eric learns that Yevgen has also been using the app and, having recently lost £10 to the campaign of a politician with a penchant for recklessly spreading bullshit, has never been so fired up about glute bridges and deadlifts. Now he never skips leg day. Still, Eric doesn't budge. The idea of losing £10 to a politician with a penchant for spreading bullshit is just too high a risk. But then Jamuna adopts the app. Maybe it's not so bad? 
+
+Eric adopts. 
+
+In these cases, we've focused on differences in what simple and complex contagions need to spread through a network. The main difference boils down to whether exposure from a single source is sufficient to activate a node ("Karen told me she's storming the US capitol building on Wednesday. I am most definitely not doing that.") or whether more social confirmation is required to make a decision to activate ("*Everyone I know is storming the capitol building on Wednesday*... I guess that's a thing that happens now? And Karen graciously offered to give me a ride to the riot, so maybe I should go?"). 
+
+I realize that in the example above, I'm making light of an extremely serious situation. While possibly in poor taste, I'm using an extreme case to drive home an important point: there are some things that most of us are highly unlikely to do just because we know someone who is doing it, and this is most certainly the case for decisions that involve a non-trivial amount of risk and uncertainty. But it also raises another interesting dimension of the problem: our own individual **thresholds** for social confirmation might vary. Some people might be willing to storm the capitol building when their favoured candidate loses an election because 1/2 of their closest friends are storming the capital. For others it might take 3/4 or 7/8 of their friends. Or perhaps all they need is to know a total of 10 people. Or perhaps they would *never* storm the capitol building no matter who else was. 
+
+How can we take these variations into account? And how does the nature of the contagion, variability in individual thresholds, the social and interaction rules governing the formation of ties in a network, and the emergent structure of the network interact? How do we deal with the probabilistic nature of all of this? *How do we manage all this complexity?*
+
+We'll be in a position to dig into these questions with some models very soon. But first, let's take a closer look at some of the ways in which network structure matters in a more *global* sense, and how it relates to the notion of variability in individual-level thresholds. 
+:::
+
+
+## BEYOND LOCAL NEIGHBORHOODS: NETWORK EFFECTS AND THRESHOLDS
+
+We know that micro-level social mechanisms shape specific exposure events in somewhat predictable ways and govern the transmission of a contagion from one individual to another. We discussed several examples in the previous chapter. These micro-level processes give rise to specific macro-level structures that act in a top-down fashion to constrain our actions and determine the shape and scale of spread through a population. Importantly, these processes differ for simple and complex contagions. If we incorrectly assume that every contagion spreads like a simple contagion, then our efforts to promote specific beliefs (e.g., this vaccine is safe, the election was not rigged) and behaviours (e.g., wearing a mask reduces the likelihood of spreading COVID-19, using condoms helps reduce the spread of STIs) are in vain. @centola2018behavior, for example, has shown through ingenious experimental design and carefully designed simulations that the same network structures that accelerate the spread of a disease ("simple" contagion) can inhibit the spread of behaviours ("complex" contagion) needed to combat those same diseases. These differences are therefore vital to understand if we want to successfully conduct interventions, broadly conceived, and are highly relevant to efforts to promote social and political change [@centola2021change].
+
+In this section, we'll discuss some meso- and macro-level network properties that have a strong influence on diffusion. Our starting point is that some network structures are more conducive to spreading processes than others. The most obvious and straightforward example of this is that it's hard for a contagion to spread through a network composed of many isolated components (which is why lockdowns during COVID-19 have been an effective public health intervention despite causing other problems, such as worsening mental health). Following this discussion, we'll see how it all plays out when we conduct hundreds or thousands of simulations conditioned on empirical network data. 
+
+##
+
+#### Complex Contagions, Narrow Bridges, Wide Bridges and Thresholds
+
+Understanding complex contagions tends to be, appropriately, more complex than understanding simple contagions. The requirement that a node be exposed to a contagion through multiple sources immediately suggests a diminished role for weak ties and high-betweenness peers. The same things that make those "weak ties" ideally-suited for spreading simple contagions makes them poor conduits of complex contagions. They are, almost by definition, **narrow bridges** between clusters of densely connected nodes. The more they fit that idealized profile of a weak tie, the less likely they are to contribute to the kind of collective pressure that propels the spread of complex contagions. 
+
+Centola's work has shown us that complex contagions require **wide bridges** that involve multiple different sources repeatedly exposing us to the contagion. The question is *how wide do those bridges need to be?* Or, to put it another way, how many different sources of exposure would it take to flip our state from exposed to activated? 
+
+This question of "how many people does it take" is a question of individual **thresholds**, and once again some of the key insights into how to model the role of individual thresholds in diffusion processes are inspired by the work of Mark @granovetter1978threshold. There are two main things to consider. 
+
+1. Should we use a threshold that is uniform for all nodes in the network, or one that varies for each node? 
+2. Regardless of whether they are uniform or variable, should thresholds be count-based (e.g., activate if at least 3 alters are activated) or fractional (e.g., activate if 1/3 of alters are activated).
+
+The first consideration is largely about whether you want a model that is as simple as possible or one that is more realistic. The second is a bit more difficult because it has significant consequences for how easily different types of nodes in a network can be activated. If the network has a uniform degree distribution (every node has the same degree), a fractional threshold would be effectively identical to a count threshold. If every node has a degree of 3 and a threshold of 2/3, it's the same as saying they have a count threshold of 2. If, however, there is an uneven degree distribution (as there almost always is) the fractional threshold of 2/3 for a node with degree 3 would be very different from a node with degree 300: 2 versus 200!
+
+How should we decide whether a threshold should be a count or fractional? Theory and domain knowledge! *Think about the mechanisms of complexity mentioned earlier, and ask yourself which are likely at play*. Where diffusion is a matter of **credibility**, for example, we might expect a count threshold. If a scientist is deciding whether to incorporate a new technique into her work, she might only need a few concrete examples of it working to consider adopting it. The efficacy of the technique does not especially rely on how much of her network has adopted the technique. Where diffusion is a matter of **legitimacy**, on the other hand, we might expect a fractional threshold. If your friend tells you that the 70s are back in fashion, you might wait until some proportion of your personal network has adopted the look before you yourself seriously consider adopting it. If at least half of your friends are bringing back the 70s, you might be a lot more comfortable joining in, or even feel pressured into joining in. That kind of peer pressure/acceptance is very different depending on the size of your personal network, of course.
+
+There could, of course, also be counterveiling forces at play here. You may recall that in a previous chapter I mentioned the notion of **negative ties** (dislike, distrust, disesteem, etc.) that can be observed on their own, or alongside positive ties in a **signed graph**. It is, of course, possible that adoption decisions are also driven by observing what our *negative* ties do. For example, earlier when we were discussing credibility, I offered the example of a scientist who is considering adopting some sort of new technique. Seeing her peers adopt the technique only signals credibility *if she trusts the judgement of her peers*. Normally networks researchers collect data on positive ties, which might include asking questions about who you admire or respect. If we were to collect data on negative ties, we might very well find that increases in adoption among those we are negatively tied to decreases the likelihood of our own adoption. However, we should expect that there is individual variability here too, and hopefully few people are embedded in such a mess of negative ties that the weight of those negative ties overwhelms that of the positive. But they might. Despite being rarer than positive ties, we know that negative are disproportionately influential. 
+
+There are many benefits to *really* thinking this through carefully for any given research problem, but as with anything pertaining to complex systems, our intuitions will inevitably fail us at some point and we will be quickly humbled by what we learn from even simple models. Let's turn to them now. 
+
+
+## Our First Threshold Model!
+
+```{python}
+infect_sets = [
+    sims.rand_infection_set(g_bluetooth_contact, 0.1) 
+    for x in range(500)
+]
+
+infect_sets_2 = sims.add_to_infection_set(
+    infect_sets, 0.05, g_bluetooth_contact
+)
+```
+
+- make the code on the following a function ffs 
+
+::: {.notes}
+Now let's create some *threshold models* for complex contagions. I'll start with a simple example, using a fractional threshold of 0.1, and infecting 0.1, or 10%, of the population at T0. I will then contrast this against a model with a fractional threshold of 0.35 and the same initially infected nodes. Then I will compare this second model with a third that has a fractional threshold of 0.35 and an initial infection of 0.15, or 15%, of the population. 
+
+Note that we have changed only one variable between model 1 and model 2, increasing the fractional threshold from 0.1 to 0.35 while keeping the same initially infected nodes. With model 3, we are increasing the number of initially infected nodes. To keep the comparison as close as possible between the model 2 and model 3, we will define new sets of intially infected nodes that contain the same nodes as before, and simply adds new ones until the appropriate fraction has been reached. 
+:::
+
+
+
+## Threshold Model 1
+
+```{python}
+thresh_model_1 = ep.ThresholdModel(g_bluetooth_contact)
+thresh_config = mc.Configuration()
+
+threshold = 0.1
+fraction_infected = .1
+thresh_config.add_model_parameter("fraction_infected", fraction_infected)
+
+for n in g_bluetooth_contact.nodes():
+    thresh_config.add_node_configuration("threshold", n, threshold)
+
+thresh_model_1.set_initial_status(thresh_config)
+
+threshold_trends = multi_runs(
+    thresh_model_1,
+    execution_number=500,
+    iteration_number=40,
+    infection_sets=infect_sets,
+    nprocesses=4
+)
+
+sims.visualize_trends(
+    threshold_trends,
+    network=g_bluetooth_contact,
+    states=[0, 1],
+    labels=['Not Activated', 'Activated'],
+    proportion=True,
+    return_data=False
+)
+```
+
+::: {.notes}
+Let's take a look at model 1. Despite starting with only 10% of the population infected, this contagion spreads to the whole population in less than 5 iterations in every simulation. This complex contagion spreads faster than the simple contagions I modelled earlier! After a moment's reflection, this should make sense. Model 1 has a fractional threshold of 0.1, which means that a node only needs 10% of its neighbours to be activated for the contagion to spread. Given that the average degree is less than 10, that will usually translate to needing a single activated neighbour. While I have *technically* defined a threshold model for a complex contagion, this contagion will *effectively* act like a simple contagion with perfect transmissibility for most of the population!
+:::
+
+
+## Threshold Model 2
+
+```{python}
+thresh_model_2 = ep.ThresholdModel(g_bluetooth_contact)
+thresh_config_2 = mc.Configuration()
+threshold_2 = 0.35
+fraction_infected_2 = .1
+
+thresh_config_2.add_model_parameter(
+    "fraction_infected", fraction_infected_2
+)
+
+for n in g_bluetooth_contact.nodes():
+    thresh_config_2.add_node_configuration("threshold", n, threshold_2)
+
+thresh_model_2.set_initial_status(thresh_config_2)
+
+threshold_trends_2 = multi_runs(
+    thresh_model_2,
+    execution_number=500,
+    iteration_number=40,
+    infection_sets=infect_sets,
+    nprocesses=4,
+)
+
+sims.visualize_trends(
+    threshold_trends_2,
+    network=g_bluetooth_contact,
+    states=[0, 1],
+    labels=['Not Activated', 'Activated'],
+    proportion=True,
+    return_data=False
+)
+```
+
+::: {.notes}
+Now let's compare the results against model 2, where I have set the fractional threshold to 0.35. This is a much stricter threshold. Nodes will now need a little over a third of their neighbours to be activated for a contagion to spread to them. Where model 1 usually required the narrowest of bridges possible, model 2 will require much thicker bridges. As a result, we see that the contagion takes a bit longer to reach its steady state, but perhaps only a few iterations more. The really dramatic difference, though, is how incredibly variable the outcomes are! In most simulations, the contagion doesn't even infect 20% of the network, while in others, it infects the entire network. In most cases, the initial infections are not situated in the right places to infect the thick bridges key to reaching the network. I will emphasize that this is why we run so many simulations. The positions of the initial infected nodes can *dramatically* influence the results of a particular simulation, as they may be the difference between a key node, cluster, or bridge activating or not. Based on only these plots, it seems that there may be some key chokepoints or important feature(s) in the network that are difficult for the contagion to infect without the right initial conditions. Recall our earlier visualization of the network in conjunction with the decisions we made about the model, and consider what might be going on. A consequence of the fractional threshold condition is non-adopters apply pressure on their neighbours. Having lots of non-adopter neighbours makes it harder to activate. As a result, hubs are harder to activate than lense dense portions of the network. Keeping in mind the strong core-periphery structure of the network that we visualized, it would be reasonable to hypothesize that, in most cases, the initially infected nodes were too dispersed across the network and unable to activate enough nodes in the core to spread further. Conversely, in the cases where the contagion did manage to spread, the initial infection was likely clustered in key areas, enabling it to build up enough momentum to break into the hub, resulting in rapid infection rates and eventual domination of the network. 
+
+In model 3, we increase the proportion of initially infected nodes from 10% to 15% of the population. While this is a relatively small increase, we once again see dramatic differences. The simulations now take over 10 iterations to reach their steady state, and the median proportion of the population infected has risen to *almost 100%*. In some cases, portions of the network resist infection. The sensitivity to initial conditions and parameter values that these three models and their variablity display is one of the major reasons that complex contagions require very careful consideration and thorough investigation.
+:::
+
+##
+
+Let's take a moment to compare these results to the simple contagions we modelled in the previous chapter. The earlier SIR models allowed a node to have one of 3 states, Susceptible, Infected, and Recovered/Removed, but these threshold models allow only inactivated and activated states. Once a node has been activated, there is no mechanism to deactivate it (in this model, you cannot forget that juicy gossip or let go of the 70s), so the number of activated nodes can only ever stay the same or increase. This is why we don't see the peak and drop that occurred in the SIR model. This version of the threshold model is also deterministic once the intially infected nodes have been chosen. Once a node has reached its threshold, it *immediately* activates. This immediate activation is the main reason we see such a small number of iterations needed to get to the final steady state. The probabilistic SIR model with low probabilitites of infection and recovery can have many steps where nothing changes, or very little changes, even though the *potential* for change is great. It's just unlikely, so it takes longer. Of course, just as more advanced SIR models exist, so do more advanced threshold models exist that might have probabilistic activation once a threshold has been met or allow nodes to deactivate based on some condition.
+
+
+
+
+## Threshold Model 3
+
+Complex Contagions with Variable Thresholds
+
+```{python}
+thresh_model_3 = ep.ThresholdModel(g_bluetooth_contact)
+thresh_config_3 = mc.Configuration()
+threshold_3 = 0.35
+fraction_infected_2 = .15
+
+thresh_config_3.add_model_parameter(
+    "fraction_infected", fraction_infected_2
+)
+
+for n in g_bluetooth_contact.nodes():
+    thresh_config_3.add_node_configuration("threshold", n, threshold_3)
+
+thresh_model_3.set_initial_status(thresh_config_3)
+
+threshold_trends_3 = multi_runs(
+    thresh_model_3,
+    execution_number=500,
+    iteration_number=40,
+    infection_sets=infect_sets_2,
+    nprocesses=4
+)
+
+sims.visualize_trends(
+    threshold_trends_3,
+    network=g_bluetooth_contact,
+    states=[0, 1],
+    labels=['Not Activated', 'Activated'],
+    proportion=True,
+    return_data=False
+)
+```
+
+- better distribution to use?
+
+::: {.notes}
+So far, what we've seen makes some intuitive sense. When the contagion is simple and the thresholds for activation are low, the contagion spreads quickly and activates most of the nodes in the network with little trouble. When the contagion is complex, and the individual thresholds are higher for all the reasons we discussed previously, then the contagion travels much more slowly over wide bridges, and eventually hits a plateau where some cohesive subgroups in the the network are activated and others are not. This sheds some light on how beliefs, behaviours, and norms can be more homogeneous within cohesive subgroups and heterogeneous across them. 
+
+All of the earlier threshold models had uniform thresholds: every node had the same threshold for activation. However, as we have mentioned, that is a rather dramatic simplifying assumption. In the real world, not everyone has identical thresholds. Some people have very low thresholds, changing their beliefs and behaviours quickly and easily; others have a high threshold, and are unwilling to change no matter what anyone around them thinks or does. Most, probably, sit somewhere in between. If we expect real people to have some variability in their activation thresholds, perhaps we should account for that in our simulations.
+
+There are a variety of ways we could go about assigning variable thresholds. Here, we will assign each node a threshold by randomly selecting values between 0 (always adopts) and 1 (never adopts) from a probability distribution (which will be introduced in Chapter 26). There are a number of distributions we could choose from here, but as Centola suggests, the best choice is probably simply a Gaussian (i.e. normal) distribution. With variable threshold models, there are even more parameters we can tweak to try to model the spread of a complex contagion. For the sake of brevity, we will compare two models using the same network as before, and the same 10% initially infected nodes. One model will use a Gaussian distribution of threshold scores from 0 to 1 with a mean of .35 and a standard deviation of .001. The other will be the same, but with a standard deviation of 0.1. Intuitively, we might expect the first model to resemble our earlier uniform threshold model with a threshold of 0.35, and the second model might have a higher variance. 
+:::
+
+
+
+##
+
+- redo this part maybe?
+
+```{python}
+from scipy.stats import truncnorm
+def get_truncated_normal(mean, sd, low, upp):
+    return truncnorm((low - mean) / sd, (upp - mean) / sd, loc=mean, scale=sd)
+
+model_cc_vt = ep.ThresholdModel(g_bluetooth_contact)
+config_cc_vt = mc.Configuration()
+
+fraction_infected = .1
+random_thresholds = []
+threshold_dist = get_truncated_normal(mean=.35, sd=.001, low=0, upp=1)
+
+# Loop over all nodes to assign random thresholds
+for n in g_bluetooth_contact.nodes():
+    threshold = threshold_dist.rvs()
+    config_cc_vt.add_node_configuration("threshold", n, threshold)
+    random_thresholds.append(threshold)
+
+# Set the initial status with the configuration
+config_cc_vt.add_model_parameter("fraction_infected", fraction_infected)
+model_cc_vt.set_initial_status(config_cc_vt)
+
+# WITH THAT DONE, WE CAN ADD THE OTHER MODEL INFORMATION TO THE CONFIG.
+config_cc_vt.add_model_parameter("fraction_infected", fraction_infected)
+model_cc_vt.set_initial_status(config_cc_vt)
+
+
+sns.ecdfplot(random_thresholds)
+sns.despine()
+plt.show()
+```
+
+::: {.notes}
+As a quick check, let's quickly visualize the distribution of randomly sampled individual thresholds using an ecdf, which should be centered on .35.
+
+And now let's run the final models
+:::
+
+##
+
+```{python}
+threshold_trends_vt = multi_runs(
+    model_cc_vt,
+    execution_number=500,
+    iteration_number=40,
+    infection_sets=infect_sets,
+    nprocesses=4
+)
+
+sims.visualize_trends(
+    threshold_trends_vt,
+    network=g_bluetooth_contact,
+    states=[0, 1],
+    labels=['Not Activated', 'Activated'],
+    proportion=True,
+    return_data=False
+)
+```
+
+##
+
+```{python}
+model_cc_vt_2 = ep.ThresholdModel(g_bluetooth_contact)
+config_cc_vt_2 = mc.Configuration()
+fraction_infected = .1
+random_thresholds_2 = []
+threshold_dist_2 = get_truncated_normal(mean=.35, sd=.1, low=0, upp=1)
+
+for n in g_bluetooth_contact.nodes():
+    threshold_2 = threshold_dist_2.rvs()
+    config_cc_vt_2.add_node_configuration("threshold", n, threshold_2)
+    random_thresholds_2.append(threshold_2)
+
+config_cc_vt_2.add_model_parameter("fraction_infected", fraction_infected)
+model_cc_vt_2.set_initial_status(config_cc_vt_2)
+
+threshold_trends_vt_2 = multi_runs(
+    model_cc_vt_2,
+    execution_number=500,
+    iteration_number=40,
+    infection_sets=infect_sets,
+    nprocesses=4
+)
+
+sims.visualize_trends(
+    threshold_trends_vt_2,
+    network=g_bluetooth_contact,
+    states=[0, 1],
+    labels=['Not Activated', 'Activated'],
+    proportion=True,
+    return_data=False
+)
+```
+
+::: {.notes}
+Wow. These two models appear incredibly distinct! Recall that these models are being run on the same network, with the same initially infected nodes, with the same mean threshold of 0.35. The only difference is the size of the standard standard deviation of their thresholds. For a far deeper and more thorough exploration of variable threshold models, I will once again draw your attention to Centola's [CITE] work. Let this example serve to emphasize a major theme of this chapter: intuitions can be very unreliable when dealing with complex contagions. Explore every facet of your model and the network because due diligence is especially important when models can be sensitive to initial conditions.
+
+Finally, just as NDLib allows us to extend our models of simple contagions to dynamic networks, so too can we extend complex contagions. I urge you to look into the documentation and experiment with these models!
+
+In these last two chapters, we've scratched the surface of modelling the spread of simple and complex contagions and we've only focused on two common types of models! To bring this discussion of diffusion to a close, I want to briefly point to two additional things you might consider. First, it is possible to configure some of these models so that thresholds don't just vary across people in a population, but also *within a person over time*. This is another step towards greater realism. You know, one day you are feeling pretty open and into new things, another day you aren't. If we introduce this additional bit of realism, does anything change? To find out, we could use stochastic thresholds instead of deterministic ones, drawing a new threshold for each node at each iteration. 
+
+- we can do a lot more with `mesa`. this is a bit beyong our scope, but I will show an overview of how a mesa model can be configured and worked with to give you a sense of what is possible
+:::
+
+
+
+# Mesa
+
+## Agent-based Modelling in Python
+
+`Mesa`
+
+- what's possible?
+- what does a simple example look like?

@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-
+import random
+import copy
 
 def simulation_df(iteration_results, network, prop=True):
     population_size = network.number_of_nodes()
@@ -84,10 +85,27 @@ def visualize_trends(
             plt.plot(medians[i], c="black", label=labels[i], linestyle=lstyles[i])
 
     ax.set(xlabel="Iteration", ylabel="Proportion of nodes")
-    plt.legend()
+    plt.legend() 
     sns.despine()
     plt.tight_layout()
     plt.show()
 
     if return_data is True:
         return state_matrices, medians
+
+
+def rand_infection_set(network, frac):
+    node_list = list(network.nodes())
+    return random.sample(node_list, int(round(len(node_list)*frac, 0))) # randomly select nodes from node_list without replacement
+
+def add_to_infection_set(infection_sets, fraction_increase, network):
+    num_adds = int(round(network.number_of_nodes()*fraction_increase, 0)) # Number of new initial nodes needed to be added
+    new_infection_sets = []
+    for inf_set in infection_sets:
+        new_set = copy.deepcopy(inf_set)
+        while len(new_set) < len(inf_set) + num_adds: # Keep randomly selecting nodes, checking if they're already in the list, and adding if they haven't until the new set is as long as needed.
+            new_add = random.choice(list(network.nodes()))
+            if new_add not in new_set:
+                new_set.append(new_add)
+        new_infection_sets.append(new_set)
+    return new_infection_sets
