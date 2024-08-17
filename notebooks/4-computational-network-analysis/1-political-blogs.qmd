@@ -34,10 +34,11 @@ from icsspy.networks import rotate_positions
 print(f'Using graph-tool version {gt.__version__}')
 ```
 
-If you are running this code in a Jupyter Notebook, you'll want to tell `matplotlib` to plot inline.
+If you are running this code in a Jupyter Notebook, you'll want to tell `matplotlib` to plot inline. The second line uses `svg` as the backend for displaying inline plots instead of `png` If you can't scroll through your notebook smoothly, you might want to comment out that line.
 
-```python
+```{python}
 %matplotlib inline
+%config InlineBackend.figure_format = 'svg'
 ```
 
 ## Loading the Political Blogs Dataset
@@ -132,7 +133,7 @@ gt.graph_draw(
     output_size=(1200, 1200),
     bg_color=[1, 1, 1, 1],
     inline=True,
-    output="output/polblogs_1.png",
+    # output="output/polblogs_1.png",
 )
 ```
 
@@ -219,7 +220,7 @@ blockstate_level_0.draw(
 Let's rotate the refined layout for a more aesthetically pleasing figure:
 
 ```{python}
-pos_refined = rotate_positions(pos_refined, 90)
+pos_refined = rotate_positions(pos_refined, 45)
 
 blockstate_level_0.draw(
     pos=pos_refined,
@@ -254,7 +255,7 @@ blockstate.draw(
     output_size=(1200, 1200),
     bg_color=[1, 1, 1, 1],
     inline=True,
-    output="output/polblogs_7.png",
+    # output="output/polblogs_7.png",
 )
 ```
 
@@ -287,7 +288,7 @@ blockstate.draw(
     output_size=(1200, 1200),
     bg_color=[1, 1, 1, 1],
     inline=True,
-    output="output/polblogs_8.png",
+    # output="output/polblogs_8.png",
 )
 ```
 

@@ -4,12 +4,7 @@
 
 ![](media/heuristic.png){width=40% .shadow-img}
 
-### pitfalls and other problems <br>with [heuristic]{.kn-pink} network analysis
-
-<br>
-
-🔴 community detection via modularity-maximization [(Louvain, Leiden)]{.nord-light}<br>
-🔴 implicit model-based [(force-directed)]{.nord-light} visualization
+### pitfalls and problems <br>with [heuristic]{.kn-pink} network analysis
 
 ##
 
@@ -25,7 +20,7 @@ $\longleftarrow$<br>This famous figure from @adamic2005political shows a conserv
 
 - Nodes: political blogs
 - Edges: links [("citations")]{.nord-light} to other blogs
-- Color: liberal (blue), conservative (red)
+- Color: liberal (blue), conservative (red) [(not CD!)]{.nord-light}
 - Size: indegree
 - Layout: force directed
 
@@ -47,7 +42,7 @@ $\longleftarrow$<br>This famous figure from @adamic2005political shows a conserv
 
 ### Common First Steps
 
-- simplify network [(detect subgroup structure, compute centrality)]{.nord-light}
+- reduce the network [(e.g., detect subgroup structure)]{.nord-light}
 - visualize network [(usually force-directed layouts)]{.nord-light}
 - interpret and ...
 
@@ -78,18 +73,21 @@ Can we trust intuition?
 :::
 
 ::: {.column width="50%"}
-<br><br>
+<br>
 
-#### Common pitfalls and other problems
+#### Common pitfalls and problems
 
 [@peixoto2021modularity; @peixoto2023descriptive; @peixoto2021hairball]{.nord-footer}
 
-(Implicitly?) believing that network structure will be self-evident and our intuitions will hold up when reasoning about high-dimensional network structure
+- (Implicitly?) believing some approaches are more "model-free" than others
+- (Implicitly?) believing that network structure will be self-evident and our intuitions will hold up when reasoning about high-dimensional network structure
 
 <br>
 
-- using heuristic approaches [(esp. modularity-maximization)]{.nord-light} to simplify and partition networks into subgroups
-- using network visualizations [(esp. force-directed)]{.nord-light} for insight into network structure without sufficient consideration and criticism of implicit models
+Which often translates to:
+
+- using heuristic approaches [(esp. modularity-maximization)]{.nord-light} to partition/reduce networks
+- interpreting generic network visualizations [(esp. force-directed)]{.nord-light} without sufficient model criticism
 :::
 ::::
 
@@ -97,6 +95,7 @@ Can we trust intuition?
 
 ![These loops encourage us to explicate, criticize, and refine **models** in order to be confident in our inferences.](media/box_loop.png){width=80% .shadow-img}
 
+There is [no inference without models]{.kn-blue}, so we should always make our models explicit.
 
 ##
 
@@ -144,10 +143,9 @@ Some **well-known problems**:
 - the illusion of greater objectivity<br>[[see @moody2023cohesion]]{.nord-footer}
 - simultaneously over- and under-fit<br>[[see @peixoto2023descriptive]]{.nord-footer}
 - often has a degenerate solution space<br>[[see @peixoto2023descriptive]]{.nord-footer}
+- etc.
 
-<br>
-
-[There have been some improvements to modularity-maximization approaches [[e.g., @traag2019louvain]]{.nord-light}, but these only go so far. There are **fundamental problems** with the modularity-maximization idea.]{.fragment}
+[There have been some improvements to modularity-maximization approaches [[e.g., @traag2019louvain]]{.nord-light}, but these only go so far. There are **fundamental problems** with the modularity-maximization idea, and heuristic approaches in general.]{.fragment}
 :::
 ::: {.column width=45%}
 :::

@@ -1,4 +1,6 @@
-## Rethinking Subgroup Structure & Visualization
+## Generative Network Analysis
+
+"generative," "Bayesian," "probabilistic," "inferential," ...
 
 :::: {.columns}
 ::: {.column width="30%"}
@@ -22,25 +24,6 @@
 ::: {.notes}
 NOTES
 :::
-
-
-##
-
-<br><br>
-
-### taking a generative approach
-
-<br>
-
-🟢 generative modelling and Bayesian Data Analysis (BDA)<br>
-🟢 nested Stochastic Blockmodels (SBMs)<br>
-🟢 explicit model-based visualization
-
-
-
-## Why do we need a generative model of networks for inference?
-
-- need to include this!
 
 
 ##
@@ -70,36 +53,37 @@ NOTES
 :::
 ::::
 
-
-
-
-
-
-
-
-
-
 ##
 
-[Thinking probabilistically about networks]{.nord-light}
-
-### Bayesian Data Analysis (BDA) in a nutshell
+<br><br><br><br>
 
 :::: {.columns}
 ::: {.column width="45%"}
-<br>
-
-![Box's loop for iterative model-based data analysis.](media/box_loop.png){#fig-box_loop width=85%}
-
-![Hadley Wickham's framework for iterative data science.](media/data-science.png){#fig-data-science width=85%}
+### Bayesian data analysis (BDA)
 :::
 
 ::: {.column width="10%"}
 :::
 
 ::: {.column width="45%"}
+1. is a workflow
+2. is mature and statistically principled
+3. re-allocates credibility
+4. infers the distribution of latent variables
+:::
+::::
+
+
+##
+
+[Thinking probabilistically about networks]{.nord-light}
+
+### BDA is a workflow
+
 <br>
 
+:::: {.columns}
+::: {.column width="55%"}
 @blei2014build "Build, Compute, Critique, Repeat"
 
 > [(...) Here, we take the perspective -- inspired by the work of George Box -- that **models are developed in an iterative process: we formulate a model, use it to analyze data, assess how the analysis succeeds and fails, revise the model, and repeat**. With this view, we describe how new research in statistics and machine learning has transformed each of these essential activities. (...)]{.small-text}
@@ -110,6 +94,10 @@ NOTES
 
 > [(...) Beyond inference, the workflow also includes **iterative model building**, model checking, validation and troubleshooting of computational problems, model understanding, and model comparison. We review all these aspects of workflow in the context of several examples, keeping in mind that in practice we will be **fitting many models** for any given problem, even if only a subset of them will ultimately be relevant for our conclusions.]{.small-text}
 :::
+
+::: {.column width="45%"}
+![Box's loop for iterative model-based data analysis.](media/box_loop.png){#fig-box_loop width=85%}
+:::
 ::::
 
 
@@ -118,7 +106,7 @@ NOTES
 
 [Thinking probabilistically about networks]{.nord-light}
 
-### Bayesian Data Analysis (BDA) in a nutshell
+### BDA is mature and statistically principled
 
 <br><br>
 
@@ -144,7 +132,8 @@ where $H$ represents our hypotheses and $E$ represents the observed evidence.
 
 [Thinking probabilistically about networks]{.nord-light}
 
-### Bayesian Data Analysis (BDA) in a nutshell
+### BDA re-allocates credibility
+[@kruschke2014doing]{.nord-footer}
 <br>
 
 :::: {.columns}
@@ -166,11 +155,11 @@ $P(E|H)$ is the **likelihood**, or 'sampling probability.' As in Frequentism, it
 
 <br>
 
-$P(H)$ is the **prior**. It represents our extant knowledge about the hypothesis before observing the data. Bayesian models treat priors as latent variables whose probability distributions are logically determined by the information available to the researcher [[see @cox1946probability; @jaynes2003probability]]{.nord-light}.
+$P(H)$ is the **prior**. It represents our knowledge about the hypothesis before observing the data. Bayesian models treat priors as latent variables whose probability distributions are logically determined by the information available [[see @cox1946probability; @jaynes2003probability]]{.nord-light}.
 
 <br>
 
-$P(E)$ is the **unconditional probability of the evidence** and is sometimes referred to as the 'Bayes Denominator' or 'Marginal Probability of the Data.' It's often analytically intractable, so we approximate it with stochastic sampling (e.g., MCMC).
+$P(E)$ is the **unconditional probability of the evidence** and is sometimes referred to as the 'Bayes Denominator' or 'Marginal Probability of the Data.' It's often analytically intractable, so we approximate it (e.g., with MCMC).
 :::
 ::::
 
@@ -178,10 +167,10 @@ $P(E)$ is the **unconditional probability of the evidence** and is sometimes ref
 
 [Thinking probabilistically about networks]{.nord-light}
 
-### Bayesian Data Analysis (BDA) in a nutshell
+### BDA infers the distribution of latent variables
 <br><br>
 
-Bayesian SBMs (BSBMs) apply the inferential logic of BDA to network analysis. We have:
+[Bayesian SBMs]{.kn-pink} apply the inferential logic of BDA to network analysis. We have:
 
 - **observed data**^[Although, [as Richard McElreath argues](https://www.youtube.com/watch?v=hnYhJzYAQ60) we can't literally observe a network, so it doesn't really make sense to talk about network "data." From this perspective, all network "data" are latent variables in some sense. The main implication is that we need more generative thinking and Bayesian data analysis.] in the form of an adjacency matrix describing connections among nodes, and
 - **unobserved latent variables** for our block or community memberships.
@@ -198,7 +187,7 @@ $$
 
 <br><br><br><br>
 
-This BSBM is still rather limited.
+This SBM is still rather limited.
 
 For example, like most approaches it requires us to pre-specify the number of blocks.
 
@@ -250,6 +239,4 @@ The [nested]{.kn-pink} SBM extends the SBM by modelling block structure **hierar
 :::
 ::::
 
-There's a lot to wrap your head around here!
-
-😌 Let's take a break before jumping into some code.
+Nested SBMs can be a **lot** to wrap your head around, so let's code our way through some examples.

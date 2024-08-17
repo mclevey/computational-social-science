@@ -79,7 +79,7 @@ g.list_properties()
 - `vertex_lookup` is an internal dictionary that maps each email address to a unique integer ID.
 - `label` is a string variable containing the email address.
 - `position` is a string variable containing information about the job position associated with the email account.
-- `edge weight` are counts of the number of emails that vertex `i` sent vertex `j` (since this is a directed network)
+- `edge weight` are counts of the number of emails that vertex `i` sent vertex `j` (since this is a directed network).
 
 ## Prepare for Modelling
 
@@ -162,6 +162,16 @@ vertex_data = pd.DataFrame(vertex_data)
 vertex_data.columns = ["VertexID", "JobPosition", "M1BlockID"]
 vertex_data.head(10)
 ```
+
+
+```{python}
+def df_to_md(df, filepath):
+    md = df.to_markdown(index=False)
+    with open(filepath, 'w') as f:
+        f.write(md)
+df_to_md(vertex_data.head(10), 'output/vertex_data_1.md')
+```
+
 
 > [!info] `BlockID` Labels
 > This is the first time we've looked block assignment data in this way. The sequence of integers used for block IDs is an artifact of `graph-tool`'s internal optimizations, which creates and then drops many empty blocks during the modelling process.  It doesn't matter since the numbers don't have any meaning -- they are just ID labels.
@@ -266,7 +276,7 @@ model_mdl_scores["Model 2"] = int(round(m2_mdl))
 pprint(model_mdl_scores)
 ```
 
-The MDL scores it much higher! However, *this is to be expected*, as the jump from a binary to a weighted network requires a huge increase in bits to adequetely compress the network. We'll see how this model compares to the other weighted models we'll fit below.
+The MDL score is much higher! However, *this is to be expected*, as the jump from a binary to a weighted network requires a huge increase in bits to adequetely compress the network. We'll see how this model compares to the other weighted models we'll fit below.
 
 > [!info] MDL is Always Larger for Models with Edge Weights and Other Covariates
 > Recall that MDL is computed by compressing the model *and* the data. Models with more parameters will always have larger MDLs, and models with edge weights always have more parameters than binary networks. Weighted networks contain more information than binary networks, and therefore require more bits to compress.
@@ -281,7 +291,7 @@ plot_line_comparison(
     title="Model Comparison\nMinimum Description Length (MDL)\n",
     xlabel="\nMDL",
     padding=5_000,
-    filename = 'output/model_comparison_mdl.png')
+    filename = 'output/model_comparison_mdl_M1_M2.png')
 ```
 
 What about the homogeneity of job titles within blocks?
@@ -306,7 +316,7 @@ plot_line_comparison(
     xlabel="\nHomogeneity",
     xrange=(0, 1),  # homogeneity scores range from 0 to 1
     print_decimals=True,
-    filename = 'output/model_comparison_homogeneity.png')
+    filename = 'output/model_comparison_homogeneity_M1_M2.png')
 ```
 
 
@@ -368,26 +378,22 @@ Finally, `num_mcmc_iters_per_call` determines the number of iterations that `mul
 
 How thoroughly we search the posterior distribution depends on all three of these parameters. In this case, we are performing {{ num_refinements }} independent refinement loops, each with {{ num_mcmc_calls }} `multiflip_mcmc_sweep()` calls, each of which performs {{ num_mcmc_iters_per_call }} iterations. This results in a total of {{ num_mcmc_calls * num_mcmc_iters_per_call }} per refinement loop, or {{ num_refinements * num_mcmc_calls * num_mcmc_iters_per_call }} overall.
 
-Once the code block above finishes running, we can see how much we improved on the estimate from Model 2.
-
-```{python}
-model_mdl_scores["Model 3"] = int(round(m3_mdl))
-pprint(model_mdl_scores)
-```
-
 The larger the numbers we provide our three search parameters, the more thoroughly we search the posterior distribution, and the more likely we are to find refinements for our model. The cost, of course, is increased computation time.
 
 #### Model 3 MDL and Homogeneity
 
-Now that we have another new model, let's update our MDL comparison.
+Once the code block above finishes running, we can see how much we improved on the estimate from Model 2. Let's update our MDL comparison.
 
 ```{python}
+model_mdl_scores["Model 3"] = int(round(m3_mdl))
+pprint(model_mdl_scores)
+
 plot_line_comparison(
     models_dict=model_mdl_scores,
     title="Model Comparison\nMinimum Description Length (MDL)\n",
     xlabel="\nMDL",
     padding=5_000,
-    filename = 'output/model_comparison_mdl.png')
+    filename = 'output/model_comparison_mdl_M1_M2_M3.png')
 ```
 
 And now block homogeneity with respect to job titles comparison.
@@ -417,8 +423,10 @@ plot_line_comparison(
     xlabel="\nHomogeneity",
     xrange=(0, 1),
     print_decimals=True,
-    filename = 'output/model_comparison_homogeneity.png')
+    filename = 'output/model_comparison_homogeneity_M1_M2_M3.png')
 ```
+
+
 
 Relative to Model 2, the homogeneity of job titles within blocks changed by `{{ round(m3_homogeneity - m2_homogeneity, 4) }}` as a result of our refinements. Not much!
 
@@ -452,7 +460,7 @@ plot_line_comparison(
     title="Model Comparison\nMinimum Description Length (MDL)\n",
     xlabel="\nMDL",
     padding=10_000,
-    filename = 'output/model_comparison_mdl.png')
+    filename = 'output/model_comparison_mdl_M1_M2_M3_M4.png')
 ```
 
 The `get_consensus_partition_from_posterior()` function assigns each node to a block in the consensus partition (averages from partitions in the posterior weighted by posterior probability). We can extract that block information to consider homogeneity with respect to job titles for this model (below). As we go through the usual process below, we'll also extract information from a newly created internal property map that contains counts the times each node was assigned to each partition in our posterior samples. We can normalize these counts to get the each node's marginal probability for it's block assignment. We'll store that information in our `vertex_data` dataframe as well and will look at it shortly.
@@ -480,6 +488,8 @@ vertex_data['M4BlockID'] = vertex_data['VertexID'].map(m4_vertex_assignments)
 vertex_data['MargProbsConsPart'] = vertex_data['VertexID'].map(m4_vertex_marginal_probs)
 
 vertex_data.head(20)
+
+df_to_md(vertex_data.head(10), 'output/vertex_data_M1-M4.md')
 ```
 
 And now homogeneity:
@@ -500,7 +510,7 @@ plot_line_comparison(
     xlabel="\nHomogeneity",
     xrange=(0, 1),
     print_decimals=True,
-    filename = 'output/model_comparison_homogeneity.png')
+    filename = 'output/model_comparison_homogeneity_M1_M2_M3_M4.png')
 ```
 
 Based on the consensus partition, our blocks are now a little *less* homogeneous with respect to job description.

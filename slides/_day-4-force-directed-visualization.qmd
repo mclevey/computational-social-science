@@ -1,0 +1,79 @@
+
+
+##
+
+[But wait, there's more...]{.nord-light}
+
+### Force Directed Visualization
+
+:::: {.columns}
+::: {.column width="60%"}
+![](media/divided_they_blog.png){width=100% .shadow-img}
+:::
+
+::: {.column width="40%"}
+<br><br><br><br><br><br>
+
+Is the network structure<br>[self-evident? 🤔]{.large-text}
+:::
+::::
+
+::: {.notes}
+Nodes are initially placed randomly. Repulsive forces push then away from one another, but edges act like springs to pull connected nodes back towards one another. Repulsive and attractive forces are then summed to update node positions. This continues until equilibrium or the maximum number of iterations has been reached.
+:::
+
+
+## Nope
+
+:::: {.columns}
+::: {.column width="55%"}
+![Figure reproduced from @peixoto2023descriptive](media/face_mars.png){width=86%}
+:::
+
+::: {.column width="5%"}
+:::
+
+::: {.column width="40%"}
+![😂 [From https://x.com/GrandjeanMartin/status/1600154712380014594]{.nord-light}](media/jaws.png){width=80%}
+:::
+::::
+
+
+## Force Directed Visualization
+
+[From @peixoto2021hairball]{.nord-light}
+
+:::: {.columns}
+::: {.column width="50%"}
+![The political blogs network from @adamic2005political, redrawn for easier comparison with @fig-divided_they_blog_sbm.](media/divided_they_blog_tiago.png){width=100% #fig-divided_they_blog_tiago}
+:::
+
+
+::: {.column width="50%"}
+![Subgroup membership assigned using a generative network model.<br>Which is the problem? The visualization model, or the SBM? [(It's the visualization...)]{.nord-light}](media/divided_they_blog_sbm.png){width=90%  #fig-divided_they_blog_sbm}
+:::
+::::
+
+
+##
+
+:::: {.columns}
+::: {.column width="69%"}
+![Things look *very* different if we add attractive forces between nodes placed in the same group rather than just between adjacent nodes. [Image reproduced from @peixoto2021hairball.]{.nord-light}](media/divided_they_blog_lay.png){width=100% #fig-divided_they_blog_lay}
+:::
+
+::: {.column width="1%"}
+:::
+
+::: {.column width="30%"}
+$\longleftarrow$<br>
+This is still force directed, but this time the **model has been explicated, criticized, and refined** for the task at hand.
+<br><br>
+
+<!-- > [There’s no good reason for us to accept the status quo: We can simply modify how the layout behaves based on what we know about the network data, or what we have discovered using a well-defined methodology that is relevant for our research question. Equipped with this information, we can then use it to constrain the visualization, rather than the other way around. In the case of a force-directed layout we can simply add an additional attractive force between nodes that belong to the same detected module.<br><br>@peixoto2021hairball]{.small-text} -->
+We are not limited to force directed visualizations, of course.
+
+![Another view of subgroup structure in the political blogs network, this time with hierarchical edge bundling.](media/divided_they_blog_chordal.png){width=60% #fig-divided_they_blog_chordal}
+
+:::
+::::

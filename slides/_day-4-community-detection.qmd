@@ -1,0 +1,33 @@
+##
+
+:::: {.columns}
+::: {.column width="50%"}
+![](media/reduction.jpg){width=70% .shadow-img}
+
+### Community Detection
+[is like a good reduction]{.nord-footer}
+:::
+
+::: {.column width="50%"}
+- an essential topic in network analysis [[see @prell2011social; @robins2015doing; @light2020oxford; @mclevey2022doing; @moody2023cohesion; @peixoto2023descriptive; @mclevey2023sage; @borgatti2024analyzing]]{.nord-light}
+- high-level goal is to simplify network structure by partitioning and [reducing]{.kn-pink} complex observed networks
+- there are different kinds of structure and subgroups
+  - assortative-connective, equivalent-positional
+- there are different methods and models we can use
+  - **heuristic-descriptive**
+    - have been popular for some time
+    - are deeply flawed and should be avoided
+  - **generative-inferential**
+    - not new [[e.g., @holland1983stochastic; @snijders1997estimation; @bearman2004chains]]{.nord-light}, better and more accessible than ever
+    - strong opinion: must become be the standard
+:::
+::::
+
+::: {.notes}
+**The reduction analogy**
+
+- Starting with Complexity: Just as you begin cooking with a variety of ingredients in a sauce, you start with a complex network that has many nodes and edges representing different interactions or relationships.
+- Reducing to Essentials: In cooking, reducing a sauce involves simmering it to evaporate excess liquid, concentrating the flavors, and focusing on the essential ingredients. Similarly, blockmodeling simplifies the network by grouping similar nodes into blocks or communities, thereby reducing the complexity of the network and focusing on the essential structural patterns.
+- Enhancing Understanding: The goal of reducing a sauce is to create a richer, more flavorful dish that enhances the overall meal. Likewise, the goal of blockmodeling is to create a clearer, more understandable representation of the network, making it easier to identify key patterns, relationships, and structures.
+- Striking the Right Balance: Just as you must be careful not to reduce a sauce too much (which could lead to an overly intense or burnt flavor), in blockmodeling, it’s important to strike the right balance between simplification and preserving the network’s meaningful structure. Over-simplification could result in loss of important details.
+:::

@@ -1,5 +1,5 @@
 ---
-title: "Computational Network Analysis"
+title: "Generative<br>Network Analysis"
 subtitle: "[DAY FOUR]{.kn-pink} [GESIS Fall Seminar in Computational Social Science]{.kn-blue}"
 author:
   - name: John McLevey
@@ -45,14 +45,15 @@ bibliography: references.bib
 {{< include _day-4-origins.qmd >}}
 {{< include _day-4-sna-topics.qmd >}}
 {{< include _day-4-learning-objectives.qmd >}}
+{{< include _day-4-community-detection.qmd >}}
 {{< include _day-4-modularity-maximization-is-bad.qmd >}}
-{{< include _day-4-force-directed_visualization.qmd >}}
+{{< include _day-4-force-directed-visualization.qmd >}}
 {{< include _day-4-generative-modelling-networks.qmd >}}
 <!-- Tutorials -->
 {{< include _day-4-tutorial-plan.qmd >}}
 {{< include _day-4-tutorial-political-blogs.qmd >}}
 {{< include _day-4-tutorial-enron.qmd >}}
-{{< include _day-4-tutorial-youtube.qmd >}}
+<!-- {{< include _day-4-tutorial-youtube.qmd >}} -->
 
 
 

@@ -1,13 +1,12 @@
-##
+#
 
-<br><br>
+<br><br><br>
 
-### develop nested stochastic blockmodels
+iteratively fit, refine, assess, compare, visualize, and interpret
 
-<br>
+[Nested Stochastic Blockmodels]{.large-text}
 
-🟢 fit, refine, assess, interpret, visualize, and compare models
-
+in Python, using `graph-tool`
 
 ##
 
@@ -25,7 +24,8 @@ First, we set up our environment. We will do things a little differently this ti
 <br>
 
 ```zsh
-conda create --name gt -c conda-forge graph-tool
+cd computational-social-science
+conda env create -f setup/graphtool.yaml
 conda activate gt
 ```
 
@@ -35,26 +35,21 @@ conda activate gt
 
 ##
 
+:::: {.columns}
+::: {.column width="45%"}
+Accompanying
+
+### tutorial notebooks
+:::
+
+::: {.column width="10%"}
+:::
+
+::: {.column width="45%"}
 <br>
 
-We'll start by working with the
-
-### Political Blogs Network
-
-to see some quick results and learn a few basics of `graph-tool`.
-
-<br><br>
-
-Then we'll work with the
-
-### Enron Email Network
-
-to learn how to iteratively develop, assess, compare, and improve Nested SBMs.
-
-<br><br>
-
-Finally, we'll shift over to working with data from the YouTube API, specifically a
-
-### 'Talks at Google' Entity Co-mention Network
-
-to push your modelling skills a little further.
+1. Foundations<br>[Political Blogs Network]{.nord-light}
+2. Iterative Modelling<br>[Enron Email Network]{.nord-light}
+3. Practice<br>[YouTube Entity Network]{.nord-light}
+:::
+::::
