@@ -1,0 +1,281 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "---\n",
+        "title: \"Simulation &<br>Agent-based Models\"\n",
+        "subtitle: \"[DAY FIVE]{.kn-pink} [GESIS Fall Seminar in Computational Social Science]{.kn-blue}\"\n",
+        "author:\n",
+        "  - name: John McLevey\n",
+        "    affiliations:\n",
+        "      - name: University of Waterloo\n",
+        "  - name: Johannes B. Gruber\n",
+        "    affiliations:\n",
+        "      - name: VU Amsterdam\n",
+        "output-dir: \"../docs/\"\n",
+        "format:\n",
+        "  revealjs:\n",
+        "    theme: [default, custom.scss]\n",
+        "    width: 1600\n",
+        "    height: 900\n",
+        "    embed-resources: true\n",
+        "    execute:\n",
+        "      echo: true\n",
+        "      warning: false\n",
+        "      cache: true\n",
+        "      freeze: true\n",
+        "    slide-number: false\n",
+        "    chalkboard: false\n",
+        "    preview-links: auto\n",
+        "    smaller: true\n",
+        "    fig-align: left\n",
+        "    fig-format: svg\n",
+        "    lightbox: true\n",
+        "    scrollable: true\n",
+        "    code-overflow: scroll\n",
+        "    code-fold: false\n",
+        "    code-line-numbers: true\n",
+        "    code-copy: hover\n",
+        "    reference-location: document\n",
+        "    tbl-cap-location: margin\n",
+        "    logo: media/logo_gesis.png\n",
+        "    footer: \"[CC BY-SA 4.0]{.nord-footer}\"\n",
+        "    email-obfuscation: javascript\n",
+        "highlight-style: \"nord\"\n",
+        "bibliography: references.bib\n",
+        "---\n",
+        "\n",
+        "\n",
+        "<!-- {{< include _day-5-introduction.qmd >}} -->\n",
+        "<!-- {{< include _day-5-synthetic-networks.qmd >}} -->\n",
+        "\n",
+        "## Agent-based Modelling in Python\n",
+        "\n",
+        "`NDLib`\n",
+        "\n",
+        "<br>\n",
+        "\n",
+        ":::: {.columns}\n",
+        "::: {.column width=\"40%\"}\n",
+        "\n",
+        "![Don't forget about your conda environment!](media/chatgpt_dependency_hell.png){width=100%}\n",
+        "\n",
+        ":::\n",
+        "\n",
+        "::: {.column width=\"5%\"}\n",
+        ":::\n",
+        "\n",
+        "::: {.column width=\"55%\"}\n",
+        "With the `gt` conda environment still activated, import the packages.\n"
+      ],
+      "id": "efb6463e"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "import networkx as nx\n",
+        "import pandas as pd\n",
+        "import seaborn as sns\n",
+        "import matplotlib.pyplot as plt\n",
+        "\n",
+        "import ndlib.models.ModelConfig as mc \n",
+        "import ndlib.models.epidemics as ep \n",
+        "from ndlib.utils import multi_runs\n",
+        "\n",
+        "from icsspy import set_style\n",
+        "import icsspy.simulations as sims\n",
+        "\n",
+        "set_style()"
+      ],
+      "id": "8a9e8f07",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::\n",
+        "::::\n",
+        "\n",
+        "\n",
+        "##\n"
+      ],
+      "id": "e449d6a6"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "population_size = 300 \n",
+        "G = nx.watts_strogatz_graph(population_size, 4, 0.15) \n",
+        "G.name = \"A Simulated Small World\" \n",
+        "\n",
+        "layout = nx.nx_pydot.graphviz_layout(G) \n",
+        "\n",
+        "fig, ax = plt.subplots(figsize=(12, 12)) \n",
+        "nx.draw(G, pos=layout, node_color='gray', edge_color='gray', node_size=100, width=.5) \n",
+        "plt.show()"
+      ],
+      "id": "ce31b794",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "##\n",
+        "\n",
+        "We'll define a function\n"
+      ],
+      "id": "a59520a3"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "def sir_model(network, beta, gamma, fraction_infected): \n",
+        "  config = mc.Configuration() \n",
+        "  config.add_model_parameter('beta', beta) \n",
+        "  config.add_model_parameter('gamma', gamma) \n",
+        "  config.add_model_parameter(\"fraction_infected\", fraction_infected) \n",
+        "  \n",
+        "  model = ep.SIRModel(network) \n",
+        "  model.set_initial_status(config) \n",
+        "  return model"
+      ],
+      "id": "ab8fd023",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## \n",
+        "\n",
+        "And run our first SIR model!\n"
+      ],
+      "id": "bc100ad3"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "sir_model_1 = sir_model(G, beta=0.05, gamma=0.01, fraction_infected=0.1) \n",
+        "sir_1_iterations = sir_model_1.iteration_bunch(200, node_status=True)\n",
+        "sir_1_trends, sir_1_deltas = sims.simulation_df(sir_1_iterations, G)\n",
+        "sir_1_trends.head(10)"
+      ],
+      "id": "1545f137",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "##\n"
+      ],
+      "id": "aaeceb0d"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "fig, ax = plt.subplots()\n",
+        "sns.lineplot(data=sir_1_trends)\n",
+        "ax.set(xlabel='Iteration / step in time', ylabel='Proportion of nodes')\n",
+        "sns.despine()\n",
+        "plt.legend()\n",
+        "plt.show()"
+      ],
+      "id": "3911baf6",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "##\n"
+      ],
+      "id": "6b7469bd"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "fig, (ax1, ax2, ax3) = plt.subplots(3,1, figsize=(8,8), sharex=True)\n",
+        "sns.lineplot(ax = ax1, data=sir_1_deltas['Susceptible'], color='gray')\n",
+        "sns.lineplot(ax = ax2, data=sir_1_deltas['Infected'], color='gray')\n",
+        "sns.lineplot(ax = ax3, data=sir_1_deltas['Removed'], color='gray')\n",
+        "## EMPHASIZE DEVIATIONS FROM 0\n",
+        "ax1.axhline(0, color='crimson')\n",
+        "ax2.axhline(0, color='crimson')\n",
+        "ax3.axhline(0, color='crimson')\n",
+        "ax3.set(xlabel='Iteration')\n",
+        "plt.show()"
+      ],
+      "id": "e419342f",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "##\n",
+        "\n",
+        "![The same simulated small-world network as before, displayed 20 times –\n",
+        "once for each of the first 20 time steps in the simulation of epidemic spread through the\n",
+        "network](media/small_world_epidemic.png){width=100% #fig-small_world_epidemic}\n",
+        "\n",
+        "## Let's do that 500 more times\n"
+      ],
+      "id": "f1ddb2c5"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "trends = multi_runs(\n",
+        "  sir_model_1, \n",
+        "  execution_number=3, \n",
+        "  iteration_number=200, \n",
+        "  infection_sets=None, \n",
+        "  nprocesses=4\n",
+        ")\n",
+        "\n",
+        "sims.visualize_trends(trends, network=G, proportion=True, return_data=False)"
+      ],
+      "id": "c0552e50",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "# References\n",
+        "\n",
+        "## "
+      ],
+      "id": "c5262305"
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "python3",
+      "language": "python",
+      "display_name": "Python 3 (ipykernel)",
+      "path": "/Users/johnmclevey/miniconda3/envs/gt/share/jupyter/kernels/python3"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}

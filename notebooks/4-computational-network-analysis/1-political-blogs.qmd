@@ -6,8 +6,6 @@ date: "{{< date >}}"
 categories:
 ---
 
-## Introduction
-
 In this notebook, we'll recreate the political blogs network visualization from Adamic and Glance (2005),^[Adamic, Lada and Natalie Glance. 2005. "The political blogosphere and the 2004 US Election: Divided they blog", in *Proceedings of the WWW-2005 Workshop on the Weblogging Ecosystem*.] as well as a series of visualizations discussed in the lecture. You'll learn how to use graph-tool to fit nested Stochastic Block Models (SBMs) and create informative network visualizations.
 
 This notebook assumes familiarity with the content covered in the recorded lecture. Be sure to watch that before working on this notebook!

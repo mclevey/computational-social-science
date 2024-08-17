@@ -14,7 +14,7 @@ repos:
       - id: check-toml
         exclude: '^.*\.pdpp.*|.*\.ipynb$|.*/\.jupyter_cache/|^docs/'
       - id: check-yaml
-        exclude: '^.*\.pdpp.*|.*\.ipynb$|.*/\.jupyter_cache/|^docs/'
+        exclude: '^.*\.pdpp.*|.*\.ipynb$|.*/\.jupyter_cache/|^docs/|^setup/'
       - id: detect-private-key
         exclude: '^.*\.pdpp.*|.*\.ipynb$|.*/\.jupyter_cache/|^docs/'
       - id: end-of-file-fixer

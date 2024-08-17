@@ -1,0 +1,203 @@
+
+## Simulation via Sampling from Distributions
+
+<br>
+
+:::: {.columns}
+::: {.column width="45%"}
+We can sample from **any** probability distribution, however simple [(e.g., Gaussian $\longrightarrow$)]{.nord-light} or complex [(e.g., posterior distribution of a generative network model)]{.nord-light}. Probability distributions are generative models!
+
+<br>
+
+```python
+import numpy as np
+
+mu = 0
+sigma = 1
+
+samples = np.random.normal(
+  loc=mu, scale=sigma, size=50
+)
+
+print(samples)
+```
+:::
+
+::: {.column width="10%"}
+:::
+
+::: {.column width="45%"}
+![](media/statistical_rethinking.png){width=100% .shadow-img}
+
+Bayesian Data Analysis (BDA) in Python with [PyMC]{.kn-blue}, [ArViz]{.kn-blue}, [babmi]{.kn-blue}, [graph-tool]{.kn-blue}, etc.
+:::
+::::
+
+
+
+## Simulating Networks
+
+<br>
+
+:::: {.columns}
+::: {.column width="40%"}
+Just as @bearman2004chains simulated networks conditioned on the adolescent romantic and sexual networks in the Add Health dataset, we can simulate networks **conditioned on the Enron communication network** we worked with yesterday.
+
+<br>
+
+Since we'll be using `graph-tool` here, activate your `gt` conda environment.
+
+```zsh
+conda activate gt
+```
+
+Then import packages and load the data.
+:::
+
+::: {.column width="5%"}
+:::
+
+::: {.column width="55%"}
+```python
+import numpy as np
+import pandas as pd
+from graph_tool.all import *
+import seaborn as sns
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
+
+from icsspy.paths import enron
+from icsspy import set_style
+
+set_style()
+plt.rcParams['text.usetex'] = True
+
+enron_email_network = str(enron / 'enron_graph.gt')
+g = load_graph(enron_email_network)
+```
+:::
+::::
+
+
+## Simulating Networks
+
+<br>
+
+::: {.column width="50%"}
+```python
+state = minimize_blockmodel_dl(g)
+
+synthetic_g = generate_sbm(
+  state.b.a,
+  state.get_matrix(),
+  directed=g.is_directed()
+)
+
+g, synthetic_g
+```
+:::
+
+::: {.column width="5%"}
+:::
+
+:::: {.columns}
+::: {.column width="45%"}
+We'll fit a simple SBM (minimizing description length) and then use it to generate a synthetic network.
+:::
+::::
+
+> (<Graph object, directed, with 149 vertices and 2582 edges, 2 internal vertex properties, 1 internal edge property, 1 internal graph property, at 0x32d7a8770>,
+ <Graph object, directed, with 149 vertices and 2634 edges, at 0x31289ca40>)
+
+
+## Simulating Networks
+
+<br>
+
+::: {.column width="70%"}
+```python
+blocks = state.get_blocks()
+block_matrix = state.get_matrix()
+block_counts = np.bincount(blocks.a)
+
+edge_weights = g.new_edge_property("double")
+
+for e in g.edges():
+    i, j = int(e.source()), int(e.target())
+    k, l = blocks[i], blocks[j]
+    # calculate the probability of connection between nodes i and j
+    if block_counts[k] > 0 and block_counts[l] > 0:
+        prob = block_matrix[k, l] / (block_counts[k] * block_counts[l])
+    else:
+        prob = 0  # in case the block size is zero
+    edge_weights[e] = prob
+
+g.ep["weight"] = edge_weights
+```
+:::
+
+::: {.column width="5%"}
+:::
+
+:::: {.columns}
+::: {.column width="20%"}
+1. get the inter-block edge count matrix
+2. iterate over the edges to compute edge probabilities
+3. assign the probabilities to an edge property map
+:::
+::::
+
+
+
+## Simulating Networks
+
+<br>
+
+::: {.column width="70%"}
+We'll create a weighted edgelist, store it in a Pandas dataframe, and write it to disk.
+
+```python
+stp = []
+for e in synthetic_g.edges():
+    stp.append((int(e.source()), int(e.target()), g.ep['weight'][e]))
+
+stp = pd.DataFrame(stp)
+stp.columns = ['i', 'j', 'p(edge)']
+stp.to_csv('output/simulated_network.csv', index=False)
+```
+:::
+
+::: {.column width="5%"}
+:::
+
+:::: {.columns}
+::: {.column width="20%"}
+{{< include ../notebooks/5-simulation-abms/output/sim_net_wel_df.md >}}
+:::
+::::
+
+
+##
+
+:::: {.columns}
+::: {.column width="45%"}
+![Cumulative distribution of edge probabilities for the synthetic network.](../notebooks/5-simulation-abms/output/sim_net_pedge_ecdf.png){width=100% #fig-sim_net_pedge_ecdf}
+:::
+
+::: {.column width="10%"}
+:::
+
+::: {.column width="45%"}
+![SFDP layout of the synthetic network.](../notebooks/5-simulation-abms/output/simulated_g.png){width=56% #fig-simulated_g}
+:::
+::::
+
+<br><br>
+
+::: {.fragment}
+That's it for the first part! 😎 We'll set this simulated network aside for now, but you'll see it again soon.
+
+[Python code available in the tutorial notebook.]{.nord-footer}
+:::
+
+##
