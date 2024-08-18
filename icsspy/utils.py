@@ -150,3 +150,12 @@ def markdown_table(df: pd.DataFrame, filepath: str = None) -> str:
         with open(filepath, "w") as file:
             file.write(md)
     return md
+
+
+def estimate_meters_from_rssi(df, rssi_col, A=-40, n=2):
+    """
+    A = -40  # RSSI value at 1 meter distance
+    n = 2    # Path-loss exponent
+    """
+    estimated_meters = 10 ** ((A - df[rssi_col]) / (10 * n))
+    return estimated_meters

@@ -9,6 +9,7 @@ author:
     affiliations:
       - name: VU Amsterdam
 output-dir: "../docs/"
+engine: jupyter
 format:
   revealjs:
     theme: [default, custom.scss]
@@ -16,9 +17,10 @@ format:
     height: 900
     embed-resources: true
     execute:
+      enabled: true
       echo: true
       warning: false
-      cache: true
+      # cache: true
       freeze: true
     slide-number: false
     chalkboard: false
