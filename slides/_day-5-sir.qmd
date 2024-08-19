@@ -285,6 +285,37 @@ Peak infections are slower and lower when agents move less. But we all know this
 ::::
 
 
+## Time, Space, & Interaction
+
+
+![The space covered by an agent who can take as many as 5 steps is much greater than the space covered by an agent who can only take 1. The grid is toridal.](media/compare_agent_step_sizes.png){width=100% #fig-compare_agent_step_sizes}
+
+
+## 
+
+:::: {.columns}
+::: {.column width="55%"}
+![Explanation...](media/compare_agent_networks.png){width=50% #fig-compare_agent_networks}
+
+:::
+
+::: {.column width="5%"}
+:::
+
+::: {.column width="40%"}
+`Number of nodes` 500
+`Number of edges` 105,589
+`Average degree` 422.356
+
+<br><br>
+WOW.<br>
+This is **extensive** mixing.
+:::
+::::
+
+
+
+
 
 ## SIR, Classic vs. Agent-based
 
