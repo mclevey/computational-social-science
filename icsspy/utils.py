@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 from dotenv import load_dotenv
 from rich.logging import RichHandler
+import yaml
 
 from .paths import root
 
@@ -159,3 +160,14 @@ def estimate_meters_from_rssi(df, rssi_col, A=-40, n=2):
     """
     estimated_meters = 10 ** ((A - df[rssi_col]) / (10 * n))
     return estimated_meters
+
+
+def update_quarto_variables(new_key, new_value, path="_variables.yml"):
+    with open(path, 'r') as file:
+        quarto_variables = yaml.safe_load(file)
+
+    # add a new key-value pair or update an existing key
+    quarto_variables[new_key] = new_value 
+    
+    with open(path, 'w') as file:
+        yaml.dump(quarto_variables, file, default_flow_style=False)
