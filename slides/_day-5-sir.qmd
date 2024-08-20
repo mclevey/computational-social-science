@@ -8,7 +8,7 @@
 How do diseases spread through a population?
 
 - Divide the population into three "compartments"<br>**[S]{.kn-pink}usceptible**, **[I]{.kn-pink}nfected**, **[R]{.kn-pink}ecovered/Removed**
-- Model the movement of people in and out of the compartments over time
+- Model the movement of people in and out of the compartments in continuous time
 - Traditionally done with differential equations
 
 <br>
@@ -49,7 +49,7 @@ is the derivative with respect to time, which represents the **rate of change** 
 How do diseases spread through a population?
 
 - Divide the population into three "compartments"<br>**[S]{.kn-pink}usceptible**, **[I]{.kn-pink}nfected**, **[R]{.kn-pink}ecovered/Removed**
-- Model the movement of people in and out of the compartments over time
+- Model the movement of people in and out of the compartments in continuous time
 - Traditionally done with differential equations
 
 <br>
@@ -90,7 +90,7 @@ $$
 How do diseases spread through a population?
 
 - Divide the population into three "compartments"<br>**[S]{.kn-pink}usceptible**, **[I]{.kn-pink}nfected**, **[R]{.kn-pink}ecovered/Removed**
-- Model the movement of people in and out of the compartments over time
+- Model the movement of people in and out of the compartments in continuous time
 - Traditionally done with differential equations
 
 <br>
@@ -129,7 +129,7 @@ $$
 How do diseases spread through a population?
 
 - Divide the population into three "compartments"<br>**[S]{.kn-pink}usceptible**, **[I]{.kn-pink}nfected**, **[R]{.kn-pink}ecovered/Removed**
-- Model the movement of people in and out of the compartments over time
+- Model the movement of people in and out of the compartments in continuous time
 - Traditionally done with differential equations
 
 <br>
@@ -189,7 +189,7 @@ We're just tracking the number of people in each compartment over time.
 
 :::: {.columns}
 ::: {.column width="45%"}
-We can represent the same basic model of changes in the number of people in each compartment *in discrete time intervals*. 
+We can represent the same basic model of changes in the number of people in each compartment *in discrete time intervals* [(which makes it easier to simulate with agent-based models)]{.nord-light}
 
 $$
 \begin{align}
@@ -199,7 +199,7 @@ R(t + 1) &= R(t) + \gamma I(t)
 \end{align}
 $$
 
-<br><br>
+<br>
 
 **Some Model Assumptions** $\longrightarrow$
 :::
@@ -255,6 +255,14 @@ A `{python} round(variables['results_sir_model_1_max_infected']-variables['resul
 :::
 ::::
 
+
+
+## Mixing and Flattening the Curve
+
+![The space covered by an agent who can take as many as 5 steps is much greater than the space covered by an agent who can only take 1. The grid is toridal.](media/compare_agent_step_sizes.png){width=90% #fig-compare_agent_step_sizes}
+
+
+
 ## Mixing and Flattening the Curve
 
 <br>
@@ -283,13 +291,6 @@ Peak infections are slower and lower when agents move less. But we all know this
 - `recovery_time_range` (7, 14) <!-- Quarto doesn't support tuples or lists; change this later if time -->
 :::
 ::::
-
-
-## Time, Space, & Interaction
-
-
-![The space covered by an agent who can take as many as 5 steps is much greater than the space covered by an agent who can only take 1. The grid is toridal.](media/compare_agent_step_sizes.png){width=100% #fig-compare_agent_step_sizes}
-
 
 ## 
 

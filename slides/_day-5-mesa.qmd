@@ -2,7 +2,7 @@
 
 ## SIR Model
 
-```python
+```{python}
 from mesa import Agent, Model
 from mesa.time import RandomActivation
 from mesa.space import MultiGrid
@@ -25,7 +25,7 @@ random.seed(36)
 
 ## Define the agent class
 
-```python
+```{python}
 class SIRAgent(Agent):
     def __init__(self, unique_id, model, recovery_time_range=(8, 12), max_agent_step_size=1):
         super().__init__(unique_id, model)
@@ -33,6 +33,8 @@ class SIRAgent(Agent):
         self.infected_time = 0  # Counter for how long the agent has been infected
         self.recovery_time_range = recovery_time_range  # Tuple for min and max recovery times
         self.max_agent_step_size = max_agent_step_size  # Step size for movement
+        self.pos_history = []  # Track agent's position over time
+        self.interactions = {}  # Track interactions with a count
 
     def step(self):
         if self.state == "I":
@@ -54,11 +56,20 @@ class SIRAgent(Agent):
         possible_moves = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=False, radius=self.max_agent_step_size)
         new_position = self.random.choice(possible_moves)
         self.model.grid.move_agent(self, new_position)
+        self.pos_history.append(new_position)  # Record the new position
+
+        # Record interactions
+        neighbors = self.model.grid.get_neighbors(self.pos, moore=True, include_center=False)
+        for neighbor in neighbors:
+            if neighbor.unique_id in self.interactions:
+                self.interactions[neighbor.unique_id] += 1
+            else:
+                self.interactions[neighbor.unique_id] = 1
 ```
 
 ## Define the model class
 
-```python
+```{python}
 class SIRModel(Model):
     def __init__(self, grid_width, grid_height, N, infection_rate, recovery_time_range, max_agent_step_size=1, n_initial_infections=1):
         self.num_agents = N
@@ -70,16 +81,18 @@ class SIRModel(Model):
 
         # Create agents
         for i in range(self.num_agents):
-            a = SIRAgent(i, self)
+            step_size = max_agent_step_size if i % 2 == 0 else 1  # Half agents have large step size, half small
+            a = SIRAgent(i, self, recovery_time_range, max_agent_step_size=step_size)
             self.grid.place_agent(a, (self.random.randrange(self.grid.width),
                                       self.random.randrange(self.grid.height)))
+            a.pos_history.append(a.pos)  # Initialize the position history with the starting position
             self.schedule.add(a)
 
         # Infect a specified number of random agents
         initial_infected_agents = self.random.sample(self.schedule.agents, n_initial_infections)
         for agent in initial_infected_agents:
             agent.state = "I"
-            agent.infection_duration = 0  # Initialize infection duration
+            agent.infected_time = 0  # Initialize infection duration
 
         self.datacollector = DataCollector(
             model_reporters={"Infected": self.compute_infected},
@@ -93,13 +106,24 @@ class SIRModel(Model):
     def compute_infected(self):
         infected = sum([1 for a in self.schedule.agents if a.state == "I"])
         return infected / self.num_agents
+
+    def get_interaction_graph(self):
+        G = nx.Graph()
+        for agent in self.schedule.agents:
+            G.add_node(agent.unique_id)
+            for interacted_agent, count in agent.interactions.items():
+                if G.has_edge(agent.unique_id, interacted_agent):
+                    G[agent.unique_id][interacted_agent]['weight'] += count
+                else:
+                    G.add_edge(agent.unique_id, interacted_agent, weight=count)
+        return G
 ```
 
 ## Run the model
 
 Load the model parameters
 
-```python
+```{python}
 with open('_variables.yml', 'r') as file:
     params = yaml.safe_load(file)
 
@@ -112,7 +136,7 @@ pprint(model_2_params)
 
 and run!
 
-```python
+```{python}
 model_1 = SIRModel(
     n_initial_infections = model_1_params['n_initial_infections'],
     grid_width = model_1_params['grid_width'],
@@ -130,7 +154,7 @@ m1res = model_1.datacollector.get_model_vars_dataframe()
 ```
 
 
-```python
+```{python}
 model_2 = SIRModel(
     n_initial_infections = model_2_params['n_initial_infections'],
     grid_width = model_2_params['grid_width'],
@@ -151,7 +175,7 @@ m2res = model_2.datacollector.get_model_vars_dataframe()
 
 Plot the results
 
-```python
+```{python}
 fig, ax = plt.subplots()
 ax.plot(m1res['Infected'], label=r'High transmissability, $\beta$=0.3')
 ax.plot(m2res['Infected'], label=r'Low transmissability $\beta$=0.15')
@@ -166,7 +190,7 @@ plt.savefig('media/sir_compare_models_1-2.png')
 
 ## Model 3
 
-```python
+```{python}
 model_3_params = params.get('model_3')
 pprint(model_3_params['max_agent_step_size'])
 
@@ -181,7 +205,7 @@ pprint(model_6_params['max_agent_step_size'])
 ```
 
 
-```python
+```{python}
 model_3 = SIRModel(
     n_initial_infections = model_3_params['n_initial_infections'],
     grid_width = model_3_params['grid_width'],
@@ -200,7 +224,7 @@ m3res = model_3.datacollector.get_model_vars_dataframe()
 
 ## 
 
-```python
+```{python}
 model_4 = SIRModel(
     n_initial_infections = model_4_params['n_initial_infections'],
     grid_width = model_4_params['grid_width'],
@@ -220,7 +244,7 @@ m4res = model_4.datacollector.get_model_vars_dataframe()
 
 ##
 
-```python
+```{python}
 model_5 = SIRModel(
     n_initial_infections = model_5_params['n_initial_infections'],
     grid_width = model_5_params['grid_width'],
@@ -239,7 +263,7 @@ m5res = model_5.datacollector.get_model_vars_dataframe()
 
 ##
 
-```python
+```{python}
 model_6 = SIRModel(
     n_initial_infections = model_6_params['n_initial_infections'],
     grid_width = model_6_params['grid_width'],
@@ -261,7 +285,7 @@ m6res = model_6.datacollector.get_model_vars_dataframe()
 
 Plot the results
 
-```python
+```{python}
 fig, ax = plt.subplots()
 ax.plot(m3res['Infected'], label=f'Max Agent Steps: {model_3_params['max_agent_step_size']}')
 ax.plot(m4res['Infected'], label=f'Max Agent Steps: {model_4_params['max_agent_step_size']}')
@@ -277,7 +301,7 @@ plt.savefig('media/sir_compare_models_3-6.png')
 
 <!-- UPDATE _VARIABLES -->
 
-```python
+```{python}
 #| echo: false
 from icsspy.utils import update_quarto_variables
 
@@ -290,7 +314,7 @@ update_quarto_variables("results_sir_model_2_max_infected", float(m2res['Infecte
 
 ##
 
-```python
+```{python}
 import matplotlib.pyplot as plt
 from mesa import Agent, Model
 from mesa.time import RandomActivation
@@ -300,7 +324,7 @@ import random
 
 Define the agent class.
 
-```python
+```{python}
 class SIRAgent(Agent):
     def __init__(self, unique_id, model, max_agent_step_size=1):
         super().__init__(unique_id, model)
@@ -326,7 +350,7 @@ class SIRAgent(Agent):
 
 Define the model class.
 
-```python
+```{python}
 class SIRModel(Model):
     def __init__(self, grid_width, grid_height, N, max_agent_step_size):
         super().__init__()
@@ -350,7 +374,7 @@ Run the model.
 
 - Put parameters into _variables
 
-```python
+```{python}
 grid_width = 20
 grid_height = 20
 num_agents = 500
@@ -367,7 +391,7 @@ for _ in range(num_steps):
 
 Plot the random walks for an agent with low steps (agent 7) and high-steps.
 
-```python
+```{python}
 import matplotlib.pyplot as plt
 import icsspy
 icsspy.set_style()
@@ -390,6 +414,10 @@ axs[0].set_xlabel("X Position")
 axs[0].set_ylabel("Y Position")
 axs[0].grid(True, which='both', linestyle='--')  # Show grid lines at every tick
 axs[0].minorticks_on()  # Ensure minor ticks are on for finer grid control
+axs[0].set_xlim(-0.5, 20.5)
+axs[0].set_ylim(-0.5, 20.5)
+axs[0].set_yticks(np.arange(0, 21, 2))  # Set y-axis ticks to every 2nd number
+axs[0].set_xticks(np.arange(0, 21, 2))  # Set x-axis ticks to every 2nd number
 
 # Plot the larger step agent's trajectory in the second subplot
 x_large, y_large = zip(*larger_step_agent.pos_history)
@@ -399,6 +427,10 @@ axs[1].set_xlabel("X Position")
 axs[1].set_ylabel("Y Position")
 axs[1].grid(True, which='both', linestyle='--')  # Show grid lines at every tick
 axs[1].minorticks_on()  # Ensure minor ticks are on for finer grid control
+axs[1].set_xlim(-0.5, 20.5)
+axs[1].set_ylim(-0.5, 20.5)
+axs[1].set_yticks(np.arange(0, 21, 2))  # Set y-axis ticks to every 2nd number
+axs[1].set_xticks(np.arange(0, 21, 2))  # Set x-axis ticks to every 2nd number
 
 # Adjust layout and show plot
 plt.tight_layout()
@@ -408,7 +440,7 @@ plt.savefig('media/compare_agent_step_sizes.png', dpi=300)
 
 # Get the agent interaction history.
 
-```python
+```{python}
 for agent in model.schedule.agents:
     print(f"Agent {agent.unique_id} position history: {agent.pos_history}")
     print(f"Agent {agent.unique_id} interactions: {agent.interactions}")
@@ -418,7 +450,7 @@ for agent in model.schedule.agents:
 
 These are INSANE.
 
-```python
+```{python}
 # Initialize an empty graph
 G = nx.Graph()
 
@@ -432,13 +464,13 @@ for agent in model.schedule.agents:
             G.add_edge(agent.unique_id, interacted_agent, weight=count)
 ```
 
-```python
+```{python}
 print(f"Number of nodes: {G.number_of_nodes()}")
 print(f"Number of edges: {G.number_of_edges()}")
 print(f"Average degree: {sum(dict(G.degree()).values()) / float(G.number_of_nodes())}")
 ```
 
-```python
+```{python}
 # Extract the edge weights
 weights = [d['weight'] for u, v, d in G.edges(data=True)]
 

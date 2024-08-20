@@ -162,6 +162,7 @@ def estimate_meters_from_rssi(df, rssi_col, A=-40, n=2):
     return estimated_meters
 
 
+
 def update_quarto_variables(new_key, new_value, path="_variables.yml"):
     with open(path, 'r') as file:
         quarto_variables = yaml.safe_load(file)

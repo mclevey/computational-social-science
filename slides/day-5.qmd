@@ -56,8 +56,8 @@ bibliography: references.bib
 1. Why simulate?
 2. SIR models
 3. Agent-based modelling (ABM)
-4. Designing, developing, documenting, and analyzing models<br>[Simple and complex contagions (SIR, thresholds)]{.nord-footer}<br>[Opinion dynamics (bounded confidence)]{.nord-footer}<br>[Associative learning and diffusion]{.nord-footer}
-5. Empirically-calibrated ABMs<br>[Simulating networks]{.nord-footer}
+4. Designing, developing, documenting, and analyzing models<br>[Simple and complex contagions (SIR, thresholds)]{.nord-light}<br>[Opinion dynamics (bounded confidence)]{.nord-light}<br>[Associative learning and diffusion]{.nord-light}
+5. Empirically-calibrated ABMs<br>[Simulating networks]{.nord-light}
 6. Developing models with Mesa
 :::
 ::::
