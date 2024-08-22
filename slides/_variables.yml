@@ -1,10 +1,10 @@
 model_0:
-  epsilon: 0.5
   N: 100
+  epsilon: 0.5
   grid_height: 40
   grid_width: 40
   max_agent_step_size: 1
-  n_iterations: 1_500
+  n_iterations: 1500
 model_1:
   N: 100
   grid_height: 40
@@ -72,5 +72,5 @@ model_6:
   - 7
   - 14
 ontario_population: 14.4
-results_sir_model_1_max_infected: 0.12
-results_sir_model_2_max_infected: 0.02
+results_sir_model_1_max_infected: 0.17
+results_sir_model_2_max_infected: 0.05
