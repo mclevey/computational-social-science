@@ -1,3 +1,0 @@
-# Designing, Developing, Documenting, and Analyzing Models
-
-[Associative Diffusion and Learning]{.kn-pink}
