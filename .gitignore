@@ -16,7 +16,7 @@ package.json
 *.json
 *batch_run_*.csv
 slides/output/
-
+*./docs/*
 
 # Environment variables (api keys, etc.)
 .env
