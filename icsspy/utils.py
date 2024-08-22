@@ -146,6 +146,8 @@ def markdown_table(df: pd.DataFrame, filepath: str = None) -> str:
     Returns:
     str: The markdown formatted table as a string.
     """
+    pd.set_option('display.float_format', lambda x: '%.0f' % x)
+    
     md = df.to_markdown(index=False)
     if filepath is not None:
         with open(filepath, "w") as file:

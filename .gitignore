@@ -8,6 +8,7 @@
 *.mov
 *.svg
 docs/
+icsspy/data/CNS-figshare/
 package-lock.json
 package.json
 */bcm_batch_results.csv
