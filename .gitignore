@@ -1,4 +1,4 @@
-.DS_Store
+DS_Store
 **/.jupyter_cache/
 **/quarto/
 **/.vscode/
@@ -9,9 +9,11 @@
 *.svg
 docs/
 icsspy/data/CNS-figshare/
+slides/_freeze/
 package-lock.json
 package.json
 */bcm_batch_results.csv
+*.json
 
 
 # Environment variables (api keys, etc.)
