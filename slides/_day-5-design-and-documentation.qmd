@@ -1,0 +1,3 @@
+# Designing and Documenting Agent-based Models
+
+- Return to @railsback2019agent content mentioned earlier in the lecture

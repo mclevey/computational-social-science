@@ -1,0 +1,17 @@
+# Reduction, Realism, and Model Tradeoffs
+
+- agent cognition and preferences as binary or continuous but one-dimensional
+    - multiple opinions; modelling schemas; associative diffusion and learning
+- time, space, and especially interaction
+    - more realistic social network structures, movements through space and time
+- we can't do everything
+
+## Fine-grained vs. Course-grained Models
+
+[[@bruch2015agent; @smaldino2023modeling]]
+
+## Associative Learning and Diffusion
+
+## Improving Simulation of Network Societies
+
+{{< include _day-5-copenhagen-networks-study-sbm.qmd >}}

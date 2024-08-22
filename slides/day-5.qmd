@@ -17,7 +17,7 @@ format:
     height: 900
     embed-resources: true
     execute:
-      enabled: true
+      enabled: false
       echo: true
       warning: false
       freeze: true
@@ -42,36 +42,18 @@ highlight-style: "nord"
 bibliography: references.bib
 ---
 
-##
-
-:::: {.columns}
-::: {.column width="15%"}
-### Today
-:::
-
-::: {.column width="10%"}
-:::
-
-::: {.column width="75%"}
-1. Why simulate?
-2. SIR models
-3. Agent-based modelling (ABM)
-4. Designing, developing, documenting, and analyzing models<br>[Simple and complex contagions (SIR, thresholds)]{.nord-light}<br>[Opinion dynamics (bounded confidence)]{.nord-light}<br>[Associative learning and diffusion]{.nord-light}
-5. Empirically-calibrated ABMs<br>[Simulating networks]{.nord-light}
-6. Developing models with Mesa
-:::
-::::
-
 {{< include _day-5-introduction.qmd >}}
-{{< include _day-5-sir.qmd >}}
-{{< include _day-5-abms.qmd >}}
-{{< include _day-5-model-design-development-documentation-analysis.qmd >}}
-{{< include _day-5-simple-contagions.qmd >}}
+{{< include _day-5-sir-models-101.qmd >}} 
+{{< include _day-5-why-simulate.qmd >}} 
+{{< include _day-5-mesa.qmd >}} 
+{{< include _day-5-developing-sir-models.qmd >}} 
 {{< include _day-5-complex-contagions.qmd >}}
-{{< include _day-5-opinion-dynamics.qmd >}}
-{{< include _day-5-associative-learning.qmd >}}
-{{< include _day-5-empirical-calibration.qmd >}}
-{{< include _day-5-mesa.qmd >}}
+{{< include _day-5-opinion-dynamics-bcm.qmd >}}
+{{< include _day-5-reduction-realism-tradeoffs.qmd >}}
+{{< include _day-5-design-and-documentation.qmd >}}
+
+<!-- conclude by returning to the introduction -->
+{{< include _day-5-introduction.qmd >}}
 
 # References
 

@@ -1,0 +1,432 @@
+## The Copenhagen Networks Study
+
+- Details about the study here
+- Explain connection to greater realism, etc.
+- What we will do: look at the data; fit network models; generate networks
+
+##
+
+```{python}
+import icsspy 
+import seaborn as sns
+import random
+import matplotlib.pyplot as plt
+import pandas as pd
+import graph_tool.all as gt
+
+import icsspy
+from icsspy.utils import estimate_meters_from_rssi
+import icsspy.plotting as plotting
+
+icsspy.set_style()
+```
+
+```{python}
+#| echo: false
+from icsspy.utils import markdown_table
+pd.set_option('display.float_format', lambda x: '%.0f' % x) 
+# plt.rcParams['text.usetex'] = True
+```
+
+```{python}
+bluetooth_contact = icsspy.load_data('cns_bluetooth_filtered') 
+
+# RSSI values are negative; drop 1 incorrectly recorded observation
+bluetooth_contact = bluetooth_contact[bluetooth_contact['rssi'] <= 0] 
+bluetooth_contact.head(10)
+type(bluetooth_contact['# timestamp'])
+```
+
+```{python}
+#| echo: false
+bluetooth_contact['# timestamp'].astype(str)
+md = markdown_table(bluetooth_contact.head(10), 'tables/_cns_bluetooth_df.md')
+bluetooth_contact['# timestamp'].astype(int)
+print(md)
+```
+
+{{< include tables/_cns_bluetooth_df.md >}}
+
+## Working with Timestamps
+
+- The timestamps are relative; we need to provide an arbitrary start date so we can more easily work with datetime objects, etc.
+- or maybe easier to just use these values?
+
+```{python}
+# arbitrarily the study started on January 1, 2019, at midnight
+arbitrary_start_date = pd.to_datetime('2019-01-01')
+
+# convert the relative timestamps to datetime format
+bluetooth_contact['processed_timestamp'] = arbitrary_start_date + pd.to_timedelta(
+    bluetooth_contact['# timestamp'], unit='s'
+)
+
+bluetooth_contact.sample(10)
+```
+
+## Working with RSSI
+
+Let's convert the RSSI values to an estimated distance (meters). We'll use the Log-Distance Path Loss Model [@rappaport2002wireless] to do this, but it will be imperfect because we can't adjust the parameters based on the environmental context (indoors, outdoors, etc.) since we don't know that information. The conversion to meters is done using the model below.
+
+```{python}
+bluetooth_contact['estimated_meters'] = estimate_meters_from_rssi(bluetooth_contact, 'rssi')
+```
+
+```{python}
+sns.ecdfplot(bluetooth_contact['estimated_meters'])
+plt.xticks(range(0, 11))
+plt.grid(True, which='both', axis='x')
+plt.xlabel("\nDistance (up to 10 meters) estimated from RSSI")
+plt.ylabel("Proportion of edges\n")
+plt.savefig('media/cns_ecdf_rssi_edges.png', dpi=300)
+```
+
+![The cumulative distribution of distances (meters) between participants in the CNS, estimated using the Log-Distance Path Loss Model [[@rappaport2002wireless]]{.nord-light}.](media/cns_ecdf_rssi_edges.png){#fig-cns_ecdf_rssi_edges}
+
+## Time and Space in the CNS
+
+Let's pick a pair of participants who spent a lot of time together. We'll convert their RSSI values to estimated distance (meters) and plot their physical proximity to one another every 5 minutes over a 2 week stretch (1/2 the study).
+
+```{python}
+bluetooth_contact['user_pair'] = bluetooth_contact.apply(
+    lambda row: tuple(sorted([row['user_a'], row['user_b']])), axis=1
+)
+
+pair_counts = bluetooth_contact.groupby('user_pair').size().reset_index(name='counts')
+pair_counts = pair_counts.sort_values(by='counts', ascending=False)
+pair_counts.head(10)
+```
+
+We'll work with the top pair.
+
+```{python}
+frequent_pair = pair_counts.iloc[0] 
+user1, user2 = frequent_pair['user_pair']
+print(f"Selected users with frequent interactions: {user1} and {user2}")
+```
+
+## 
+
+Filter the dataframe to their interactions.
+
+```{python}
+pair_proximity = bluetooth_contact[
+    ((bluetooth_contact['user_a'] == user1) & (bluetooth_contact['user_b'] == user2)) |
+    ((bluetooth_contact['user_a'] == user2) & (bluetooth_contact['user_b'] == user1))
+]
+
+# sort by timestamp for plotting
+pair_proximity = pair_proximity.sort_values(by='processed_timestamp')
+pair_proximity.head()
+```
+
+## 
+
+Create a timeseries with 5-minute intervals; NaN if not present.
+
+```{python}
+time_range = pd.date_range(
+    start=pair_proximity['processed_timestamp'].min().floor('min'),
+    end=pair_proximity['processed_timestamp'].max().ceil('min'),
+    freq='5min' # 5 min intervals
+)
+
+time_series_df = pd.DataFrame(time_range, columns=['processed_timestamp'])
+# round the timestamps in the filtered data to the nearest 5-minute interval
+pair_proximity['rounded_timestamp'] = pair_proximity['processed_timestamp'].dt.round('5min')
+merged_df = pd.merge(time_series_df, pair_proximity[['rounded_timestamp', 'estimated_meters']],
+                     left_on='processed_timestamp', right_on='rounded_timestamp', how='left')
+# drop the extra column created by the merge
+merged_df.drop(columns=['rounded_timestamp'], inplace=True)
+merged_df
+```
+
+::: {.notes}
+With this approach, even if an interaction occurs slightly before or after a 5-minute boundary, it will still be counted in the nearest 5-minute bin, preventing any gaps or inaccuracies in the distance data. The final DataFrame will accurately reflect the estimated distances between the selected users at each 5-minute interval, including interactions that don’t line up perfectly with the original bins.
+:::
+
+
+## Interactions in Space [(RSSI)]{.kn-light}
+
+Now let's plot the estimated distances between these two users over time.
+
+We'll use the `plot_distance_per_day()` function from the course package, since the code to produce this figure is fairly complex and the specifics are beyond the scope of this course (and irrelevant to the task at hand anyway).
+
+```{python}
+plotting.plot_distance_per_day(
+    merged_df, 
+    time_col='processed_timestamp', 
+    distance_col='estimated_meters', 
+    num_segments=15,
+    filename='media/colocations_two_users_two_weeks.png'
+)
+```
+
+
+## Participants in Time and Space
+
+:::: {.columns}
+::: {.column width="75%"}
+![What explanations are there for this temporal pattern of co-location?](media/colocations_two_users_two_weeks.png){width=100% #fig-colocations_two_users_two_weeks}
+:::
+::: {.column width="25%"}
+Let's look at the physical co-locations of two participants. Remeber, we've selected two participants -- `{python} user1` and `{python} user2` -- who spend more time together than any other pair in the data.
+:::
+::::
+
+## Improving Simulation of Network Societies
+
+Our goal is to use this data to develop more structurally realistic ABMs. To do so, we'll load CNS networks, fit a simple SBM, and then use it to generate synthetic networks for use in the ABM.
+
+But first... how does this work?
+
+
+## Simulation via Sampling from Distributions
+
+<br>
+
+:::: {.columns}
+::: {.column width="45%"}
+We can sample from **any** probability distribution, however simple [(e.g., Gaussian $\longrightarrow$)]{.nord-light} or complex [(e.g., posterior distribution of a generative network model)]{.nord-pink}. Probability distributions are generative models!
+
+<br>
+
+```{python}
+import numpy as np
+
+mu = 0
+sigma = 1
+
+samples = np.random.normal(
+  loc=mu, scale=sigma, size=50
+)
+
+print(samples)
+```
+:::
+
+::: {.column width="10%"}
+:::
+
+::: {.column width="45%"}
+![](media/statistical_rethinking.png){width=100% .shadow-img}
+
+Bayesian Data Analysis (BDA) in Python with [PyMC]{.kn-blue}, [ArViz]{.kn-blue}, [babmi]{.kn-blue}, [graph-tool]{.kn-blue}, etc.
+:::
+::::
+
+# START TESTING HERE
+
+## Copenhagen Student Networks
+
+- load up the CNS csvs
+- construct relations at time points
+- then after that, simulate
+
+```{python}
+bt_symmetric = icsspy.load_data('CNS-figshare/bt_symmetric') 
+bt_symmetric
+```
+
+
+<!-- column names:
+	- timestamp
+	- user A 
+	- user B 
+	- received signal strength
+
+Notes:
+Empty scans are marked with user B = -1 and RSSI = 0
+Scans of devices outside of the experiment are marked with user B = -2. All non-experiment devices are given the same ID. -->
+
+```{python}
+# pre-process the bt data
+# Empty scans are marked with user B = -1 and RSSI = 0
+# Scans of devices outside of the experiment are marked with user B = -2. All non-experiment devices are given the same ID.
+bt_symmetric = bt_symmetric[bt_symmetric['rssi'] < 0]
+bt_symmetric = bt_symmetric[bt_symmetric['user_b'] != -1]
+bt_symmetric = bt_symmetric[bt_symmetric['user_b'] != -2]
+bt_symmetric
+```
+
+- Have to go to meetings; pick up back here.
+
+```{python}
+
+```
+
+> Notes for alignment later in this notebook
+> - make sure the goal / objective is explicit (realism, validity, etc.)
+> - match temporal resolution in the model with temporal resolution in the data (ordering or sequencing the relational data is key here); start small because an exact match is too much (every 5 minutes for 4 weeks) but if the binning is too large then it might lose meaning
+> - how do I want to handle situations where a node has no interactions during an iteration? (Maybe just have them pass and retain whatever state they have?); what if there are gaps in the timeseries, or other missing data?
+> - in all of this, be sure to keep the model design and data processes seperate / modular
+> - pre-process / chunk the data before running the model so that it can work more efficiently.
+> - How do I want to handle sensitivity analyses here and parameter sweeps here?
+
+
+
+# END TESTING HERE
+
+
+## Copenhagen Student Networks
+
+<br>
+
+:::: {.columns}
+::: {.column width="60%"}
+![We could construct networks from the CNS data ourselves, but they are already available in the `graph-tool` repository. We'll load those versions.](media/cns-gt-n.png){width=100%}
+:::
+
+::: {.column width="5%"}
+:::
+
+::: {.column width="40%"}
+```{python}
+g_bt = gt.collection.ns["copenhagen/bt"]
+g_sms = gt.collection.ns["copenhagen/sms"]
+g_calls = gt.collection.ns["copenhagen/calls"]
+g_fb_friends = gt.collection.ns["copenhagen/fb_friends"]
+```
+:::
+::::
+<!-- 
+
+```{python}
+bt_edges = []
+
+for e in g_bt.edges():
+    ids = [int(v) for v in e]
+    print(ids, e, g_bt.ep.timestamp[e])
+```
+
+```{python}
+for prop_name, prop_map in g_bt.edge_properties.items():
+    print(f"Property name: {prop_name}, Property type: {prop_map}")
+
+for prop_name, prop_map in g_bt.vertex_properties.items():
+    print(f"Property name: {prop_name}, Property type: {prop_map}")
+``` -->
+
+## Simulating Networks
+
+<br>
+
+::: {.column width="50%"}
+```{python}
+state = gt.minimize_blockmodel_dl(g_bt)
+
+synthetic_g_bt = gt.generate_sbm(
+  state.b.a,
+  state.get_matrix(),
+  directed=g_bt.is_directed()
+)
+
+g_bt, synthetic_g_bt
+```
+:::
+
+::: {.column width="5%"}
+:::
+
+:::: {.columns}
+::: {.column width="45%"}
+We'll fit a simple SBM (minimizing description length) and then use it to generate a synthetic network.
+:::
+::::
+
+> (<Graph object, directed, with 149 vertices and 2582 edges, 2 internal vertex properties, 1 internal edge property, 1 internal graph property, at 0x32d7a8770>,
+ <Graph object, directed, with 149 vertices and 2634 edges, at 0x31289ca40>)
+
+
+
+
+<!-- 
+## Simulating Networks
+
+<br>
+
+::: {.column width="70%"}
+```{python}
+blocks = state.get_blocks()
+block_matrix = state.get_matrix()
+block_counts = np.bincount(blocks.a)
+
+edge_weights = g.new_edge_property("double")
+
+for e in g.edges():
+    i, j = int(e.source()), int(e.target())
+    k, l = blocks[i], blocks[j]
+    # calculate the probability of connection between nodes i and j
+    if block_counts[k] > 0 and block_counts[l] > 0:
+        prob = block_matrix[k, l] / (block_counts[k] * block_counts[l])
+    else:
+        prob = 0  # in case the block size is zero
+    edge_weights[e] = prob
+
+g.ep["weight"] = edge_weights
+```
+:::
+
+::: {.column width="5%"}
+:::
+
+:::: {.columns}
+::: {.column width="20%"}
+1. get the inter-block edge count matrix
+2. iterate over the edges to compute edge probabilities
+3. assign the probabilities to an edge property map
+:::
+::::
+
+
+
+## Simulating Networks
+
+<br>
+
+::: {.column width="70%"}
+We'll create a weighted edgelist, store it in a Pandas dataframe, and write it to disk.
+
+```{python}
+stp = []
+for e in synthetic_g.edges():
+    stp.append((int(e.source()), int(e.target()), g.ep['weight'][e]))
+
+stp = pd.DataFrame(stp)
+stp.columns = ['i', 'j', 'p(edge)']
+stp.to_csv('output/simulated_network.csv', index=False)
+```
+:::
+
+::: {.column width="5%"}
+:::
+
+:::: {.columns}
+::: {.column width="20%"}
+{{< include ../notebooks/5-simulation-abms/output/sim_net_wel_df.md >}}
+:::
+::::
+
+
+##
+
+:::: {.columns}
+::: {.column width="45%"}
+![Cumulative distribution of edge probabilities for the synthetic network.](../notebooks/5-simulation-abms/output/sim_net_pedge_ecdf.png){width=100% #fig-sim_net_pedge_ecdf}
+:::
+
+::: {.column width="10%"}
+:::
+
+::: {.column width="45%"}
+![SFDP layout of the synthetic network.](../notebooks/5-simulation-abms/output/simulated_g.png){width=56% #fig-simulated_g}
+:::
+::::
+
+<br><br>
+
+::: {.fragment}
+That's it for the first part! 😎 We'll set this simulated network aside for now, but you'll see it again soon.
+
+[Python code available in the tutorial notebook.]{.nord-footer}
+::: -->
