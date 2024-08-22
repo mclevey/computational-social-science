@@ -6,8 +6,11 @@
 *.gif
 *.mp4
 *.mov
+*.svg
+docs/
 package-lock.json
 package.json
+*/bcm_batch_results.csv
 
 
 # Environment variables (api keys, etc.)
