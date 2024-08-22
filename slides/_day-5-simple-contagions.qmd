@@ -1,4 +1,0 @@
-# Designing, Developing, Documenting, and Analyzing Models
-
-[Simple Contagions, SIR]{.kn-pink}
-

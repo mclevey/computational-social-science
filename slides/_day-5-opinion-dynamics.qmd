@@ -1,3 +1,0 @@
-# Designing, Developing, Documenting, and Analyzing Models
-
-[Opinion Dynamics]{.kn-pink}
