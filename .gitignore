@@ -7,7 +7,6 @@ DS_Store
 *.mp4
 *.mov
 *.svg
-docs/
 icsspy/data/CNS-figshare/
 slides/_freeze/
 package-lock.json
@@ -16,7 +15,6 @@ package.json
 *.json
 *batch_run_*.csv
 slides/output/
-*./docs/*
 
 # Environment variables (api keys, etc.)
 .env
