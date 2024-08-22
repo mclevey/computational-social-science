@@ -14,6 +14,8 @@ package-lock.json
 package.json
 */bcm_batch_results.csv
 *.json
+*batch_run_*.csv
+slides/output/
 
 
 # Environment variables (api keys, etc.)
