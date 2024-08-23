@@ -1,4 +1,6 @@
-# Developing ABMs with Mesa
+# Getting to Know Mesa {background-image=media/robot.jpg background-opacity=0.8}
+
+Developing Your First ABM
 
 ## A minumum effective dose of object-oriented programming
 
