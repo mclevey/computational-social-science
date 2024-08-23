@@ -43,17 +43,14 @@ bibliography: references.bib
 ---
 
 {{< include _day-5-introduction.qmd >}}
-{{< include _day-5-sir-models-101.qmd >}} 
-{{< include _day-5-why-simulate.qmd >}} 
-{{< include _day-5-mesa.qmd >}} 
-{{< include _day-5-developing-sir-models.qmd >}} 
+{{< include _day-5-abms-101.qmd >}} 
+{{< include _day-5-modelling-cycle.qmd >}} 
+{{< include _day-5-mesa-sir.qmd >}} 
 {{< include _day-5-complex-contagions.qmd >}}
 {{< include _day-5-opinion-dynamics-bcm.qmd >}}
 {{< include _day-5-reduction-realism-tradeoffs.qmd >}}
-{{< include _day-5-design-and-documentation.qmd >}}
-
-<!-- conclude by returning to the introduction -->
-{{< include _day-5-introduction.qmd >}}
+{{< include _day-5-learning-from-abms.qmd >}}
+<!-- conclusion of some sort here -->
 
 # References
 

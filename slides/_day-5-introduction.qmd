@@ -10,12 +10,31 @@ Agent-based modelling with [Mesa]{.kn-pink}
 :::
 
 ::: {.column width="65%"}
-1. SIR Models<br>[equation vs. agent-based]{.nord-light}
-2. Why Simulate?<br>[foundations of iterative agent-based modelling]{.nord-light}
-3. Developing ABMs with Mesa<br>[a minumum effective dose of object-oriented programming<br>SIR modelling]{.nord-light}
-4. Diffusion and Complex Contagions<br>[threshold models]{.nord-light}
-5. Opinion Dynamics<br>[bounded confidence models]{.nord-light}
-6. Reduction, Realism, and Model Tradeoffs<br>[$\longleftarrow$ fine-grained vs. course-grained $\longrightarrow$<br>improving simulation of network societies<br>agent cognition and associative diffusion]{.nord-light}
-7. Design and documentation<br>[the ODD protocol]{.nord-light}
+1. What are Agent-based Models (ABMs)?<br>[e.g., SIR models]{.nord-light} <!-- {{< include _day-5-abms-101.qmd >}} -->
+2. Simulation and the Modelling Cycle<br>[designing, documenting, and developing ABMs]{.nord-light} <!-- {{< include _day-5-modelling-cycle.qmd >}} -->
+3. Getting to Know Mesa<br>[developing your first ABM]{.nord-light} <!-- {{< include _day-5-mesa-sir.qmd >}} -->
+4. Adding Complexity<br>[complex contagions and spreading processes with threshold models]{.nord-light} <!-- {{< include _day-5-complex-contagions.qmd >}} -->
+5. Social Learning and Opinion Dynamics<br>[homophily, echo chambers, and bounded confidence models]{.nord-light} <!-- {{< include _day-5-opinion-dynamics-bcm.qmd >}} -->
+6. Reduction, Realism, and Model Tradeoffs<br>[$\longleftarrow$ fine-grained vs. course-grained $\longrightarrow$<br>improving simulation of network societies<br>agent cognition and associative diffusion]{.nord-light} <!-- {{< include _day-5-reduction-realism-tradeoffs.qmd >}} -->
+7. Learning From ABMs<br>[design concepts and pattern-oriented modelling]{.nord-light} <!-- {{< include _day-5-learning-from-abms.qmd >}} -->
+:::
+::::
+
+
+:::: {.columns}
+::: {.column width="30%"}
+### Approach
+Python, R
+:::
+
+::: {.column width="5%"}
+:::
+
+::: {.column width="65%"}
+I will spend a lot of time explaining how the models are implemented in Python, but for most of you the primary [learning objectives]{.kn-pink} will be to (1) understand these models conceptually as well as (2) set up their inputs and (3) analyze their outputs within a theoretical or applied context.
+
+<br>
+
+[If you are in the R course, focus on the logic of the Python code to better understand the models themselves; there is no expectation that you will "learn Python." Johannes will show you how to setup, run, and analyze these models using R.]{.nord-light}
 :::
 ::::

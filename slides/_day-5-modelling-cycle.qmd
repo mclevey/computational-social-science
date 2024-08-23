@@ -1,0 +1,28 @@
+# The Modelling Cycle {background-image=media/neom-n7SdozgzvyA-unsplash.jpg background-opacity=0.3}
+
+## 
+
+[[@railsback2019agent]]{.nord-footer}
+
+### The Modelling Cycle
+
+<br>
+
+:::: {.columns}
+::: {.column width="45%"}
+![The ABM modelling cycle. [Figure reproduced from @railsback2019agent.]{.nord-light}](media/abm-cycle.png){width=100% #fig-abm-cycle}
+:::
+
+::: {.column width="10%"}
+:::
+
+::: {.column width="45%"}
+1. Formulate the question
+2. Assemble hypotheses for essential processes and structure
+3. Choose scales, entities, state variables, processes, and parameters
+4. Implement the model
+5. Analyze, test, and revise the model<br>[(recall the Box and Wickham loops!)]{.nord-footer}
+6. Communicate the model
+:::
+::::
+
