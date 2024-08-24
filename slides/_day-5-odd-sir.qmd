@@ -1,0 +1,98 @@
+### 1. Purpose and Patterns
+
+<br>
+
+#### Purpose
+
+The purpose of this model is to simulate the spread of an infectious disease through a population using a Susceptible-Infected-Recovered (SIR) framework. The model aims to explore how different factors such as infection rate, recovery time, and agent mobility affect the dynamics of disease spread and the overall infection rate in a population.
+
+<br>
+
+#### Patterns
+
+The model is intended to replicate the typical patterns observed in infectious disease spread, such as:
+
+- The rapid increase in the number of infected individuals (an epidemic curve).
+- The eventual decline in the number of infections as individuals recover.
+- The effect of varying recovery times and movement speeds on the spread of the disease.
+- The impact of initial infection rates on the overall dynamics of the disease.
+
+### 2. Entities, State Variables, and Scales
+
+<br>
+
+#### Entities
+
+- **Agents:** The model consists of agents representing individuals in the population. Each agent can be in one of three states: Susceptible (S), Infected (I), or Recovered (R). Agents move around the grid and interact with each other, potentially spreading the infection.
+- **Environment:** The environment is a grid where agents move and interact. The grid is defined by a width and height, and the movement of agents is confined within this grid.
+
+<br>
+
+#### State Variables
+
+- **For Agents:**
+  - **state**: The current health state of the agent (S, I, or R).
+  - **infected_time**: The time the agent has been infected.
+  - **recovery_time_range**: The range within which the agent might recover from the infection.
+  - **max_agent_step_size**: The maximum distance an agent can move in one step.
+  - **pos_history**: The history of positions the agent has occupied.
+  - **interactions**: A record of interactions with other agents.
+  - **infection_duration**: The total duration the agent has been infected.
+- **For the Environment:**
+  - The environment does not have dynamic state variables but is characterized by its dimensions (**grid_width** and **grid_height**).
+
+<br>
+
+#### Scales
+
+- **Temporal Scale:** The model operates in discrete time steps. Each step represents one unit of time, during which agents move and potentially interact with others.
+- **Spatial Scale:** The environment is a discrete grid where each cell can hold multiple agents. The grid's size is defined by the parameters **grid_width** and **grid_height**, which are set in the file **\_variables.qmd**.
+
+### 3. Process Overview and Scheduling
+
+<br>
+
+#### Process Overview
+
+- **Agent Movement:** Each agent moves to a new location within its movement range (**max_agent_step_size**). The new position is randomly chosen from neighboring cells.
+- **Infection Spread:** Infected agents attempt to infect neighboring susceptible agents with a probability defined by the infection rate.
+- **Recovery:** Infected agents have a chance to recover based on the time they have been infected. The recovery time is determined by the **recovery_time_range**.
+
+<br>
+
+#### Scheduling
+
+- At each time step, the following processes occur:
+  1. **Data Collection:** The model records the current state of the system (e.g., the number of infected agents).
+  2. **Agent Actions:** Each agent, in random order, executes the **step()** method, which includes moving, attempting to infect others, and potentially recovering.
+  3. **Iteration Control:** The model checks if the stopping conditions (maximum iterations or change in infection ratio) are met to decide whether to continue running.
+
+### 4. Design Concepts
+
+- **Basic Principles:** The model follows the basic principles of the SIR framework, where agents transition between susceptible, infected, and recovered states based on interactions with others and time spent infected.
+- **Emergence:** The primary emergent behavior is the epidemic curve showing how the number of infections grows, peaks, and declines over time.
+- **Adaptation:** Agents do not adapt; their behavior is determined by the rules of movement, infection, and recovery.
+- **Objectives:** The model's objective is to simulate disease spread dynamics and analyze the effects of different parameters on the spread.
+- **Learning:** Agents do not learn or change behavior over time.
+- **Prediction:** Agents do not predict future states; they act based on their current state and the states of their neighbors.
+- **Sensing:** Agents "sense" the state of other agents in their immediate neighborhood (Moore neighborhood).
+- **Interaction:** Interaction occurs when infected agents are in proximity to susceptible agents, leading to potential infection.
+- **Stochasticity:** The model includes randomness in agent movement, infection transmission, and recovery timing.
+- **Collectives:** No explicit collectives are modeled.
+- **Observation:** The model tracks the number of infected agents over time and can output interaction graphs to analyze agent interactions.
+
+### 5. Initialization
+
+- **Agent Initialization:** The model begins with **N** agents randomly placed on the grid. A specified number of agents (**n_initial_infections**) are initially infected.
+- **Environment Initialization:** The environment is a grid of size **grid_width** x **grid_height**. The grid is toroidal, meaning agents moving off one edge appear on the opposite edge.
+- **Initial Conditions:** Agents are placed with a random state of "S" (susceptible), except for the initially infected agents. The agents' recovery times are set within the specified **recovery_time_range**.
+
+### 6. Input Data
+
+- The model does not use external input data during the simulation. All necessary parameters are set at initialization.
+
+### 7. Submodels
+
+- **Movement Submodel:** Each agent selects a random neighboring cell within its movement range (**max_agent_step_size**) and moves there. The movement is subject to the boundaries of the grid.
+- **Infection Submodel:** If an agent is infected, it attempts to infect neighboring susceptible agents with a probability equal to the **infection_rate**.
+- **Recovery Submodel:** Infected agents track their infection duration and attempt to recover based on their **recovery_time_range**. Agents have a 50% chance of recovery after the minimum recovery time is reached, and they automatically recover if the maximum time is exceeded.

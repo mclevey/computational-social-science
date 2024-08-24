@@ -59,6 +59,14 @@ h5 {
   color: $nord-dark-bg !important;
 }
 
+
+// LIGHT TEXT ON DARK IMAGES
+
+.light-against-image {
+  color: #FFF !important;
+}
+
+
 // STYLE INLINE CODE
 
 code {
@@ -92,10 +100,29 @@ code {
   margin: 0 !important;
 }
 
-code span.er {
-  color: $nord-dark-bg !important;
-  text-decoration: none !important;
+// code span.er {
+//   color: $nord-dark-bg !important;
+//   text-decoration: none !important;
+// }
+
+// STYLE SPECIFIC CODE BLOCKS BY LANGUAGE
+
+/* Style for Python code blocks */
+.reveal pre code.language-python {
+  background-color: $nord-dark-bg !important;
+  /* Same as before */
+  border-radius: 5px;
 }
+
+/* Style for Plaintext code blocks */
+.reveal pre code.language-text {
+  background-color: $kn-green !important;
+  /* Green background for Plaintext */
+  color: $nord-dark-bg !important;
+  /* Dark text for contrast */
+  border-radius: 5px;
+}
+
 
 // STYLE QUARTO OUTPUT FROM CODE BLOCKS
 
@@ -210,6 +237,19 @@ table caption {
 .kn-red {
   color: $kn-red;
   font-weight: bold;
+}
+
+
+.monospace {
+  font-family: "Hack", monospace;
+  font-size: 0.9em;
+  font-weight: normal;
+}
+
+.pink-monospace {
+  font-family: "Hack", monospace;
+  color: $kn-pink !important;
+  font-weight: normal;
 }
 
 // STYLE IMAGES

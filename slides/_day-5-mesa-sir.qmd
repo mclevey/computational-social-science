@@ -1,22 +1,140 @@
-# Getting to Know Mesa {background-image=media/robot.jpg background-opacity=0.8}
+# Mesa {background-image=media/robot.jpg}
 
 Developing Your First ABM
 
-## A minumum effective dose of object-oriented programming
 
-- one slide of basic concepts
-- this will help you understand what follows, but focus on the high-level logic and it will come to you
-- the idea is for you to focus on the code for model analysis and experimentation; just run these models, the code is there to help you understnad hwo they work, may be out of reach for now and that is fine; R users can see this as psuedocode and Johannes will show you how to setup, run, and analyze these models
+## An MED of OOP for ABM [(sorry...)]{.nord-light}
 
-## Mesa model components
+[Object-oriented Programming (OOP), Essential Concepts]{.nord-footer}
 
-- the model class and methods
-- the agent class and methods
-- initialization procedures, etc.
-- steps, iterations, and batches
+<br>
 
-## SIR Model
+:::: {.columns}
 
+::: {.column width="35%"}
+![[Photo by <a href="https://unsplash.com/@fairfilter?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Oliver Roos</a> on <a href="https://unsplash.com/photos/landscape-photography-of-splitted-road-surrounded-with-trees-PCNdauVPbjA?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>]{.nord-light}](media/oliver-roos-PCNdauVPbjA-unsplash.jpg){width="100%"}
+:::
+
+::: {.column width="65%"}
+- **Classes** are like blueprints for creating objects (e.g., a Person class defines what properties and behaviors a person has).
+- **Objects** are specific instances of a class (e.g., `maria = Person()` creates an object `maria` from the `Person` class).
+- **Attributes** are variables that store data specific to an object (e.g., alice.age).
+- **Methods** are functions that define behaviors of an object (e.g., `alice.move()`).
+- **Inheritance** allows one class to inherit attributes and methods from another class, promoting code reuse (e.g., Professor class inherits from Person, because professors are people too).
+- **Encapsulation** allows us to bundle data (attributes) and methods that operate on the data into a single unit or class, restricting direct access to some of an object’s components.
+:::
+::::
+
+::: {.notes}
+Introduction to OOP:
+
+- Object-Oriented Programming (OOP) is a programming paradigm that structures software design around data, or objects, rather than functions and logic. It’s especially useful for modeling complex systems, like those you’ll encounter in agent-based modeling (ABM).
+
+Classes and Objects:
+
+- Think of a class as a blueprint. For example, if you’re modeling a group of people, the class might be Person. This class defines the properties (e.g., age, location) and behaviors (e.g., move, speak) that every person should have.
+- An object is a specific instance of that class. If you were to create a person named Alice in your model, you would instantiate the Person class like this: alice = Person(). Now, alice is an object with her own specific age, location, and so on.
+
+Attributes and Methods:
+
+- Attributes are like variables that hold information about the object. For example, alice.age = 25 sets Alice’s age to 25. Each object can have different values for these attributes.
+- Methods are functions that belong to the class and define what an object can do. For example, alice.move() could be a method that changes Alice’s location within the simulation.
+
+Inheritance:
+
+- Inheritance allows you to create a new class that is based on an existing class. If you have a Worker class that should include everything a Person has, but with some additional features, you can create Worker as a subclass of Person. This means Worker inherits all attributes and methods from Person but can also have its own unique features. This is crucial in ABM, where you might have different types of agents with shared behaviors.
+
+Encapsulation:
+
+- Encapsulation is the idea of keeping the internal workings of an object hidden from the outside. You can think of it as protecting the data inside an object. For example, you might not want other parts of your program to change an agent’s age directly; instead, they might call a method that safely updates the age. Encapsulation helps maintain the integrity of your model’s data and logic.
+
+Applying OOP in Mesa:
+
+- When you move to Mesa, you’ll use these OOP principles to define your agents as classes. Each agent will be an object of its class, with attributes that define its state (like position or health) and methods that define its behavior (like move() or interact()).
+- You’ll also use inheritance to create different types of agents with shared and unique behaviors, which makes your model more scalable and easier to manage.
+
+In short, OOP is fundamental for structuring your agent-based models in Python. By organizing your code into classes and objects, you can create agents with complex behaviors and interactions that are both manageable and scalable, which is exactly what you’ll be doing in Mesa.
+:::
+
+## Agent-based Modelling with Mesa
+
+[Object-oriented Programming (OOP), Essential Concepts]{.nord-footer}
+
+<br>
+
+:::: {.columns}
+::: {.column width="45%"}
+- We define an [Agent Class]{.kn-pink} [(which inherits from a more general Mesa class)]{.nord-light}. Each agent created from our class is an **object** with **attributes** [(states)]{.nord-light} and **methods** [(behaviors)]{.nord-light}.
+- The **environment** is typically represented as a grid or network where agents interact. The [Model class]{.kn-pink} manages the overall simulation, including initializing agents, updating them each step, and collecting data.
+- The Mesa [Scheduler]{.kn-pink} determines the order in which agents act. Common options include random or sequential activation. Agents execute their actions and update their states in each step of the schedule [(i.e., a tick of time)]{.nord-light}.
+- The Mesa [DataCollector]{.kn-pink} is used to gather and store data during the simulation for analysis.
+:::
+
+::: {.column width="10%"}
+:::
+
+::: {.column width="45%"}
+![](media/robot.jpg){width="100%" .shadow-img}
+
+[Agents are like little robots we manufactor according to some set of explicit instructions (the agent class).]{.nord-footer}
+:::
+::::
+
+::: {.notes}
+When we build agent-based models with Mesa, we apply these OOP concepts. Each agent in our models are instances of a class, meaning it has specific attributes and methods that define how it behaves in the simulation. In our SIR model, for example, each agent has a state attribute that indicates whether the agent is currently susceptible, infected, or in recovery.
+
+The environment where our agents interact is managed by the Model class. This environment could be a grid (like a city map) or a network (like social connections). The Model class handles the setup, including creating agents and placing them in the environment, and it oversees the simulation process.
+
+The Scheduler in Mesa is key to controlling how and when agents act. You can set agents to act in a random order, which might simulate more realistic scenarios, or in a specific sequence, depending on what makes sense for your model. This scheduling allows the simulation to evolve dynamically as agents interact with each other and the environment. Throughout the simulation, you can use the DataCollector to track various metrics—like the number of infected individuals in our SIR model. This data is crucial for analyzing the outcomes of your model.
+
+With that, let's get into things!
+:::
+
+
+##
+
+<br><br>
+
+:::: {.columns}
+::: {.column width="35%"}
+![ChatGPT / DALL-E3's artistic rendering of "dependency hell."](media/chatgpt_dependency_hell.png){.shadow-img width=100%}
+:::
+
+::: {.column width="5%"}
+:::
+
+::: {.column width="60%"}
+First, we set up our environment. We'll continue using the `gt` environment from yesterday. If you created it from the `setup/graphtool.yml` file, it has everything we need.
+
+<br>
+
+```zsh
+cd computational-social-science
+conda env create -f setup/graphtool.yaml
+conda activate gt
+```
+
+:::
+::::
+
+
+##
+
+:::: {.columns}
+::: {.column width="40%"}
+<br><br>
+
+Let's develop the
+
+### SIR model
+
+we've been using as an example so far.
+:::
+
+::: {.column width="5%"}
+:::
+
+::: {.column width="55%"}
 ```{python}
 import mesa
 from mesa import Agent, Model
@@ -34,17 +152,34 @@ import networkx as nx
 import seaborn as sns
 import matplotlib.pyplot as plt
 import icsspy
-
-icsspy.set_style()
-random.seed(30)
 ```
 
+<br>
 
-## Define the agent class
+Set a seed, for reproducibility, and [(optionally)]{.nord-light} use `icsspy.set_style()` to style your plots like mine.
+
+```{python}
+random.seed(42)
+icsspy.set_style()
+```
+:::
+::::
+
+
+## First, define the [agent class]{.kn-pink}
+
+<br>
 
 ```{python}
 class SIRAgent(Agent):
-    def __init__(self, unique_id, model, recovery_time_range=(8, 12), max_agent_step_size=1):
+    def __init__(
+        self,
+        unique_id,
+        model,
+        recovery_time_range=(8, 12),
+        max_agent_step_size=1
+    ):
+
         super().__init__(unique_id, model)
         self.state = "S"  # All agents start as susceptible
         self.infected_time = 0  # Counter for how long the agent has been infected
@@ -72,13 +207,17 @@ class SIRAgent(Agent):
                         neighbor.state = "I"
 
         # Move to a random neighboring cell with the given step size
-        possible_moves = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=False, radius=self.max_agent_step_size)
+        possible_moves = self.model.grid.get_neighborhood(
+            self.pos, moore=True, include_center=False, radius=self.max_agent_step_size
+        )
         new_position = self.random.choice(possible_moves)
         self.model.grid.move_agent(self, new_position)
         self.pos_history.append(new_position)  # Record the new position
 
         # Record interactions
-        neighbors = self.model.grid.get_neighbors(self.pos, moore=True, include_center=False)
+        neighbors = self.model.grid.get_neighbors(
+            self.pos, moore=True, include_center=False
+        )
         for neighbor in neighbors:
             if neighbor.unique_id in self.interactions:
                 self.interactions[neighbor.unique_id] += 1
@@ -86,11 +225,25 @@ class SIRAgent(Agent):
                 self.interactions[neighbor.unique_id] = 1
 ```
 
-## Define the model class
+## Second, define the [model class]{.kn-pink}
+
+<br>
 
 ```{python}
 class SIRModel(Model):
-    def __init__(self, grid_width, grid_height, N, infection_rate, recovery_time_range, max_agent_step_size=1, n_initial_infections=1, max_iterations=1000, change_threshold=0.01):
+    def __init__(
+        self,
+        grid_width,
+        grid_height,
+        N,
+        infection_rate,
+        recovery_time_range,
+        max_agent_step_size=1,
+        n_initial_infections=1,
+        max_iterations=1000,
+        change_threshold=0.001
+    ):
+
         super().__init__()
         self.num_agents = N
         self.grid = MultiGrid(grid_width, grid_height, True)
@@ -102,7 +255,7 @@ class SIRModel(Model):
         self.current_iteration = 0
         self.change_threshold = change_threshold
         self.previous_infected_ratio = None  # Track the ratio of infected agents in the previous step
-        
+
         # Create agents
         for i in range(self.num_agents):
             step_size = max_agent_step_size if i % 2 == 0 else 1  # Half agents have large step size, half small
@@ -113,14 +266,23 @@ class SIRModel(Model):
             self.schedule.add(a)
 
         # Infect a specified number of random agents
-        initial_infected_agents = self.random.sample(self.schedule.agents, n_initial_infections)
+        initial_infected_agents = self.random.sample(
+            self.schedule.agents, n_initial_infections
+        )
         for agent in initial_infected_agents:
             agent.state = "I"
             agent.infected_time = 0  # Initialize infection duration
 
         self.datacollector = DataCollector(
-            model_reporters={"Infected": self.compute_infected},
-            agent_reporters={"State": "state", "Infection_Duration": "infection_duration"}  # Collect infection duration
+            model_reporters={
+                "Susceptible": lambda m: self.count_state("S"),
+                "Infected": lambda m: self.compute_infected(),
+                "Recovered": lambda m: self.count_state("R")
+            },
+            agent_reporters={
+                "State": "state",
+                "Infection_Duration": "infection_duration"
+            }
         )
         self.running = True  # Ensure the model runs by default
 
@@ -145,6 +307,10 @@ class SIRModel(Model):
         infected = sum([1 for a in self.schedule.agents if a.state == "I"])
         return infected / self.num_agents
 
+    def count_state(self, state_name):
+        count = sum([1 for a in self.schedule.agents if a.state == state_name])
+        return count / self.num_agents
+
     def get_interaction_graph(self):
         G = nx.Graph()
         for agent in self.schedule.agents:
@@ -157,9 +323,9 @@ class SIRModel(Model):
         return G
 ```
 
-## Run the model
+## Third, load the [model parameters]{.kn-pink}
 
-Load the model parameters
+<br>
 
 ```{python}
 with open('_variables.yml', 'r') as file:
@@ -167,12 +333,28 @@ with open('_variables.yml', 'r') as file:
 
 model_1_params = params.get('model_1')
 pprint(model_1_params)
+```
 
+> output
+
+<br>
+
+```{python}
 model_2_params = params.get('model_2')
 pprint(model_2_params)
 ```
 
-and run!
+> output
+
+## Forth, [run the model(s)]{.kn-pink}
+
+<br>
+
+We'll run two models here to reproduce @fig-sir_compare.
+
+Here's **Model 1**
+
+<br>
 
 ```{python}
 model_1 = SIRModel(
@@ -191,6 +373,20 @@ for i in range(model_1_params['n_iterations']):
 m1res = model_1.datacollector.get_model_vars_dataframe()
 ```
 
+## Forth, [run the model(s)]{.kn-pink}
+
+<br>
+
+- MODEL 1 DATAFRAME OUTPUT
+
+
+## Forth, [run the model(s)]{.kn-pink}
+
+<br>
+
+And here's **Model 2**
+
+<br>
 
 ```{python}
 model_2 = SIRModel(
@@ -209,9 +405,18 @@ for i in range(model_2_params['n_iterations']):
 m2res = model_2.datacollector.get_model_vars_dataframe()
 ```
 
-## 
+## Forth, [run the model(s)]{.kn-pink}
 
-Plot the results
+<br>
+
+- MODEL 2 DATAFRAME OUTPUT
+
+
+## Plot the results
+
+Recall: [Design patterns]{.kn-pink}
+
+<br>
 
 ```{python}
 fig, ax = plt.subplots()
@@ -223,149 +428,56 @@ plt.legend(loc='upper right', fontsize=10)
 plt.savefig('media/sir_compare_models_1-2.png')
 ```
 
-![This is @fig-sir_compare from earlier in the lecture. Proportion of infected people in a population over time from two SIR simulations with different transmissability rates.](media/sir_compare){width=100%}
+<br>
+
+:::: {.columns}
+::: {.column width="25%"}
+![](media/sir_compare){width=100%}
+:::
+
+::: {.column width="75%"}
+$\longleftarrow$<br>This is @fig-sir_compare from earlier in the lecture. Proportion of infected people in a population over time from two SIR simulations with different transmissability rates.
+:::
+::::
+
+<!-- (TEMPORARILY?) CUTTING THIS OUT; NO SPACE AND NOT PEDAGOGICALLY USEFUL ANYWAY -->
+<!-- _day-5-CUT-illustrative-models.qmd -->
+
+## Agent Interaction
+
+![Who interacted with whom?](media/anthony-delanoix-hzgs56Ze49s-unsplash.jpg){width=65% .shadow-img}
 
 
-## Model 3
+## Agent Interaction
 
-```{python}
-model_3_params = params.get('model_3')
-pprint(model_3_params['max_agent_step_size'])
+We can iterate over the agents in the model and retrieve their interaction history. [Note that we can only do this because I built that data collection into the model! We can collect just about anything we want, but only if we set things up properly.]{.nord-light} Let's construct some agent **interaction networks**!
 
-model_4_params = params.get('model_4')
-pprint(model_4_params['max_agent_step_size'])
-
-model_5_params = params.get('model_5')
-pprint(model_5_params['max_agent_step_size'])
-
-model_6_params = params.get('model_6')
-pprint(model_6_params['max_agent_step_size'])
-```
-
-
-```{python}
-model_3 = SIRModel(
-    n_initial_infections = model_3_params['n_initial_infections'],
-    grid_width = model_3_params['grid_width'],
-    grid_height = model_3_params['grid_height'],
-    N = model_3_params['N'],
-    infection_rate = model_3_params['infection_rate'],
-    recovery_time_range = model_3_params['recovery_time_range'],
-    max_agent_step_size = model_3_params['max_agent_step_size'],
-)
-
-for i in range(model_3_params['n_iterations']):
-    model_3.step()
-
-m3res = model_3.datacollector.get_model_vars_dataframe()
-```
-
-## 
+<br>
 
 ```{python}
-model_4 = SIRModel(
-    n_initial_infections = model_4_params['n_initial_infections'],
-    grid_width = model_4_params['grid_width'],
-    grid_height = model_4_params['grid_height'],
-    N = model_4_params['N'],
-    infection_rate = model_4_params['infection_rate'],
-    recovery_time_range = model_4_params['recovery_time_range'],
-    max_agent_step_size = model_4_params['max_agent_step_size'],
-)
-
-for i in range(model_4_params['n_iterations']):
-    model_4.step()
-
-m4res = model_4.datacollector.get_model_vars_dataframe()
-```
-
-
-##
-
-```{python}
-model_5 = SIRModel(
-    n_initial_infections = model_5_params['n_initial_infections'],
-    grid_width = model_5_params['grid_width'],
-    grid_height = model_5_params['grid_height'],
-    N = model_5_params['N'],
-    infection_rate = model_5_params['infection_rate'],
-    recovery_time_range = model_5_params['recovery_time_range'],
-    max_agent_step_size = model_5_params['max_agent_step_size'],
-)
-
-for i in range(model_5_params['n_iterations']):
-    model_5.step()
-
-m5res = model_5.datacollector.get_model_vars_dataframe()
-```
-
-##
-
-```{python}
-model_6 = SIRModel(
-    n_initial_infections = model_6_params['n_initial_infections'],
-    grid_width = model_6_params['grid_width'],
-    grid_height = model_6_params['grid_height'],
-    N = model_6_params['N'],
-    infection_rate = model_6_params['infection_rate'],
-    recovery_time_range = model_6_params['recovery_time_range'],
-    max_agent_step_size = model_6_params['max_agent_step_size'],
-)
-
-for i in range(model_6_params['n_iterations']):
-    model_6.step()
-
-m6res = model_6.datacollector.get_model_vars_dataframe()
-```
-
-##
-
-Plot the results
-
-```{python}
-fig, ax = plt.subplots()
-ax.plot(m3res['Infected'], label=f'Max Agent Steps: {model_3_params['max_agent_step_size']}')
-ax.plot(m4res['Infected'], label=f'Max Agent Steps: {model_4_params['max_agent_step_size']}')
-ax.plot(m5res['Infected'], label=f'Max Agent Steps: {model_5_params['max_agent_step_size']}')
-ax.plot(m6res['Infected'], label=f'Max Agent Steps: {model_6_params['max_agent_step_size']}')
-plt.title(r'$\beta$=' + f'{model_3_params['infection_rate']} for all models\n', loc='left')
-plt.xlabel("\nDiscrete Steps in Time")
-plt.ylabel("Proportion Infected\n")
-plt.legend(loc='upper right', fontsize=10)
-plt.savefig('media/sir_compare_models_3-6.png')
-```
-
-
-<!-- UPDATE _VARIABLES -->
-
-```{python}
-#| echo: false
-from icsspy.utils import update_quarto_variables
-
-# compute the infection peak for both models so you can use them dynamically in the lecture
-update_quarto_variables("results_sir_model_1_max_infected", float(m1res['Infected'].max()))
-update_quarto_variables("results_sir_model_2_max_infected", float(m2res['Infected'].max()))
-```
-
-
-## Model Interaction Histories
-
-Get the agent interaction history.
-
-```{python}
+interaction_graphs = {}
 interaction_graph_summaries = {}
-models = [model_1, model_2, model_3, model_4, model_5, model_6]
+
+models = [model_1, model_2]
 for i, model in enumerate(models, start=1):
     wel = []
     for agent in model.schedule.agents:
         for k, v in agent.interactions.items():
             wel.append((int(agent.unique_id), k, v))
-    
-    G = nx.Graph()
-    G.add_weighted_edges_from(wel)  
-    avg_degree = round(sum(dict(G.degree()).values()) / float(G.number_of_nodes()), 2)
-    interaction_graph_summaries[i] = (G.number_of_nodes(), G.number_of_edges(), avg_degree)
 
+    G = nx.Graph()
+    G.add_weighted_edges_from(wel)
+    interaction_graphs[f'M{i}'] = G
+
+    avg_degree = round(sum(dict(G.degree()).values()) / float(G.number_of_nodes()), 2)
+    interaction_graph_summaries[f'M{i}'] = (G.number_of_nodes(), G.number_of_edges(), avg_degree)
+```
+
+## Agent Interaction
+
+<br>
+
+```{python}
 interaction_graph_summaries = pd.DataFrame(interaction_graph_summaries).T
 interaction_graph_summaries.columns = ['No. Nodes', 'No. Edges', 'Avg. Degree']
 interaction_graph_summaries
@@ -375,25 +487,38 @@ interaction_graph_summaries
 #| echo: false
 from icsspy.utils import markdown_table
 md = markdown_table(interaction_graph_summaries, 'tables/_sir_1_interaction_graph_summaries.md')
-print(md)
+# print(md)
 ```
 
+|   No. Nodes |   No. Edges |   Avg. Degree |
+|------------:|------------:|--------------:|
+|         100 |         984 |         19.68 |
+|         100 |         997 |         19.94 |
 
+<!-- won't load external table for some reason... -->
 
+<br>
 
-```{python}
-for agent in model_6.schedule.agents:
-    print(f"Agent {agent.unique_id} interactions: {agent.interactions}")
-```
-
-Plot agent interaction networks.
-
+:::: {.columns}
+::: {.column width="65%"}
 ```{python}
 # Initialize an empty graph
-G = nx.Graph()
+G = interaction_graphs['M2']
+weights = [d['weight'] for u, v, d in G.edges(data=True)]
 
-# Add nodes and edges based on interactions
-for agent in model_6.schedule.agents:
+plt.figure(figsize=(8, 6))
+sns.ecdfplot(weights)
+plt.xlabel('Interaction Weight')
+plt.ylabel('ECDF')
+plt.title('ECDF of Interaction Weights')
+plt.grid(True)
+plt.savefig('media/compare_agent_networks.png', dpi=300)
+```
+
+```{python}
+#| echo: false
+# testing something... ignore this... nothing to see here...
+for agent in model_2.schedule.agents:
     G.add_node(agent.unique_id)  # Add agent as a node
     for interacted_agent, count in agent.interactions.items():
         if G.has_edge(agent.unique_id, interacted_agent):
@@ -401,373 +526,223 @@ for agent in model_6.schedule.agents:
         else:
             G.add_edge(agent.unique_id, interacted_agent, weight=count)
 ```
+:::
 
-```{python}
-print(f"Number of nodes: {G.number_of_nodes()}")
-print(f"Number of edges: {G.number_of_edges()}")
-print(f"Average degree: {sum(dict(G.degree()).values()) / float(G.number_of_nodes())}")
-```
+::: {.column width="35%"}
+![Model 2 edge weight ECDF.](media/compare_agent_networks.png){width="75%" #fig-compare_agent_networks}
+:::
+::::
 
-```{python}
-# Extract the edge weights
-weights = [d['weight'] for u, v, d in G.edges(data=True)]
+## Analysis Chapter Summary
 
-plt.figure(figsize=(8, 6))
-sns.ecdfplot(weights)
-plt.xlabel('Interaction Weight')
-plt.ylabel('ECDF')
-plt.title('ECDF of Interaction Weights')
-plt.grid(True)
-plt.savefig('media/compare_agent_networks.png', dpi=300)
-```
+- TODO
 
+## Model Analysis
 
-## Plot the random walks for an agent with low steps (agent 7) and high-steps.
+<br>
 
-```{python}
-# Find the agent with unique_id = 7
-agent_id_7 = 29
-agent_7 = next(agent for agent in model_6.schedule.agents if agent.unique_id == agent_id_7)
+:::: {.columns}
+::: {.column width="60%"}
+#### [Sensitivity Analysis]{.kn-pink .large-text}
 
-# Find another agent with a larger step size
-larger_step_agent = max(model_6.schedule.agents, key=lambda agent: agent.max_agent_step_size)
+helps determine which model parameters are most important and/or uncertain, and which require careful estimation and interpretation.
 
-# Create subplots
-fig, axs = plt.subplots(1, 2, figsize=(24, 12))
+<br>
 
-# Plot agent 7's trajectory in the first subplot
-x7, y7 = zip(*agent_7.pos_history)
-axs[0].plot(x7, y7, label=f"Agent {agent_7.unique_id} (Step size: {agent_7.max_agent_step_size})", color='blue')
-axs[0].set_title(f"Agent {agent_7.unique_id} (Step size: {agent_7.max_agent_step_size})")
-axs[0].set_xlabel("X Position")
-axs[0].set_ylabel("Y Position")
-axs[0].grid(True, which='both', linestyle='--')  # Show grid lines at every tick
-axs[0].minorticks_on()  # Ensure minor ticks are on for finer grid control
-axs[0].set_xlim(-0.5, 40.5)
-axs[0].set_ylim(-0.5, 40.5)
-axs[0].set_yticks(np.arange(0, 41, 2))  # Set y-axis ticks to every 2nd number
-axs[0].set_xticks(np.arange(0, 41, 2))  # Set x-axis ticks to every 2nd number
+#### [Parameter Sweeps]{.kn-pink .large-text}
 
-# Plot the larger step agent's trajectory in the second subplot
-x_large, y_large = zip(*larger_step_agent.pos_history)
-axs[1].plot(x_large, y_large, label=f"Agent {larger_step_agent.unique_id} (Step size: {larger_step_agent.max_agent_step_size})", color='red')
-axs[1].set_title(f"Agent {larger_step_agent.unique_id} (Step size: {larger_step_agent.max_agent_step_size})")
-axs[1].set_xlabel("X Position")
-axs[1].set_ylabel("Y Position")
-axs[1].grid(True, which='both', linestyle='--')  # Show grid lines at every tick
-axs[1].minorticks_on()  # Ensure minor ticks are on for finer grid control
-axs[1].set_xlim(-0.5, 40.5)
-axs[1].set_ylim(-0.5, 40.5)
-axs[1].set_yticks(np.arange(0, 41, 2))  # Set y-axis ticks to every 2nd number
-axs[1].set_xticks(np.arange(0, 41, 2))  # Set x-axis ticks to every 2nd number
+allow for a systematic exploration of how different settings influence model behavior, which helps in understanding the model's **response landscape**.
 
-# Adjust layout and show plot
-plt.tight_layout()
-plt.savefig('media/compare_agent_step_sizes.png', dpi=300)
-```
+<br>
 
-![](media/media/compare_agent_step_sizes.png){width=100%}
+#### [Computational Experiments]{.kn-pink .large-text}
+
+involve systematically investigating the model's behavior to answer specific questions, understand mechanisms, or test hypotheses.
+:::
+
+::: {.column width="40%"}
+:::
+::::
+
+::: {.notes}
+When iteratively analyzing models, we can use Sensitivity Analysis, Parameter Sweeps, and Computational Experiments to understand, test, and analyze the behavior of the model under various conditions. These methods are essential for ensuring the model’s reliability and for interpreting its results. Here’s what they mean:
+
+1. Sensitivity Analysis
+
+Sensitivity analysis involves systematically varying model parameters to assess how changes in these parameters affect the model’s output. It helps identify which parameters are most influential in determining model behavior and which ones have less impact.
+
+The main goal is to understand how robust the model's results are. If small changes in a parameter lead to significant changes in outcomes, for example, that parameter is considered sensitive and could indicate areas where the model might need refinement or better data.
+
+Local Sensitivity Analysis involves small variations in one parameter at a time to observe the local impact on the model, whereas Global Sensitivity Analysis considers a broader range of variations and the combined effects of multiple parameters.
+
+2. Parameter Sweeps
+
+This allows us to map out the response of the model across the entire space of possible parameter values, which helps identify trends, tipping points, or regions of parameter space where the model behaves in a particular way. Typically, this is done by running a series of simulations where one or more parameters are adjusted incrementally. The results are then analyzed to understand the relationship between parameters and outcomes.
+
+3. Computational Experiments:
+
+In the context of ABM, computational experiments refer to the process of systematically testing the model by varying initial conditions, parameter values, or model structures to observe the resulting behavior. Most importantly, this is done with the goal of answering scientific questions, understanding mechanisms, or testing hypotheses. Sometimes this is explicitly causal and may be similar to laboratory experiments, only in a simulated environment where variables can easily be manipulated and controlled. Other times it is more exploratory, with the goal of mapping out the model’s behavior across a wide range of conditions.
+:::
 
 
-# Sensitivity Analysis and Parameter Sweeps with BatchRunner
+# [[deeper dives with]{.small-text .light-against-image}<br>batch_run]{.pink-monospace} {background-image=media/jeremy-bishop-5MvL55-rSvI-unsplash.jpg}
+
+<!-- Photo by <a href="https://unsplash.com/@sebaspenalambarri?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Sebastian Pena Lambarri</a> on <a href="https://unsplash.com/photos/two-people-scuba-diving-underwater-7i5HMCGupVw?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>
+   -->
 
 
-```{python}
-params = {
-    "N": 100,  
-    "grid_height": 40,
-    "grid_width": 40,
-    "infection_rate": 0.45,
-    "recovery_time_range": [(14,24)],
-    "max_agent_step_size": [2,4,6,8,10,12,14,16,18,20], 
-}
+## Using [batch_run]{.monospace}
 
-results = mesa.batch_run(
-    SIRModel,  # Your model class
-    parameters=params,
-    iterations=10,  # Number of iterations per parameter combination
-    max_steps=100,  # Number of steps in each simulation
-    number_processes=4,  # Use 4 CPU cores for parallel processing
-    data_collection_period=1,  # Collect data at every step
-    display_progress=True,  # Show progress bar during execution
-)
+<br>
 
-# Convert results to DataFrame for analysis
-results_df = pd.DataFrame(results)
-results_df
-```
-
-```{python}
-
-# Check the first few rows of the DataFrame
-print(results_df.head())
-
-# Check if there are any rows where State is 'R' and Infection_Duration is non-null
-recovered_agents = results_df[results_df['State'] == 'R']
-print(recovered_agents[['Infection_Duration', 'State']].dropna())
-```
-
-
-
-
-```{python}
-# Assuming results_df contains the batch run results
-infection_durations = results_df[results_df['State'] == 'R']['Infection_Duration']
-plt.figure(figsize=(10, 6))
-sns.histplot(infection_durations, kde=True)
-plt.title('Distribution of Infection Duration')
-plt.xlabel('Infection Duration (Steps)')
-plt.ylabel('Frequency')
-plt.show()
-```
-
-```{python}
-plt.figure(figsize=(10, 6))
-sns.ecdfplot(infection_durations)
-plt.title('Cumulative Distribution of Infection Duration')
-plt.xlabel('Infection Duration (Steps)')
-plt.ylabel('Cumulative Frequency')
-plt.show()
-```
-
-
-## Batch No. 2
+:::: {.columns}
+::: {.column width="75%"}
 
 ```{python}
 params = {
-    "N": 100,  
+    "N": 100,
     "grid_height": 40,
     "grid_width": 40,
-    "infection_rate": [0.1, 0.2, 0.3, 0.4, 0.5, 0.55, 0.6, 0.7, 0.8, 0.9],
-    "recovery_time_range": [(14,24)],
-    "max_agent_step_size": [4, 8, 12, 16], 
+    "infection_rate": [0.2, 0.4, 0.6, 0.8,],
+    "recovery_time_range": [(7,14), (14,24)],
+    "max_agent_step_size": [2, 4, 6, 8, 10, 12],
+    "n_initial_infections": [1, 5, 10, 15, 20, 25]
 }
+```
 
+:::
+
+::: {.column width="25%"}
+First, define a dict containing parameter valus. Use lists `[]` to configure the response space.
+:::
+
+::::
+
+<br>
+
+:::: {.columns}
+::: {.column width="75%"}
+
+```{python}
 results = mesa.batch_run(
-    SIRModel,  # Your model class
+    model_cls=SIRModel,
     parameters=params,
-    iterations=10,  # Number of iterations per parameter combination
-    max_steps=100,  # Number of steps in each simulation
-    number_processes=4,  # Use 4 CPU cores for parallel processing
-    data_collection_period=1,  # Collect data at every step
-    display_progress=True,  # Show progress bar during execution
+    iterations=10,
+    max_steps=100,
+    number_processes=1,
+    data_collection_period=1,  # collect data at every step
+    display_progress=True,
 )
 
-# Convert results to DataFrame for analysis
 results_df = pd.DataFrame(results)
-results_df
+results_df.info()
 ```
+
+:::
+
+::: {.column width="25%"}
+Then run your model using the `batch_run()` function.
+:::
+::::
 
 
 ```{python}
+#| echo: false
+#
+# if error on laptop, it's multi-processing in a notebook
+# change number_processes to 1
+#
+results = mesa.batch_run(
+    model_cls=SIRModel,
+    parameters=params,
+    iterations=10,
+    max_steps=100,
+    number_processes=1,
+    data_collection_period=1,
+    display_progress=True,
+)
 
-# Check the first few rows of the DataFrame
-print(results_df.head())
-
-# Check if there are any rows where State is 'R' and Infection_Duration is non-null
-recovered_agents = results_df[results_df['State'] == 'R']
-print(recovered_agents[['Infection_Duration', 'State']].dropna())
+results_df = pd.DataFrame(results)
+results_df.info()
 ```
 
+##
 
+```{python}
+#| echo: false
+from icsspy.utils import markdown_table
+md = markdown_table(results_df.head(), 'tables/_sir_batch_results_df.md')
+print(md)
+```
+
+```python
+results_df.head()
+```
+
+|   RunId |   iteration |   Step |   N |   grid_height |   grid_width |   infection_rate | recovery_time_range   |   max_agent_step_size |   n_initial_infections |   Susceptible |   Infected |   Recovered |   AgentID | State   |   Infection_Duration |
+|--------:|------------:|-------:|----:|--------------:|-------------:|-----------------:|:----------------------|----------------------:|-----------------------:|--------------:|-----------:|------------:|----------:|:--------|---------------------:|
+|       0 |           0 |      0 | 100 |            40 |           40 |              0.2 | (7, 14)               |                     2 |                      1 |          0.99 |       0.01 |           0 |         0 | S       |                    0 |
+|       0 |           0 |      0 | 100 |            40 |           40 |              0.2 | (7, 14)               |                     2 |                      1 |          0.99 |       0.01 |           0 |         1 | S       |                    0 |
+|       0 |           0 |      0 | 100 |            40 |           40 |              0.2 | (7, 14)               |                     2 |                      1 |          0.99 |       0.01 |           0 |         2 | S       |                    0 |
+|       0 |           0 |      0 | 100 |            40 |           40 |              0.2 | (7, 14)               |                     2 |                      1 |          0.99 |       0.01 |           0 |         3 | S       |                    0 |
+|       0 |           0 |      0 | 100 |            40 |           40 |              0.2 | (7, 14)               |                     2 |                      1 |          0.99 |       0.01 |           0 |         4 | S       |                    0 |
 
 
 ```{python}
-# Assuming results_df contains the batch run results
-infection_durations = results_df[results_df['State'] == 'R']['Infection_Duration']
-plt.figure(figsize=(10, 6))
-sns.histplot(infection_durations, kde=True)
-plt.title('Distribution of Infection Duration')
-plt.xlabel('Infection Duration (Steps)')
-plt.ylabel('Frequency')
-plt.show()
+#| echo: false
+md = markdown_table(results_df.tail(), 'tables/_sir_batch_results_df_tail.md')
+print(md)
 ```
 
+```python
+results_df.tail()
+```
+
+|   RunId |   iteration |   Step |   N |   grid_height |   grid_width |   infection_rate | recovery_time_range   |   max_agent_step_size |   n_initial_infections |   Susceptible |   Infected |   Recovered |   AgentID | State   |   Infection_Duration |
+|--------:|------------:|-------:|----:|--------------:|-------------:|-----------------:|:----------------------|----------------------:|-----------------------:|--------------:|-----------:|------------:|----------:|:--------|---------------------:|
+|    2879 |           9 |     29 | 100 |            40 |           40 |              0.8 | (14, 24)              |                    12 |                     25 |          0.04 |       0.02 |        0.94 |        50 | R       |                   14 |
+|    2879 |           9 |     29 | 100 |            40 |           40 |              0.8 | (14, 24)              |                    12 |                     25 |          0.04 |       0.02 |        0.94 |        91 | R       |                   20 |
+|    2879 |           9 |     29 | 100 |            40 |           40 |              0.8 | (14, 24)              |                    12 |                     25 |          0.04 |       0.02 |        0.94 |        74 | R       |                   21 |
+|    2879 |           9 |     29 | 100 |            40 |           40 |              0.8 | (14, 24)              |                    12 |                     25 |          0.04 |       0.02 |        0.94 |        58 | R       |                   14 |
+|    2879 |           9 |     29 | 100 |            40 |           40 |              0.8 | (14, 24)              |                    12 |                     25 |          0.04 |       0.02 |        0.94 |        68 | R       |                   16 |
+
+
+[Be selective about the data you collect during a batch run. I collected everything (including things that don't vary) here for pedagogical reasons only! Another run I did with this model produced a 4GB text file with only 6 variables. So, yeah.]{.nord-footer}
+
+##
+
+<br>
 
 ```{python}
-plt.figure(figsize=(10, 6))
-sns.ecdfplot(infection_durations)
-plt.title('Cumulative Distribution of Infection Duration')
-plt.xlabel('Infection Duration (Steps)')
-plt.ylabel('Cumulative Frequency')
-plt.show()
+melted_df = pd.melt(
+    results_df,
+    id_vars=['n_initial_infections', 'infection_rate', 'Step'],
+    value_vars=['Susceptible', 'Infected', 'Recovered'],
+    var_name='State',
+    value_name='Proportion'
+)
+
+g = sns.FacetGrid(
+    melted_df, col="n_initial_infections", hue="State", col_wrap=3, height=4, aspect=1.5
+)
+
+# map the data to the grid
+g.map_dataframe(sns.lineplot, x='Step', y='Proportion')
+
+g.add_legend()
+g.set_axis_labels("Time Step", "Proportion")
+g.set_titles("Initial Infections: {col_name}")
+
+plt.savefig("media/sir_subplots.png", dpi=300)
 ```
 
+##
 
-```{python}
-avg_duration_by_rate = recovered_agents.groupby('infection_rate')['Infection_Duration'].mean()
-
-plt.figure(figsize=(10, 6))
-plt.plot(avg_duration_by_rate.index, avg_duration_by_rate.values, marker='o')
-plt.title('Average Infection Duration vs. Infection Rate')
-plt.xlabel('Infection Rate')
-plt.ylabel('Average Infection Duration (Steps)')
-plt.show()
-```
-
-```{python}
-final_infected_by_rate = results_df.groupby('infection_rate')['Infected'].last()
-
-plt.figure(figsize=(10, 6))
-plt.plot(final_infected_by_rate.index, final_infected_by_rate.values, marker='o')
-plt.title('Final Proportion Infected vs. Infection Rate')
-plt.xlabel('Infection Rate')
-plt.ylabel('Final Proportion Infected')
-plt.show()
-```
-
-```{python}
-plt.figure(figsize=(12, 8))
-sns.boxplot(x='infection_rate', y='Infection_Duration', data=recovered_agents)
-plt.title('Boxplot of Infection Durations for Different Infection Rates')
-plt.xlabel('Infection Rate')
-plt.ylabel('Infection Duration (Steps)')
-plt.show()
-```
+![](media/sir_subplots.png){width="100%"}
 
 
-```{python}
-heatmap_data = results_df.pivot_table(index='max_agent_step_size', columns='infection_rate', values='Infected', aggfunc='last')
+##
 
-plt.figure(figsize=(10, 8))
-sns.heatmap(heatmap_data, annot=True, cmap='viridis')
-plt.title('Heatmap of Final Proportion Infected vs. Infection Rate and Agent Step Size')
-plt.xlabel('Infection Rate')
-plt.ylabel('Max Agent Step Size')
-plt.show()
-```
-
-```{python}
-fig, axs = plt.subplots(1, 2, figsize=(24, 12))
-
-# Agent 7
-x7, y7 = zip(*agent_7.pos_history)
-axs[0].plot(x7, y7, label=f"Agent {agent_7.unique_id} (Step size: {agent_7.max_agent_step_size})", color='blue')
-axs[0].set_title(f"Agent {agent_7.unique_id} (Step size: {agent_7.max_agent_step_size})")
-axs[0].set_xlabel("X Position")
-axs[0].set_ylabel("Y Position")
-axs[0].grid(True, which='both', linestyle='--')
-
-# Larger step agent
-x_large, y_large = zip(*larger_step_agent.pos_history)
-axs[1].plot(x_large, y_large, label=f"Agent {larger_step_agent.unique_id} (Step size: {larger_step_agent.max_agent_step_size})", color='red')
-axs[1].set_title(f"Agent {larger_step_agent.unique_id} (Step size: {larger_step_agent.max_agent_step_size})")
-axs[1].set_xlabel("X Position")
-axs[1].set_ylabel("Y Position")
-axs[1].grid(True, which='both', linestyle='--')
-
-plt.tight_layout()
-plt.savefig('media/compare_agent_step_sizes.png', dpi=300)
-plt.show()
-```
-
-```{python}
-# Extract the edge weights
-weights = [d['weight'] for u, v, d in G.edges(data=True)]
-
-plt.figure(figsize=(8, 6))
-sns.ecdfplot(weights)
-plt.xlabel('Interaction Weight')
-plt.ylabel('ECDF')
-plt.title('ECDF of Interaction Weights')
-plt.grid(True)
-plt.savefig('media/compare_agent_networks.png', dpi=300)
-plt.show()
-```
-
-## Comparing Batch Runs
-
-```{python}
-# Compute mean and variance of infection durations by infection rate
-mean_duration = results_df.groupby('infection_rate')['Infection_Duration'].mean()
-var_duration = results_df.groupby('infection_rate')['Infection_Duration'].var()
-
-# Plot the mean and variance
-plt.figure(figsize=(12, 6))
-plt.plot(mean_duration.index, mean_duration.values, label='Mean Infection Duration', marker='o')
-plt.fill_between(mean_duration.index, mean_duration.values - np.sqrt(var_duration.values),
-                 mean_duration.values + np.sqrt(var_duration.values), alpha=0.3)
-plt.title('Mean and Variance of Infection Duration by Infection Rate')
-plt.xlabel('Infection Rate')
-plt.ylabel('Infection Duration (Steps)')
-plt.legend(loc='best')
-plt.show()
-```
-
-```{python}
-plt.figure(figsize=(12, 8))
-for rate in params['infection_rate']:
-    subset = results_df[(results_df['infection_rate'] == rate) & (results_df['Step'] > 0)]
-    mean_infected = subset.groupby('Step')['Infected'].mean()
-    plt.plot(mean_infected.index, mean_infected.values, label=f"Infection Rate: {rate}")
-
-plt.title('Time Series of Proportion Infected Across Different Infection Rates')
-plt.xlabel('Time Step')
-plt.ylabel('Proportion Infected')
-plt.legend(loc='best')
-plt.show()
-```
-
-```{python}
-plt.figure(figsize=(12, 8))
-sns.boxplot(x='infection_rate', y='Infected', data=results_df[results_df['Step'] == results_df['Step'].max()])
-plt.title('Boxplot of Final Proportion Infected Across Infection Rates')
-plt.xlabel('Infection Rate')
-plt.ylabel('Final Proportion Infected')
-plt.show()
-```
-
-```{python}
-heatmap_data = results_df.pivot_table(index='max_agent_step_size', columns='infection_rate', values='Infected', aggfunc='mean')
-
-plt.figure(figsize=(10, 8))
-sns.heatmap(heatmap_data, annot=True, cmap='viridis')
-plt.title('Heatmap of Final Proportion Infected by Infection Rate and Step Size')
-plt.xlabel('Infection Rate')
-plt.ylabel('Max Agent Step Size')
-plt.show()
-```
-
-```{python}
-plt.figure(figsize=(12, 8))
-for rate in params['infection_rate']:
-    subset = recovered_agents[recovered_agents['infection_rate'] == rate]
-    sns.ecdfplot(subset['Infection_Duration'], label=f"Infection Rate: {rate}")
-
-plt.title('CDF of Infection Durations Across Different Infection Rates')
-plt.xlabel('Infection Duration (Steps)')
-plt.ylabel('Cumulative Frequency')
-plt.legend(loc='best')
-plt.show()
-```
-
-```{python}
-sns.pairplot(results_df, hue='infection_rate', vars=['Infection_Duration', 'Infected'])
-plt.suptitle('Pairwise Scatter Plot of Outcomes by Infection Rate')
-plt.show()
-```
-
-
-
-```{python}
-summary_table = results_df.groupby('infection_rate').agg({
-    'Infection_Duration': ['mean', 'median', 'var', 'min', 'max'],
-    'Infected': ['mean', 'median', 'var', 'min', 'max']
-})
-
-print(summary_table)
-```
-
-
-```{python}
-plt.figure(figsize=(12, 8))
-for iteration in results_df['iteration'].unique():
-    subset = results_df[(results_df['iteration'] == iteration)]
-    plt.plot(subset['Step'], subset['Infected'], alpha=0.5, label=f"Run {iteration}")
-
-plt.title('Overlay of Proportion Infected Across Multiple Runs')
-plt.xlabel('Time Step')
-plt.ylabel('Proportion Infected')
-plt.legend(loc='best', fontsize=8)
-plt.show()
-```
+- final comparison with recovery window variability?
+- say more coming in other models
+- make some bonus? thi sis a LOT and the core concepts are already hammered in here. Just ht eother models are more interesting.

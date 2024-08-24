@@ -14,4 +14,9 @@
 
 ## Improving Simulation of Network Societies
 
+- cite CNS example
+- if I do cut this, include the plots I made of co-presence, etc. but don't show all the code
+
+<!-- CUTTING -- OUT OF TIME TO FINISH THIS AND IT'S A LOT ANYWAY; THIS IS MORE ADVANCED -->
+
 {{< include _day-5-copenhagen-networks-study-sbm.qmd >}}

@@ -1,0 +1,43 @@
+
+<!-- Hidden code below produces the grid walk figure earlier in the lecture. -->
+```{python}
+#| echo: false
+
+# get agent 7 (low step size)
+agent_id_7 = 29
+agent_7 = next(agent for agent in model_2.schedule.agents if agent.unique_id == agent_id_7)
+
+# find another agent with a larger step size
+larger_step_agent = max(model_2.schedule.agents, key=lambda agent: agent.max_agent_step_size)
+
+fig, axs = plt.subplots(1, 2, figsize=(24, 12))
+
+# plot agent 7's trajectory in the first subplot
+x7, y7 = zip(*agent_7.pos_history)
+axs[0].plot(x7, y7, label=f"Agent {agent_7.unique_id} (Step size: {agent_7.max_agent_step_size})", color='blue')
+axs[0].set_title(f"Agent {agent_7.unique_id} (Step size: {agent_7.max_agent_step_size})")
+axs[0].set_xlabel("X Position")
+axs[0].set_ylabel("Y Position")
+axs[0].grid(True, which='both', linestyle='--')  # Show grid lines at every tick
+axs[0].minorticks_on()  # Ensure minor ticks are on for finer grid control
+axs[0].set_xlim(-0.5, 40.5)
+axs[0].set_ylim(-0.5, 40.5)
+axs[0].set_yticks(np.arange(0, 41, 2))  # Set y-axis ticks to every 2nd number
+axs[0].set_xticks(np.arange(0, 41, 2))  # Set x-axis ticks to every 2nd number
+
+# plot the larger step agent's trajectory in the second subplot
+x_large, y_large = zip(*larger_step_agent.pos_history)
+axs[1].plot(x_large, y_large, label=f"Agent {larger_step_agent.unique_id} (Step size: {larger_step_agent.max_agent_step_size})", color='red')
+axs[1].set_title(f"Agent {larger_step_agent.unique_id} (Step size: {larger_step_agent.max_agent_step_size})")
+axs[1].set_xlabel("X Position")
+axs[1].set_ylabel("Y Position")
+axs[1].grid(True, which='both', linestyle='--')  # Show grid lines at every tick
+axs[1].minorticks_on()  # Ensure minor ticks are on for finer grid control
+axs[1].set_xlim(-0.5, 40.5)
+axs[1].set_ylim(-0.5, 40.5)
+axs[1].set_yticks(np.arange(0, 41, 2))  # Set y-axis ticks to every 2nd number
+axs[1].set_xticks(np.arange(0, 41, 2))  # Set x-axis ticks to every 2nd number
+
+plt.tight_layout()
+plt.savefig('media/compare_agent_step_sizes.png', dpi=300)
+```

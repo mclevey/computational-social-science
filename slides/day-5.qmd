@@ -15,7 +15,7 @@ format:
     theme: [default, custom.scss]
     width: 1600
     height: 900
-    embed-resources: true
+    # embed-resources: true  # not compatible with full-size background images!
     execute:
       enabled: false
       echo: true
@@ -26,7 +26,9 @@ format:
     preview-links: auto
     smaller: true
     fig-align: left
-    fig-format: svg
+    fig-format: png
+    fig-dpi: 600
+    auto-stretch: false
     lightbox: true
     scrollable: true
     code-overflow: scroll
@@ -43,14 +45,16 @@ bibliography: references.bib
 ---
 
 {{< include _day-5-introduction.qmd >}}
-{{< include _day-5-abms-101.qmd >}} 
-{{< include _day-5-modelling-cycle.qmd >}} 
-{{< include _day-5-mesa-sir.qmd >}} 
+<!-- slow examples -->
+{{< include _day-5-abms-101.qmd >}}
+{{< include _day-5-mesa-sir.qmd >}}
+
+<!-- quick examples -->
 {{< include _day-5-complex-contagions.qmd >}}
 {{< include _day-5-opinion-dynamics-bcm.qmd >}}
+
+<!-- bonus material -- empericially calibrated networks -->
 {{< include _day-5-reduction-realism-tradeoffs.qmd >}}
-{{< include _day-5-learning-from-abms.qmd >}}
-<!-- conclusion of some sort here -->
 
 # References
 

@@ -3,12 +3,16 @@
 ## Damon Centola
 
 - one slide overview, relate to what we have done in lecture to this point
+- assitned reading
 
 ## Threshold Models
 
 - one slide overview, relate to what we have done in lecture to this point
+- use the code I wrote for this already -- package + talk
 
 ## Developing and Analyzing Threshold Models
 
 - build on the simple contagion SIR models fit earlier; mostly about changing what happens when agents interact
 - see the threshold model I already developed for this course! needs to be polished, I think. but runs.
+= load from functions; hide complexity in course packahe
+- just a slide for overview; for the model loading nd run, and a couple plots. Quijc.

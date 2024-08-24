@@ -1,17 +1,25 @@
-# What are Agent-based Models (ABMs)?
+# [What are<br>Agent-based Models<br>(ABMs)?]{.light-against-image} {background-image="media/flocking.jpg" background-opacity=1}
 
-## Modelling Complex Systems: Equation-based and Agent-based Approaches
+## Modelling Complex Systems
 
 [[@macy2002factors; @squazzoni2012agent; @bruch2015agent; @wilensky2015introduction; @crooks2018agent; @railsback2019agent; @smaldino2023modeling]]{.nord-footer}
 
-ABMs have been central to computational social science from the start.
+ABMs have been central to computational social science from the start. There are plenty of good review articles, applications, and textbooks in just about any field going back 30 years or more.
+
+![Sociology](media/factors_to_actors.png){.shadow-img width=17.75%} ![Political Science](media/abm-polisci.png){.shadow-img width=22%} ![Statistics](media/abms-micro-simulation.png){.shadow-img width=21.5%}
 
 
-## An Illustration
+##
 
 :::: {.columns}
 ::: {.column width="25%"}
-SIR Models, Classic vs. Agent-based
+<br><br><br>
+
+### An Illustration
+
+SIR Models
+
+[Equation vs. Agent-based]{.nord-footer}
 :::
 
 ::: {.column width="5%"}
@@ -50,9 +58,9 @@ $$
 
 ::: {.column width="45%" .fragment}
 
-Don't worry if your calculus is rusty! A **derivative** describes how one quantity changes in response to another quantity. 
+Don't worry if your calculus is rusty! A **derivative** describes how one quantity changes in response to another quantity.
 
-$$\frac{{d}}{{dt}}$$ 
+$$\frac{{d}}{{dt}}$$
 
 is the derivative with respect to time, which represents the **rate of change** for a quantity given another quantity.
 
@@ -94,7 +102,7 @@ $$
 #### The Susceptible Compartment
 
 $$
-\frac{{dS}}{{dt}} = - \left( \frac{{a}}{{N}}\right)  I S 
+\frac{{dS}}{{dt}} = - \left( \frac{{a}}{{N}}\right)  I S
 $$
 
 - $I S$ means that the more infected people ($I$) and susceptible people ($S$) there are, the more likely it is that susceptible people will become infected.
@@ -140,7 +148,7 @@ $$
 
 - $\left( \frac{{a}}{{N}}\right) I S$ represents the number of people getting infected (i.e., moving from $S$ to $I$).
 - $b$ is a constant that reflects how quickly people recover.^[If $R$ is "removed" instead of "recovered" ... there is no recovery.]
-- $- b I$ represents the number of people recovering (moving from $I$ to $R$). 
+- $- b I$ represents the number of people recovering (moving from $I$ to $R$).
 :::
 ::::
 
@@ -225,13 +233,15 @@ $$
 <br>
 
 **Some Model Assumptions** $\longrightarrow$
+
+![](media/smaldino.jpg){width="30%" .shadow-img}
 :::
 
 ::: {.column width="10%"}
 :::
 
 ::: {.column width="45%"}
-> These equations define how the relative numbers of susceptible, infected, and recovered individuals change over time, and represent two propositions about disease contagion. [First]{.kn-pink}, that susceptible individuals become infected via contact with infected individuals, at a rate that is proportional to the expected number of interactions between susceptible and infected individuals, tempered by the transmissibility of the infection, $β$. [Second]{.kn-pink}, that infected individuals recover at a constant rate, $γ$. 
+> These equations define how the relative numbers of susceptible, infected, and recovered individuals change over time, and represent two propositions about disease contagion. [First]{.kn-pink}, that susceptible individuals become infected via contact with infected individuals, at a rate that is proportional to the expected number of interactions between susceptible and infected individuals, tempered by the transmissibility of the infection, $β$. [Second]{.kn-pink}, that infected individuals recover at a constant rate, $γ$.
 >
 > <br>
 >
@@ -284,15 +294,15 @@ A `{python} round(variables['results_sir_model_1_max_infected']-variables['resul
 <br>
 
 :::: {.columns}
-::: {.column width="55%"}
-![The space covered by an agent who can take as many as 5 steps is much greater than the space covered by an agent who can only take 1.](media/compare_agent_step_sizes.png){width=75% #fig-compare_agent_step_sizes}
+::: {.column width="45%"}
+![Imagine agents moving around the simulated world the way we move around the real world. [Photo by <a href="https://unsplash.com/@anthonydelanoix?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Anthony DELANOIX</a> on <a href="https://unsplash.com/photos/person-performing-heart-hand-gesture-hzgs56Ze49s?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>]{.nord-light}](media/anthony-delanoix-hzgs56Ze49s-unsplash.jpg){width=85% .shadow-img}
 :::
 
 ::: {.column width="5%"}
 :::
 
-::: {.column width="40%"}
-The grid is **toroidal**, which means all four edges wrap to each other.
+::: {.column width="50%"}
+![The space covered by an agent who can take as many as 8 steps is much greater than the space covered by an agent who can only take 1. The grid is **toroidal**, which means all four edges wrap to each other.](media/compare_agent_step_sizes.png){width=100% #fig-compare_agent_step_sizes}
 :::
 ::::
 
@@ -327,38 +337,37 @@ Shared Parameters
 :::
 ::::
 
-## 
+##
 
 :::: {.columns}
 ::: {.column width="55%"}
-![Explanation...](media/compare_agent_networks.png){width=50% #fig-compare_agent_networks}
-
+![This is the general point I want to make on this slide, come back later.](media/compare_agent_networks.png){width=100% #fig-compare_agent_networks}
 :::
 
 ::: {.column width="5%"}
 :::
 
 ::: {.column width="40%"}
+#### Come back to this
+
+- present this a different way if I don't do the 6 models manually?
+
 {{< include tables/_sir_1_interaction_graph_summaries.md >}}
 :::
 ::::
 
 
-## SIR, Classic vs. Agent-based
+## Equation vs. Agent-based Models
 
-- How does it compare?
-- Pros and cons?
+<br><br><br>
 
+Unlike equation-based models of systems, ABMs
 
-
-## Zooming Back Out: The Big Picture
-
-[[@railsback2019agent]]{.nord-footer}
-
-### What are models?
-
-The agent-based perspective offers a different way to model and learn about complex systems.
-
+- do not rely on aggregated variables to represent system components
+- emphasize heterogeneity by directly represent individual agents and their iteractions
+- focuses on emergent outcomes and adaptive. comntextuialized behaviours
+- are not contrained by mathematical tractability
+- etc.
 
 ##
 
@@ -366,8 +375,71 @@ The agent-based perspective offers a different way to model and learn about comp
 
 ### What is the agent-based modelling cycle?
 
-<!-- - With reference to the SIR example -->
+<br>
 
+:::: {.columns}
+::: {.column width="45%"}
+![The ABM modelling cycle. [Figure reproduced from @railsback2019agent.]{.nord-light}](media/abm-cycle.png){width=100% #fig-abm-cycle}
+:::
+
+::: {.column width="55%"}
+::: {.fragment}
+1. Formulate the question
+:::
+::: {.fragment}
+2. Assemble hypotheses for essential processes and structure
+:::
+::: {.fragment}
+3. Choose scales, entities, state variables, processes, and parameters
+:::
+::: {.fragment}
+4. Implement the model
+:::
+::: {.fragment}
+5. Analyze, test, and revise the model<br>[(recall the Box and Wickham loops!)]{.nord-footer}
+:::
+::: {.fragment}
+6. Communicate the model
+:::
+:::
+::::
+
+::: {.notes}
+The modeling cycle is a systematic and iterative process used to develop, implement, analyze, and refine **scientific** agent-based models. This cycle is essential for ensuring that models are well-designed, accurately reflect the system they are meant to represent, and are useful for answering specific research questions. The cycle typically involves the following key steps:
+
+1. **Formulate the Question**
+   - **Purpose:** The first step is to clearly define the research question that the model is intended to answer. This question acts as a guiding principle for the entire modeling process, helping to determine which aspects of the real system should be included or excluded in the model.
+   - **Importance:** A well-defined question ensures that the model remains focused and relevant. It also serves as a filter, helping to decide which factors in the real system are important for the model and which can be ignored.
+   - **Challenges:** Formulating a clear question can be difficult, especially in complex systems where multiple factors are interrelated. Often, the question may need to be refined as the modeling process progresses.
+2. **Assemble Hypotheses for Essential Processes and Structures**
+   - **Purpose:** Once the question is formulated, the next step is to hypothesize which processes and structures within the system are essential to address the research question. This involves identifying the key factors that drive the system's behavior and determining how these factors interact.
+   - **Top-Down and Bottom-Up Approaches:** This step can be approached in two ways:
+     - **Top-Down:** Consider the major influences on the phenomena of interest and how they might interact.
+     - **Bottom-Up:** Start with basic components and build up to more complex interactions.
+   - **Simplification:** It is crucial to start with the simplest possible model that still addresses the research question. Simplification helps in quickly implementing and testing the model, which is more productive than starting with a complex model that is difficult to manage.
+3. **Choose Scales, Entities, State Variables, Processes, and Parameters**
+   - **Purpose:** In this step, the specific details of the model are defined. This includes determining the scale at which the model operates (e.g., temporal and spatial scales), identifying the entities involved (e.g., agents in an ABM), and selecting the state variables that describe these entities (e.g., position, health status).
+   - **Model Structure:** The model's structure is outlined, including how different entities interact with each other and with their environment. This is often documented in a written formulation, which serves as a blueprint for the model.
+   - **Importance:** A clear and detailed model structure is essential for successful implementation and later analysis. It also aids in communicating the model to others, such as collaborators or reviewers.
+4. **Implement the Model**
+   - **Purpose:** The verbal or written description of the model is translated into a computer program or mathematical framework. This involves using appropriate tools and platforms, such as NetLogo for agent-based models, to bring the model to life.
+   - **Challenges:** Implementation can be technically demanding, especially for beginners. However, using established software platforms can greatly simplify this task and reduce the time required to develop a functioning model.
+   - **Rightness of Implementation:** The implementation itself is always “right” in the sense that it accurately represents the assumptions encoded in the model, allowing for the rigorous exploration of these assumptions.
+5. **Analyze, Test, and Revise the Model**
+   - **Purpose:** After implementation, the model is analyzed to see if it behaves as expected and whether it provides useful insights into the research question. This involves testing the model's predictions against real-world data, conducting sensitivity analyses, and iterating on the model's design to improve its accuracy and relevance.
+   - **Iteration:** This step is the most time-consuming and involves repeated cycles of testing and refining the model. As the model is analyzed, new insights may lead to revisions in the model's structure, assumptions, or parameters.
+   - **Importance:** This step is crucial for validating the model and ensuring that it provides reliable answers to the research question. It also helps to identify and correct any oversimplifications or inaccuracies in the initial model.
+6. **Communicate the Model**
+   - **Purpose:** The final step involves sharing the model and its findings with the scientific community, policymakers, or other stakeholders. This can include publishing the model in a scientific journal, presenting it at conferences, or providing reports to decision-makers.
+   - **Documentation:** Communication also involves thoroughly documenting the model and the results of its analysis. This documentation is vital for transparency, reproducibility, and for others to understand and build upon the work.
+   - **Feedback:** Sharing the model often leads to feedback, which can further refine the model or suggest new directions for research.
+
+The modeling cycle is inherently **iterative** and focuses on **continuous imporvement**. It is rare to go through the entire cycle only once; instead, modelers often loop back to earlier steps as new insights are gained. For example, the initial research question might be refined based on what is learned during model analysis, leading to adjustments in hypotheses or model structure. This iterative nature allows for continuous improvement of the model, making it more accurate and useful over time.
+
+Throughout the modeling cycle, there is an emphasis on **starting simple and adding complexity only when necessary**. This is based on the principle that simpler models are easier to implement, test, and understand. As the model progresses through the cycle, additional factors can be introduced gradually, allowing for a better understanding of their impact on the system.
+
+In short, the modeling cycle is a structured approach to developing scientific models that involves formulating a clear question, hypothesizing essential processes, designing and implementing the model, analyzing and refining it, and finally communicating the results. This iterative process ensures that models are both scientifically rigorous and practically useful for addressing complex research questions.
+:::
 
 ##
 
@@ -375,161 +447,188 @@ The agent-based perspective offers a different way to model and learn about comp
 
 ### How do we design, document, and develop ABMs?
 
-<!-- - With reference to the SIR example -->
-
-
-##
-
-[[@railsback2019agent]]{.nord-footer}
-
-### How do we test ABMs?
-
-<!-- - With reference to the SIR example -->
-
-
-## What are [model design concepts]{.kn-pink}?
-
-<!-- - With reference to the SIR example -->
+<br>
 
 :::: {.columns}
-::: {.column width="25%"}
-[[@railsback2019agent]]{.nord-light}
+::: {.column width="45%"}
+A model does not truly exist until it has been explicitly formulated. Explicit model formulations are **essential** for understanding and thinking clearly about the model, implementing it in code, learning from it, and communicating it to others. In ABM, especially in the social and ecological sciences, this follows the **ODD protocol** [(Overview, Design concepts, and Details)]{.nord-light}, which provides a structured and systematic way to formulate, describe, and communicate ABMs, ensuring that the models are clear, complete, and reproducible.
+
+<br>
+
+ODD is not only a tool for final documentation; it serves as a framework for the iterative development of the model and an initial version should be developed *before* you start implementing your ideas! For many reasons, this makes implementation **much** easier and more efficient.
 :::
 
 ::: {.column width="10%"}
 :::
 
-::: {.column width="65%"}
-1. Emergence
-2. Observation
-3. Sensing
-4. Adaptive Behaviour and Objectives
-5. Prediction
-6. Interaction
-7. Scheduling
-8. Stochasticity
-9. Collectives
+::: {.column width="45%"}
+![High-level structure of the ODD protocol. [Figure reproduced from @railsback2019agent, which was revised from @grimm2010odd.]{.nord-light}](media/odd.png){width="75%" #fig-odd}
+:::
+::::
+
+::: {.notes}
+ODDs have the following high-level components:
+
+- Purpose and Patterns: The model’s purpose is defined clearly, specifying what the model is for and what patterns it should reproduce to be considered realistic.
+- Entities, State Variables, and Scales: These outline the types of entities (e.g., agents, environment) in the model, the variables that characterize them, and the temporal and spatial scales used in the model.
+- Process Overview and Scheduling: This describes the processes that govern the dynamics of the model (e.g., agent behaviors) and how these processes are scheduled over time.
+- Design Concepts: This section covers basic principles, emergence, adaptation, and other design concepts essential for understanding how the model works. We will come back to the idea of design concepts later in the lecture.
+- Initialization: How the model is set up at the beginning of a simulation, including the initial state of agents and environment.
+- Input Data: Describes external data inputs that change over time and are used in the model.
+- Submodels: Detailed descriptions of the submodels that represent specific processes within the ABM.
+:::
+
+
+## What are [model design concepts]{.kn-pink}?
+
+Model design concepts are an important part of the ODD protocol. What are they, exactly?
+
+<br>
+
+<!-- design-concepts-questions.png -->
+
+:::: {.columns}
+::: {.column width="25%"}
+<br>
+
+- Emergence
+- Observation
+- Sensing
+- Adaptive Behaviour and Objectives
+- Prediction
+- Interaction
+- Scheduling
+- Stochasticity
+- Collectives
+:::
+
+::: {.column width="5%"}
+:::
+
+::: {.column width="70%"}
+> Each time you build an ABM, you need to think about how each of these concepts is addressed, if it is, in the model. Why? The first reason is to make sure that you think about all the important model design issues and decide explicitly how to handle each. Otherwise, important parts of the model’s design could be determined accidentally or only by programming convenience, and your model will seem ad hoc and unscientific. The second reason is to make it easier to describe your model to others. When modelers use the ODD protocol and these design concepts to describe ABMs, it is much easier for others to understand the model’s most important characteristics. Not all of the concepts will be important to each ABM, but thinking about each of the concepts helps you convince yourself and others that all the important model design decisions were made explicitly and carefully. (For this reason, the design concepts are also very useful when you review someone else’s ABM.)
+>
+> @railsback2019agent, pp. 99-100
+:::
+::::
+
+::: {.notes}
+- **Emergence** refers to the patterns, behaviors, or outcomes that arise from the interactions of individual agents within the model. These emergent properties are not directly programmed into the model but instead result from the collective dynamics of the agents. Understanding and analyzing these emergent phenomena are often the primary goals of using ABMs.
+    - *In the SIR model, the emergent behavior is the epidemic curve that shows how the disease spreads through the population over time, leading to waves of infection, recovery, and potential stabilization.*
+- **Observation** involves how the model’s outcomes are recorded and analyzed. This concept includes specifying what data will be collected from the model during its execution, such as the number of agents in different states, spatial distributions, or interaction networks. The way observations are made can significantly influence the interpretation of the model’s results.
+    - *In the SIR model, observation is carried out by collecting data on the number of infected, susceptible, and recovered agents at each time step, as well as the duration of infections and the interactions between agents.*
+- **Sensing** describes the information that agents can perceive about their environment and other agents. It includes what variables the agents are aware of, such as the state of nearby agents or environmental conditions, and how accurately they sense this information. The sensing capability of agents influences their decision-making and behavior. In some cases, agents may not really be "aware," such as in a model of infectious disease diffusion.
+    - *In the SIR model, agents "sense" the state of neighboring agents (whether they are susceptible or infected), which influences their likelihood of becoming infected if they are susceptible.*
+- **Adaptive behavior** refers to the way agents modify their actions in response to changes in their environment or internal state. Objectives are the goals that agents seek to achieve, such as maximizing fitness, utility, or survival. In ABMs, agents often make decisions that adapt their behavior to better achieve these objectives.
+    - *In the SIR model, agents do not exhibit adaptive behavior in the traditional sense; they follow predefined rules for movement and infection based on their current state and interactions.*
+- **Prediction** involves how agents anticipate future conditions or outcomes based on their current state and environment. In some models, agents may have internal mechanisms that allow them to predict the future and adjust their behavior accordingly, while in others, predictions might be implicit in the rules governing agent actions.
+    - *In the SIR model, agents do not explicitly predict future conditions; their actions are based on immediate interactions with neighbors rather than anticipating future states.*
+- **Interaction** refers to the ways in which agents influence each other and their environment. This can include direct interactions, such as communication or physical contact, or indirect interactions, such as competition for resources. The nature and frequency of interactions among agents are key determinants of the emergent properties of the model.
+    - *In the SIR model, interactions occur when infected agents come into contact with susceptible agents, potentially spreading the infection based on a predefined infection rate.*
+- **Scheduling** is about the order and timing of agent actions and processes within the model. It defines how agents’ actions are sequenced, whether they are updated simultaneously or sequentially, and how time is represented in the model. The schedule can have a significant impact on the dynamics and outcomes of the simulation.
+    - *In the SIR model, scheduling determines the order in which agents move, interact, and possibly change their health state (susceptible, infected, or recovered) during each time step of the simulation.*
+- **Stochasticity** involves the inclusion of randomness in the model. This can be in the form of random events, variations in agent behavior, or random initialization of agent states. Stochastic processes are used to represent uncertainty, variability, or incomplete knowledge about the system being modeled.
+    - *In the SIR model, stochasticity is present in the random movement of agents, the random infection transmission based on probability, and the random timing of recovery within a specified range.*
+- **Collectives** refer to groups of agents that form higher-level entities within the model. These groups may have their own behaviors and characteristics, distinct from those of individual agents. Collectives can emerge from the interactions of agents or be explicitly defined, and they often play a crucial role in the dynamics of the system.
+    - *In the SIR model, there are no explicit collectives; however, the interactions among agents can lead to clusters of infection, which can be viewed as an emergent collective behavior.*
+:::
+
+## {background-color="#F0F0F0"}
+
+:::: {.columns}
+::: {.column width="75%"}
+<div style="background-color: white; padding: 80px; width: 75%; height: 600px; overflow-y: scroll; border-radius: 10px; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);">
+
+{{< include _day-5-odd-sir.qmd >}}
+
+</div>
+:::
+
+::: {.column width="25%"}
+ODD Protocol for SIR Model<br>$\longleftarrow$
+
+<br>
+
+![[Figure reproduced from @railsback2019agent.]{.nord-light}](media/odd.png){width="100%" .shadow-img}
 :::
 ::::
 
 
 ## What is [pattern-oriented modelling]{.kn-pink}?
 
-<!-- - With reference to the SIR example -->
+[[@railsback2019agent]]{.nord-light}
 
 :::: {.columns}
-::: {.column width="25%"}
-[[@railsback2019agent]]{.nord-light}
+::: {.column width="45%"}
+<br><br>
+
+Credible scientific models must be capable of reproducing multiple [(ideally diverse)]{.nord-light} observed patterns from the systems we want to model **without overfitting** to any given pattern.
 :::
 
 ::: {.column width="10%"}
 :::
 
-::: {.column width="65%"}
-1. patterns for model structure
-2. theory development
-3. parameterization and calibration
+::: {.column width="45%"}
+![Like generative network analysis, the high-level objective is to deepen our understanding of the latent processes governing the system.](media/flocking.jpg){width=100% .shadow-img}
 :::
 ::::
 
+::: {.notes}
+Pattern-oriented modeling (POM) is a strategy in the development and testing of agent-based models (ABMs) that uses multiple observed patterns from the real world to guide the design of the model’s structure and to validate its results. This approach aims to ensure that the model is not only structurally realistic but also capable of reproducing various patterns observed in the system it represents.
+
+In POM, the focus is on identifying and reproducing multiple, often diverse, patterns that characterize the system being modeled. These patterns can include spatial patterns, temporal dynamics, and other system behaviors observed in the real world. The rationale behind using multiple patterns is to avoid overfitting the model to a single pattern, which might lead to incorrect conclusions or predictions. By requiring the model to replicate multiple observed patterns, POM helps in selecting and refining the model’s structure and mechanisms, ensuring that the model’s behavior is not just an artifact of a particular parameter setting or assumption but is rooted in the actual processes governing the system.
+:::
 
 
-## How do we analyze ABMs?
 
-<!-- - With reference to the SIR example -->
+## What is [pattern-oriented modelling]{.kn-pink}?
+
+[Patterns for Model Structure [@railsback2019agent]]{.nord-light}
 
 :::: {.columns}
-::: {.column width="25%"}
-[[@railsback2019agent]]{.nord-light}
+::: {.column width="45%"}
+These **real-world patterns** can take many forms, such as spatial distributions, temporal sequences, or system-level properties. We want to observe and document patterns from empirical data, prior research, etc. Use these patterns to guide the design of the model structure. Then we select and organize entities, processes, and interactions in such a way tha the model is capable of generating the observed patterns. In the **SIR model example**,
+
+- the key **patterns** are observed epidemic behaviors, such as the rise and fall of infected individuals over time, especially the occurrence of an infection peak.
+- these are **incorporated into the SIR model** via the transmission rate $\beta$ [(to simulate the infection spread)]{.nord-light} and recovery rate $\gamma$ [(to simulate recovery)]{.nord-light}.
+- if the model can't reproduce the observed epidemic behaviours, we **refine** it.
 :::
 
 ::: {.column width="10%"}
 :::
 
-::: {.column width="65%"}
-- designing, implementing, and testing models is just the start
-- summarize key points from:
-    - analyzing and understanding ABMs
-    - sensitivity, uncertainty, and robustness analysis
+::: {.column width="45%"}
+![Like generative network analysis, the high-level objective is to deepen our understanding of the latent processes governing the system.](media/flocking.jpg){width=100% .shadow-img}
 :::
 ::::
 
 
+::: {.notes}
+We have to **identify**, observe, and document patterns from empirical data, prior research, etc. Then we have to **use these patterns to guide the design of model structure** such that the entities, processes, and interactions in the model are selected and organized in a way that allows the model to generate the observed patterns.
 
-<!--
+In the context of the **SIR model**, patterns refer to the observed behaviors of an epidemic, such as the rise and fall in the number of infected individuals over time or the eventual stabilization of the population into susceptible and recovered groups. One important observed pattern in many infectious diseases is the occurrence of a peak in the number of infected individuals. This peak represents the point at which the disease is spreading most rapidly, after which the number of new infections begins to decline as more individuals either recover or remain uninfected due to the declining number of susceptible contacts.
 
-## Agent-based SIR
+The SIR model incorporates this pattern by including a transmission rate ($\beta$) that determines how quickly susceptible individuals become infected when they come into contact with infected individuals. The model also includes a recovery rate ($\gamma$), which dictates how quickly infected individuals recover and move to the recovered class. By adjusting these parameters, the model can reproduce the observed pattern of an infection peak. If the model fails to produce this peak under realistic parameter settings, it might indicate a need for revising the model structure, such as adding more complexity like considering varying transmission rates over time (e.g., due to public health interventions).
+:::
+
+
+## What is [pattern-oriented modelling]{.kn-pink}?
+
+[Patterns for Theory Development [@railsback2019agent]]{.nord-light}
 
 :::: {.columns}
-::: {.column width="40%"}
-![Don't forget about your conda environment!](media/chatgpt_dependency_hell.png)
-:::
-
-::: {.column width="5%"}
-:::
-
-::: {.column width="55%"}
-#### Your Conda Virtual Environment
-
-From the command line:
-
-```zsh
-conda activate gt
-```
+::: {.column width="45%"}
+We use ABMs to **formulate**, **test**, and **refine** mechanistic theories of **how the observed patterns were generated**.
 
 <br>
 
-#### Package Imports
+In the **SIR model example**, patterns like the peak of infections or the eventual stabilization of the population into susceptible and recovered groups are used to test and refine theories of disease spread. Theories about how individuals become infected (e.g., transmission rate) and recover (e.g., recovery rate) are tested by checking whether the model can replicate these observed patterns. If the model consistently reproduces these patterns, it supports the validity of the theory. If not, the theory needs to be adjusted—perhaps by considering factors like varying contact rates or the impact of interventions, and the process is repeated until the model behaves as expected.
+:::
 
-In your script/notebooks:
+::: {.column width="10%"}
+:::
 
-```{python}
-import networkx as nx
-import pandas as pd
-
-import icsspy
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-icsspy.set_style()
-```
+::: {.column width="45%"}
+![Like generative network analysis, the high-level objective is to deepen our understanding of the latent processes governing the system.](media/flocking.jpg){width=100% .shadow-img}
 :::
 ::::
-
-
-## Agent-based SIR
-
-#### Simulating a Population
-
-:::: {.columns}
-::: {.column width="55%"}
-- Generate a small-world network with 300 nodes
-- Each node connected to 4 neighbors with 15% chance of rewiring
-
-```python
-population_size = 300
-G = nx.watts_strogatz_graph(population_size, 4, 0.15)
-G.name = "A Simulated Small World"
-
-layout = nx.nx_pydot.graphviz_layout(G)
-
-fig, ax = plt.subplots(figsize=(12, 12))
-nx.draw(G, 
-    pos=layout, 
-    node_color='gray', 
-    edge_color='gray', 
-    node_size=100, 
-    width=.5)
-plt.savefig("media/simulation-0.png", dpi=300)
-```
-:::
-
-::: {.column width="5%"}
-:::
-
-::: {.column width="40%"}
-![A simulated "small world" network. **We'll critique and improve this model later in the lecture.**](media/simulation-0.png){width=100% #fig-simulation-0}
-:::
-:::: 
-
--->

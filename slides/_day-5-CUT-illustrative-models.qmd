@@ -1,0 +1,120 @@
+## Model 3
+
+```{python}
+model_3_params = params.get('model_3')
+pprint(model_3_params['max_agent_step_size'])
+
+model_4_params = params.get('model_4')
+pprint(model_4_params['max_agent_step_size'])
+
+model_5_params = params.get('model_5')
+pprint(model_5_params['max_agent_step_size'])
+
+model_6_params = params.get('model_6')
+pprint(model_6_params['max_agent_step_size'])
+```
+
+
+```{python}
+model_3 = SIRModel(
+    n_initial_infections = model_3_params['n_initial_infections'],
+    grid_width = model_3_params['grid_width'],
+    grid_height = model_3_params['grid_height'],
+    N = model_3_params['N'],
+    infection_rate = model_3_params['infection_rate'],
+    recovery_time_range = model_3_params['recovery_time_range'],
+    max_agent_step_size = model_3_params['max_agent_step_size'],
+)
+
+for i in range(model_3_params['n_iterations']):
+    model_3.step()
+
+m3res = model_3.datacollector.get_model_vars_dataframe()
+```
+
+##
+
+```{python}
+model_4 = SIRModel(
+    n_initial_infections = model_4_params['n_initial_infections'],
+    grid_width = model_4_params['grid_width'],
+    grid_height = model_4_params['grid_height'],
+    N = model_4_params['N'],
+    infection_rate = model_4_params['infection_rate'],
+    recovery_time_range = model_4_params['recovery_time_range'],
+    max_agent_step_size = model_4_params['max_agent_step_size'],
+)
+
+for i in range(model_4_params['n_iterations']):
+    model_4.step()
+
+m4res = model_4.datacollector.get_model_vars_dataframe()
+```
+
+
+##
+
+```{python}
+model_5 = SIRModel(
+    n_initial_infections = model_5_params['n_initial_infections'],
+    grid_width = model_5_params['grid_width'],
+    grid_height = model_5_params['grid_height'],
+    N = model_5_params['N'],
+    infection_rate = model_5_params['infection_rate'],
+    recovery_time_range = model_5_params['recovery_time_range'],
+    max_agent_step_size = model_5_params['max_agent_step_size'],
+)
+
+for i in range(model_5_params['n_iterations']):
+    model_5.step()
+
+m5res = model_5.datacollector.get_model_vars_dataframe()
+```
+
+##
+
+```{python}
+model_6 = SIRModel(
+    n_initial_infections = model_6_params['n_initial_infections'],
+    grid_width = model_6_params['grid_width'],
+    grid_height = model_6_params['grid_height'],
+    N = model_6_params['N'],
+    infection_rate = model_6_params['infection_rate'],
+    recovery_time_range = model_6_params['recovery_time_range'],
+    max_agent_step_size = model_6_params['max_agent_step_size'],
+)
+
+for i in range(model_6_params['n_iterations']):
+    model_6.step()
+
+m6res = model_6.datacollector.get_model_vars_dataframe()
+```
+
+##
+
+Plot the results
+
+```{python}
+fig, ax = plt.subplots()
+ax.plot(m3res['Infected'], label=f'Max Agent Steps: {model_3_params['max_agent_step_size']}')
+ax.plot(m4res['Infected'], label=f'Max Agent Steps: {model_4_params['max_agent_step_size']}')
+ax.plot(m5res['Infected'], label=f'Max Agent Steps: {model_5_params['max_agent_step_size']}')
+ax.plot(m6res['Infected'], label=f'Max Agent Steps: {model_6_params['max_agent_step_size']}')
+plt.title(r'$\beta$=' + f'{model_3_params['infection_rate']} for all models\n', loc='left')
+plt.xlabel("\nDiscrete Steps in Time")
+plt.ylabel("Proportion Infected\n")
+plt.legend(loc='upper right', fontsize=10)
+plt.savefig('media/sir_compare_models_3-6.png')
+```
+
+
+<!-- UPDATE _VARIABLES -->
+
+```{python}
+#| echo: false
+from icsspy.utils import update_quarto_variables
+
+# compute the infection peak for both models so you can use them dynamically in the lecture
+update_quarto_variables("results_sir_model_1_max_infected", float(m1res['Infected'].max()))
+update_quarto_variables("results_sir_model_2_max_infected", float(m2res['Infected'].max()))
+```

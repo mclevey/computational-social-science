@@ -1,3 +1,0 @@
-# Learning from ABMs
-
-Design Concepts & Pattern-oriented Modelling
