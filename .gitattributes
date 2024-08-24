@@ -6,3 +6,9 @@ docs/day-1.html filter=lfs diff=lfs merge=lfs -text
 docs/day-2.html filter=lfs diff=lfs merge=lfs -text
 docs/day-3.html filter=lfs diff=lfs merge=lfs -text
 docs/day-6.html filter=lfs diff=lfs merge=lfs -text
+docs/day-5[[:space:]]3.html filter=lfs diff=lfs merge=lfs -text
+docs/day-5[[:space:]]4.html filter=lfs diff=lfs merge=lfs -text
+docs/day-5[[:space:]]5.html filter=lfs diff=lfs merge=lfs -text
+docs/day-5[[:space:]]6.html filter=lfs diff=lfs merge=lfs -text
+docs/day-5.html filter=lfs diff=lfs merge=lfs -text
+docs/day-5[[:space:]]2.html filter=lfs diff=lfs merge=lfs -text
