@@ -4,7 +4,7 @@
 
 **Purpose of the Model**:
 
-The Bounded Confidence Model (BCM) simulates opinion dynamics in a continuous opinion space. It models how agents' opinions evolve over time through interactions with other agents within a predefined confidence bound (ε). The model is used to study phenomena such as opinion polarization, consensus formation, and the effect of varying confidence bounds on these processes.
+The Bounded Confidence Model (BCM) simulates opinion dynamics in a continuous opinion space. It models how agents' opinions evolve over time through interactions with other agents within a predefined confidence bound ($\epsilon$). The model is used to study phenomena such as opinion polarization, consensus formation, and the effect of varying confidence bounds on these processes.
 
 **Entities, State Variables, and Scales**:
 
@@ -15,19 +15,19 @@ The Bounded Confidence Model (BCM) simulates opinion dynamics in a continuous op
 **Process Overview**:
 
 - Agents move to new positions on the grid based on their step size.
-- Agents interact with neighboring agents within their confidence bound (ε), potentially updating their opinions.
+- Agents interact with neighboring agents within their confidence bound ($\epsilon$), potentially updating their opinions.
 - The model tracks the evolution of opinions over time, and data is collected for further analysis.
 
 #### 2. **Design Concepts**
 
 **Basic Principles**:
 
-- **Bounded Confidence**: Agents only interact with others whose opinions differ by less than a threshold value, **ε**. This models the idea that individuals are only influenced by those whose views are not too dissimilar from their own.
+- **Bounded Confidence**: Agents only interact with others whose opinions differ by less than a threshold value, **$\epsilon$**. This models the idea that individuals are only influenced by those whose views are not too dissimilar from their own.
 - **Opinion Averaging**: When two agents interact within this bound, they adjust their opinions to the average of their own and the interacting agent's opinion.
 
 **Emergence**:
 
-- The emergence of opinion clusters, polarization, or consensus depending on the value of **ε**.
+- The emergence of opinion clusters, polarization, or consensus depending on the value of **$\epsilon$**.
 - The effect of varying confidence bounds on the structure and distribution of opinions across the agent population.
 
 **Adaptation**:
@@ -56,7 +56,7 @@ The Bounded Confidence Model (BCM) simulates opinion dynamics in a continuous op
 
 **Stochasticity**:
 
-- Agents’ initial opinions are randomly assigned within the range [-1, 1].
+- Agents' initial opinions are randomly assigned within the range [-1, 1].
 - Movement is stochastic, with agents choosing a random neighboring cell to move to in each step.
 
 **Collectives**:
@@ -73,12 +73,12 @@ The Bounded Confidence Model (BCM) simulates opinion dynamics in a continuous op
 **Initialization**:
 
 - The model initializes with **N** agents, each placed randomly on a grid of size **grid_width x grid_height**.
-- Each agent’s opinion is initialized as a random value between -1 and 1.
-- Agents are given a confidence bound, **ε**, which defines their bounded confidence interval.
+- Each agent's opinion is initialized as a random value between -1 and 1.
+- Agents are given a confidence bound, **$\epsilon$**, which defines their bounded confidence interval.
 
 **Input Data**:
 
-- The model can be initialized with parameters loaded from an external YAML file. The parameters typically include the number of agents, the grid size, the confidence bound (**ε**), the maximum step size for agent movement, and the number of iterations.
+- The model can be initialized with parameters loaded from an external YAML file. The parameters typically include the number of agents, the grid size, the confidence bound (**$\epsilon$**), the maximum step size for agent movement, and the number of iterations.
 
 **Submodels**:
 
@@ -95,4 +95,4 @@ The Bounded Confidence Model (BCM) simulates opinion dynamics in a continuous op
 
 ### Execution of the Model
 
-- The model runs for a predefined number of iterations, during which agents move, interact, and update their opinions. Data is collected at each step for post-simulation analysis, allowing for the observation of opinion dynamics under varying conditions of bounded confidence (**ε**).
+- The model runs for a predefined number of iterations, during which agents move, interact, and update their opinions. Data is collected at each step for post-simulation analysis, allowing for the observation of opinion dynamics under varying conditions of bounded confidence (**$\epsilon$**).

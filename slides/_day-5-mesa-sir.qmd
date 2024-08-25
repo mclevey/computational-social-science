@@ -21,24 +21,24 @@ Developing Your First ABM
 - **Attributes** are variables that store data specific to an object (e.g., alice.age).
 - **Methods** are functions that define behaviors of an object (e.g., `alice.move()`).
 - **Inheritance** allows one class to inherit attributes and methods from another class, promoting code reuse (e.g., Professor class inherits from Person, because professors are people too).
-- **Encapsulation** allows us to bundle data (attributes) and methods that operate on the data into a single unit or class, restricting direct access to some of an object’s components.
+- **Encapsulation** allows us to bundle data (attributes) and methods that operate on the data into a single unit or class, restricting direct access to some of an object's components.
 :::
 ::::
 
 ::: {.notes}
 Introduction to OOP:
 
-- Object-Oriented Programming (OOP) is a programming paradigm that structures software design around data, or objects, rather than functions and logic. It’s especially useful for modeling complex systems, like those you’ll encounter in agent-based modeling (ABM).
+- Object-Oriented Programming (OOP) is a programming paradigm that structures software design around data, or objects, rather than functions and logic. It's especially useful for modeling complex systems, like those you'll encounter in agent-based modeling (ABM).
 
 Classes and Objects:
 
-- Think of a class as a blueprint. For example, if you’re modeling a group of people, the class might be Person. This class defines the properties (e.g., age, location) and behaviors (e.g., move, speak) that every person should have.
+- Think of a class as a blueprint. For example, if you're modeling a group of people, the class might be Person. This class defines the properties (e.g., age, location) and behaviors (e.g., move, speak) that every person should have.
 - An object is a specific instance of that class. If you were to create a person named Alice in your model, you would instantiate the Person class like this: alice = Person(). Now, alice is an object with her own specific age, location, and so on.
 
 Attributes and Methods:
 
-- Attributes are like variables that hold information about the object. For example, alice.age = 25 sets Alice’s age to 25. Each object can have different values for these attributes.
-- Methods are functions that belong to the class and define what an object can do. For example, alice.move() could be a method that changes Alice’s location within the simulation.
+- Attributes are like variables that hold information about the object. For example, alice.age = 25 sets Alice's age to 25. Each object can have different values for these attributes.
+- Methods are functions that belong to the class and define what an object can do. For example, alice.move() could be a method that changes Alice's location within the simulation.
 
 Inheritance:
 
@@ -46,14 +46,14 @@ Inheritance:
 
 Encapsulation:
 
-- Encapsulation is the idea of keeping the internal workings of an object hidden from the outside. You can think of it as protecting the data inside an object. For example, you might not want other parts of your program to change an agent’s age directly; instead, they might call a method that safely updates the age. Encapsulation helps maintain the integrity of your model’s data and logic.
+- Encapsulation is the idea of keeping the internal workings of an object hidden from the outside. You can think of it as protecting the data inside an object. For example, you might not want other parts of your program to change an agent's age directly; instead, they might call a method that safely updates the age. Encapsulation helps maintain the integrity of your model's data and logic.
 
 Applying OOP in Mesa:
 
-- When you move to Mesa, you’ll use these OOP principles to define your agents as classes. Each agent will be an object of its class, with attributes that define its state (like position or health) and methods that define its behavior (like move() or interact()).
-- You’ll also use inheritance to create different types of agents with shared and unique behaviors, which makes your model more scalable and easier to manage.
+- When you move to Mesa, you'll use these OOP principles to define your agents as classes. Each agent will be an object of its class, with attributes that define its state (like position or health) and methods that define its behavior (like move() or interact()).
+- You'll also use inheritance to create different types of agents with shared and unique behaviors, which makes your model more scalable and easier to manage.
 
-In short, OOP is fundamental for structuring your agent-based models in Python. By organizing your code into classes and objects, you can create agents with complex behaviors and interactions that are both manageable and scalable, which is exactly what you’ll be doing in Mesa.
+In short, OOP is fundamental for structuring your agent-based models in Python. By organizing your code into classes and objects, you can create agents with complex behaviors and interactions that are both manageable and scalable, which is exactly what you'll be doing in Mesa.
 :::
 
 ## Agent-based Modelling with Mesa
@@ -76,7 +76,7 @@ In short, OOP is fundamental for structuring your agent-based models in Python. 
 ::: {.column width="45%"}
 ![](media/robot.jpg){width="100%" .shadow-img}
 
-[Agents are like little robots we manufactor according to some set of explicit instructions (the agent class).]{.nord-footer}
+[Agents are like little robots we manufacture according to some set of explicit instructions (the agent class).]{.nord-footer}
 :::
 ::::
 
@@ -137,7 +137,7 @@ we've been using as an example so far.
 :::
 
 ::: {.column width="55%"}
-```{python}
+```python
 import mesa
 from mesa import Agent, Model
 from mesa.time import RandomActivation
@@ -154,14 +154,15 @@ import networkx as nx
 import seaborn as sns
 import matplotlib.pyplot as plt
 import icsspy
+from icsspy.networks import plot_line_comparison
 ```
 
 <br>
 
 Set a seed, for reproducibility, and [(optionally)]{.nord-light} use `icsspy.set_style()` to style your plots like mine.
 
-```{python}
-random.seed(42)
+```python
+random.seed(30)
 icsspy.set_style()
 ```
 :::
@@ -174,7 +175,7 @@ icsspy.set_style()
 
 Remember that the agent class is like a blueprint for creating agents. Here, each agent can be in one of three states: susceptible, infected, or recovered. The agent interacts with its environment by moving, tracking its position, and interacting with other agents. The agent can get infected, spread the infection to others, and eventually recover based on a random chance within a specified recovery time range.
 
-```{python}
+```python
 class SIRAgent(Agent):
     def __init__(
         self,
@@ -240,7 +241,7 @@ I'm not going to explain every line of this code, since that's not the point of 
 	- max_agent_step_size: The maximum distance the agent can move in one step.
 - Line 10 calls the constructor of the parent Agent class to give the agent a unique ID within the model.
 - Lines 11 to 16 set the initial attributes of the agent. Lines 15 and 16 collect information about each agent's local and neighboring agents at each step. This will come up a bit later.
-- Starting on Line 18, we define the agent's step function, which determines what how the agent's states are updated and the actions they take when it's their turn to act in the model. In this case, we first check our agent's state. If they are infected, we increment the days infected counter and check whether they are in the recovery window. If so, we flip a coin to see if they recover. If the agent is still infected, they try to infect their neighbors. We iterate over the neighbors and, if the infection conditions are met (random), then we switch the neighbors status to ifnected. Then the agent moves to a new location on the grid that is within a pre-defined number of steps. The interactions and movement is logged.
+- Starting on Line 18, we define the agent's step function, which determines what how the agent's states are updated and the actions they take when it's their turn to act in the model. In this case, we first check our agent's state. If they are infected, we increment the days infected counter and check whether they are in the recovery window. If so, we flip a coin to see if they recover. If the agent is still infected, they try to infect their neighbors. We iterate over the neighbors and, if the infection conditions are met (random), then we switch the neighbors status to infected. Then the agent moves to a new location on the grid that is within a pre-defined number of steps. The interactions and movement is logged.
 :::
 
 ## Second, define the [model class]{.kn-pink}
@@ -249,7 +250,7 @@ I'm not going to explain every line of this code, since that's not the point of 
 
 Remember that the SIRModel is a blueprint for creating a model in which agents interact and spread infections. Any ABMs we create are created by this class. It inherits from Mesa's more general Model class, which provides basic functionality for simulation modelling that we don't need to design or develop ourselves.
 
-```{python}
+```python
 class SIRModel(Model):
     def __init__(
         self,
@@ -331,17 +332,6 @@ class SIRModel(Model):
     def count_state(self, state_name):
         count = sum([1 for a in self.schedule.agents if a.state == state_name])
         return count / self.num_agents
-
-    # def get_interaction_graph(self):
-    #     G = nx.Graph()
-    #     for agent in self.schedule.agents:
-    #         G.add_node(agent.unique_id)
-    #         for interacted_agent, count in agent.interactions.items():
-    #             if G.has_edge(agent.unique_id, interacted_agent):
-    #                 G[agent.unique_id][interacted_agent]['weight'] += count
-    #             else:
-    #                 G.add_edge(agent.unique_id, interacted_agent, weight=count)
-    #     return G
 ```
 
 ::: {.notes}
@@ -360,7 +350,7 @@ class SIRModel(Model):
 
 <br>
 
-```{python}
+```python
 with open('_variables.yml', 'r') as file:
     params = yaml.safe_load(file)
 
@@ -368,40 +358,40 @@ model_1_params = params.get('model_1')
 pprint(model_1_params)
 ```
 
-> {'N': 100,
->  'grid_height': 40,
->  'grid_width': 40,
->  'infection_rate': 0.3,
->  'max_agent_step_size': 1,
->  'n_initial_infections': 2,
->  'n_iterations': 150,
->  'recovery_time_range': [14, 24]}
+[{'N': 100,
+ 'grid_height': 40,
+ 'grid_width': 40,
+ 'infection_rate': 0.3,
+ 'max_agent_step_size': 1,
+ 'n_initial_infections': 2,
+ 'n_iterations': 150,
+ 'recovery_time_range': [14, 24]}]{.monospace}
 
 <br>
 
-```{python}
+```python
 model_2_params = params.get('model_2')
 pprint(model_2_params)
 ```
 
-> {'N': 100,
->  'grid_height': 40,
->  'grid_width': 40,
->  'infection_rate': 0.15,
->  'max_agent_step_size': 1,
->  'n_initial_infections': 2,
->  'n_iterations': 150,
->  'recovery_time_range': [14, 24]}
+[{'N': 100,
+ 'grid_height': 40,
+ 'grid_width': 40,
+ 'infection_rate': 0.15,
+ 'max_agent_step_size': 1,
+ 'n_initial_infections': 2,
+ 'n_iterations': 150,
+ 'recovery_time_range': [14, 24]}]{.monospace}
 
 ## Forth, [run the model(s)]{.kn-pink}
 
 :::: {.columns}
 ::: {.column width="65%"}
-We'll run two models here to reproduce @fig-sir_compare. Here's **Model 1**!
+We'll run two models here to reproduce @fig-sir_compare_models_1-2. Here's **Model 1**!
 
 <br>
 
-```{python}
+```python
 model_1 = SIRModel(
     n_initial_infections = model_1_params['n_initial_infections'],
     grid_width = model_1_params['grid_width'],
@@ -424,12 +414,15 @@ m1res
 :::
 
 ::: {.column width="30%"}
-```{python}
+
+<!--
+```python
 #| echo: false
 from icsspy.utils import markdown_table
 md = markdown_table(m1res.sample(10), 'tables/_sir_1_m1res.md')
 print(md)
 ```
+ -->
 
 Random sample (N=10)
 
@@ -451,7 +444,7 @@ And here's **Model 2**!
 
 <br>
 
-```{python}
+```python
 model_2 = SIRModel(
     n_initial_infections = model_2_params['n_initial_infections'],
     grid_width = model_2_params['grid_width'],
@@ -474,11 +467,14 @@ m2res
 :::
 
 ::: {.column width="30%"}
-```{python}
+
+<!--
+```python
 #| echo: false
 md = markdown_table(m2res.sample(10), 'tables/_sir_1_m2res.md')
 print(md)
 ```
+ -->
 
 Random sample (N=10)
 
@@ -494,10 +490,10 @@ Random sample (N=10)
 
 <br>
 
-```{python}
+```python
 fig, ax = plt.subplots()
-ax.plot(m1res['Infected'], label=r'High transmissability, $\beta$=0.3')
-ax.plot(m2res['Infected'], label=r'Low transmissability $\beta$=0.15')
+ax.plot(m1res['Infected'], label=r'High transmissibility, $\beta$=0.3')
+ax.plot(m2res['Infected'], label=r'Low transmissibility $\beta$=0.15')
 plt.xlabel("\nDiscrete Steps in Time")
 plt.ylabel("Proportion Infected\n")
 plt.legend(loc='upper right', fontsize=10)
@@ -508,20 +504,35 @@ plt.savefig('media/sir_compare_models_1-2.png')
 
 :::: {.columns}
 ::: {.column width="25%"}
-![](media/sir_compare){width=100% .shadow-img}
+![](media/sir_compare_models_1-2.png){width=100% .shadow-img}
 
-Recall [design patterns]{.kn-pink}
+<!-- ![](media/sir_compare){width=100% .shadow-img} -->
+
+Recall [design patterns]{.kn-pink}!
 :::
 
 ::: {.column width="75%"}
 <br>
 
-$\longleftarrow$<br>@fig-sir_compare from earlier in the lecture. Proportion of infected people in a population over time from two SIR simulations with different transmissability rates. Not (yet) shown: proportion of susceptible and recovered.
+$\longleftarrow$<br>@fig-sir_compare_models_1-2 from earlier in the lecture. Proportion of infected people in a population over time from two SIR simulations with different transmissibility rates.<br>
+
+Not (yet) shown: proportion of susceptible and recovered.
 :::
 ::::
 
 <!-- (TEMPORARILY?) CUTTING THIS OUT; NO SPACE AND NOT PEDAGOGICALLY USEFUL ANYWAY -->
 <!-- _day-5-CUT-illustrative-models.qmd -->
+
+<!--
+```python
+#| echo: false
+from icsspy.utils import update_quarto_variables
+
+# compute the infection peak for both models so you can use them dynamically in the lecture
+update_quarto_variables("results_sir_model_1_max_infected", float(m1res['Infected'].max()))
+update_quarto_variables("results_sir_model_2_max_infected", float(m2res['Infected'].max()))
+```
+ -->
 
 ## Agent Interaction
 
@@ -534,7 +545,7 @@ We can iterate over the agents in the model and retrieve their interaction histo
 
 <br>
 
-```{python}
+```python
 interaction_graphs = {}
 interaction_graph_summaries = {}
 
@@ -557,17 +568,20 @@ for i, model in enumerate(models, start=1):
 
 <br>
 
-```{python}
+```python
 interaction_graph_summaries = pd.DataFrame(interaction_graph_summaries).T
 interaction_graph_summaries.columns = ['No. Nodes', 'No. Edges', 'Avg. Degree']
 interaction_graph_summaries
 ```
 
-```{python}
+
+<!--
+```python
 #| echo: false
 md = markdown_table(interaction_graph_summaries, 'tables/_sir_1_interaction_graph_summaries.md', indexed=True)
 # print(md)
 ```
+ -->
 
 {{< include tables/_sir_1_interaction_graph_summaries.md >}}
 
@@ -575,7 +589,7 @@ md = markdown_table(interaction_graph_summaries, 'tables/_sir_1_interaction_grap
 
 :::: {.columns}
 ::: {.column width="65%"}
-```{python}
+```python
 # Initialize an empty graph
 G = interaction_graphs['M2']
 weights = [d['weight'] for u, v, d in G.edges(data=True)]
@@ -589,7 +603,8 @@ plt.grid(True)
 plt.savefig('media/compare_agent_networks.png', dpi=300)
 ```
 
-```{python}
+<!--
+```python
 #| echo: false
 # testing something... ignore this... nothing to see here...
 for agent in model_2.schedule.agents:
@@ -600,6 +615,9 @@ for agent in model_2.schedule.agents:
         else:
             G.add_edge(agent.unique_id, interacted_agent, weight=count)
 ```
+-->
+
+
 :::
 
 ::: {.column width="35%"}
@@ -622,11 +640,11 @@ for agent in model_2.schedule.agents:
 ::: {.notes}
 So far we have not been very systematic in how we've approaches analyzing the outputs of our SIR model. What's involved in more systematic analyses?
 
-The primary goal of analyzing an agent-based model is to gain insights into how the model behaves and how well it represents the real-world system it’s designed to simulate. This involves understanding the dynamics of the model, validating it against empirical data, and exploring the implications of different parameter settings.
+The primary goal of analyzing an agent-based model is to gain insights into how the model behaves and how well it represents the real-world system it's designed to simulate. This involves understanding the dynamics of the model, validating it against empirical data, and exploring the implications of different parameter settings.
 
-We can break ABM model analysis down into several types. Descriptive analysis helps summarize what’s happening in the model, while exploratory analysis digs deeper into patterns and relationships within the data. Comparative analysis is useful when we want to understand how different scenarios or versions of the model compare, and predictive analysis leverages the model to forecast future outcomes.
+We can break ABM model analysis down into several types. Descriptive analysis helps summarize what's happening in the model, while exploratory analysis digs deeper into patterns and relationships within the data. Comparative analysis is useful when we want to understand how different scenarios or versions of the model compare, and predictive analysis leverages the model to forecast future outcomes.
 
-Usually, we use several techniques at once to analyze ABMs effectively. Data collection is crucial for tracking the various states and interactions within the model, often using tools like Mesa’s DataCollector. Visualization helps us see the trends and dynamics within the model, and statistical analysis allows us to quantify and interpret the data meaningfully.
+Usually, we use several techniques at once to analyze ABMs effectively. Data collection is crucial for tracking the various states and interactions within the model, often using tools like Mesa's DataCollector. Visualization helps us see the trends and dynamics within the model, and statistical analysis allows us to quantify and interpret the data meaningfully.
 
 Ultimately, the goal of analyzing an ABM is to ensure that the model is providing accurate, reliable insights into the system being studied. This includes identifying the key factors that drive model outcomes and ensuring that the model can withstand scrutiny through robust analysis.
 
@@ -662,11 +680,11 @@ involve systematically investigating the model's behavior to answer specific que
 ::::
 
 ::: {.notes}
-When iteratively analyzing models, we can use Sensitivity Analysis, Parameter Sweeps, and Computational Experiments to understand, test, and analyze the behavior of the model under various conditions. These methods are essential for ensuring the model’s reliability and for interpreting its results. Here’s what they mean:
+When iteratively analyzing models, we can use Sensitivity Analysis, Parameter Sweeps, and Computational Experiments to understand, test, and analyze the behavior of the model under various conditions. These methods are essential for ensuring the model's reliability and for interpreting its results. Here's what they mean:
 
 1. Sensitivity Analysis
 
-Sensitivity analysis involves systematically varying model parameters to assess how changes in these parameters affect the model’s output. It helps identify which parameters are most influential in determining model behavior and which ones have less impact.
+Sensitivity analysis involves systematically varying model parameters to assess how changes in these parameters affect the model's output. It helps identify which parameters are most influential in determining model behavior and which ones have less impact.
 
 The main goal is to understand how robust the model's results are. If small changes in a parameter lead to significant changes in outcomes, for example, that parameter is considered sensitive and could indicate areas where the model might need refinement or better data.
 
@@ -678,7 +696,7 @@ This allows us to map out the response of the model across the entire space of p
 
 3. Computational Experiments:
 
-In the context of ABM, computational experiments refer to the process of systematically testing the model by varying initial conditions, parameter values, or model structures to observe the resulting behavior. Most importantly, this is done with the goal of answering scientific questions, understanding mechanisms, or testing hypotheses. Sometimes this is explicitly causal and may be similar to laboratory experiments, only in a simulated environment where variables can easily be manipulated and controlled. Other times it is more exploratory, with the goal of mapping out the model’s behavior across a wide range of conditions.
+In the context of ABM, computational experiments refer to the process of systematically testing the model by varying initial conditions, parameter values, or model structures to observe the resulting behavior. Most importantly, this is done with the goal of answering scientific questions, understanding mechanisms, or testing hypotheses. Sometimes this is explicitly causal and may be similar to laboratory experiments, only in a simulated environment where variables can easily be manipulated and controlled. Other times it is more exploratory, with the goal of mapping out the model's behavior across a wide range of conditions.
 :::
 
 
@@ -688,14 +706,81 @@ In the context of ABM, computational experiments refer to the process of systema
    -->
 
 
-## Using [batch_run]{.monospace}
+##
+:::: {.columns}
+::: {.column width="45%"}
+Let's do a
+
+[sensitivity analysis]{.large-text .kn-pink}
+:::
+
+::: {.column width="55%"}
+1. Set up the **parameter sweep** dictionary
+2. Run the model according to the sweep dictionary<br>[+ plot results from batch run]{.nord-light}
+3. Aggregate the model results
+:::
+::::
+
+<br>
+
+<hr style="border: none; border-top: 1px solid black;">
+
+<br>
+
+:::: {.columns}
+::: {.column width="45%"}
+First, we'll focus on
+
+[peak proportion infected]{.large-text}
+
+as the outcome of interest
+:::
+
+::: {.column width="55%"}
+4. Plot the results
+5. Correlate parameters with peak proportion infected^[This is an additional step, not necessarily part of a sensitivity analysis but often done alongside.]
+6. Interpret, critique... *repeat?*
+:::
+::::
+
+<br>
+
+<hr style="border: none; border-top: 1px solid black;">
+
+<br>
+
+:::: {.columns}
+::: {.column width="45%"}
+and then
+
+[**time** to peak proportion infected]{.large-text}
+
+as the outcome of interest
+:::
+
+::: {.column width="55%"}
+7. Prepare the data
+8. Plot the results
+9. Interpret, critique... *repeat?*
+:::
+::::
+
+::: {.notes}
+Sensitivity plots will show how the peak number of infections varies with changes in each parameter. Parameters with more spread (higher variability in the boxplots) are more sensitive.
+
+The correlation analysis will help identify which parameters have the most substantial impact on the peak number of infections.
+:::
+
+
+
+## Sensitivity Analysis [(1) Set up and (2) run!]{.nord-light}
 
 <br>
 
 :::: {.columns}
 ::: {.column width="75%"}
 
-```{python}
+```python
 params = {
     "N": 100,
     "grid_height": 40,
@@ -706,13 +791,11 @@ params = {
     "n_initial_infections": [1, 5, 10, 15, 20, 25]
 }
 ```
-
 <!-- _variables! update. -->
-
 :::
 
 ::: {.column width="25%"}
-First, define a dict containing parameter valus. Use lists `[]` to configure the response space.
+First, define a dict containing parameter values. Use lists `[]` to configure the response space.
 :::
 
 ::::
@@ -722,7 +805,7 @@ First, define a dict containing parameter valus. Use lists `[]` to configure the
 :::: {.columns}
 ::: {.column width="75%"}
 
-```{python}
+```python
 results = mesa.batch_run(
     model_cls=SIRModel,
     parameters=params,
@@ -745,7 +828,8 @@ Then run your model using the `batch_run()` function.
 ::::
 
 
-```{python}
+<!--
+```python
 #| echo: false
 #
 # if error on laptop, it's multi-processing in a notebook
@@ -764,15 +848,21 @@ results = mesa.batch_run(
 results_df = pd.DataFrame(results)
 results_df.info()
 ```
+ -->
 
-##
+## Sensitivity Analysis [(3) Aggregate results]{.nord-light}
 
-```{python}
+<br>
+
+
+<!--
+```python
 #| echo: false
 from icsspy.utils import markdown_table
 md = markdown_table(results_df.head(), 'tables/_sir_batch_results_df.md')
 print(md)
 ```
+ -->
 
 ```python
 results_df.head()
@@ -786,12 +876,13 @@ results_df.head()
 |       0 |           0 |      0 | 100 |            40 |           40 |              0.2 | (7, 14)               |                     2 |                      1 |          0.99 |       0.01 |           0 |         3 | S       |                    0 |
 |       0 |           0 |      0 | 100 |            40 |           40 |              0.2 | (7, 14)               |                     2 |                      1 |          0.99 |       0.01 |           0 |         4 | S       |                    0 |
 
-
-```{python}
+<!--
+```python
 #| echo: false
 md = markdown_table(results_df.tail(), 'tables/_sir_batch_results_df_tail.md')
 print(md)
 ```
+ -->
 
 ```python
 results_df.tail()
@@ -810,13 +901,13 @@ results_df.tail()
 
 <!-- Another run I did with this model produced a 4GB text file with only 6 variables. So, yeah. -->
 
-## High-level patterns
+##
 
 We can compare some high-level patterns by creating a **small multiples** plot. We'll use Seaborn's **FacePlot** for this. It's a more complex setup than other plotting code we've used so far, so if it's a bit overwhelming just focus on interpreting the output. Note that this code will take a little while to run.^[It takes a couple of minutes to run on my MacBook Air.]
 
 <br>
 
-```{python}
+```python
 melted_df = pd.melt(
     results_df,
     # include 'RunId' to differentiate runs
@@ -853,13 +944,211 @@ plt.savefig("media/sir_subplots.png", dpi=300)
 
 ![Batch results for Model 2 with mean trends emphasized.](media/sir_subplots.png){width="100%" #fig-sir_subplots}
 
+## Sensitivity Analysis [(3) Aggregate results]{.nord-light}
+
+<br>
+
+Next, we aggregate results to get the peak number of infections per run.
+
+```python
+aggregated_results = results_df.groupby(["RunId", "infection_rate", "recovery_time_range", "max_agent_step_size", "n_initial_infections"]).agg(
+    peak_infected=("Infected", "max")
+).reset_index()
+
+aggregated_results.head()
+```
+
+<!--
+
+```python
+#| echo: false
+md = markdown_table(aggregated_results.head(), 'tables/_sir_sensitivity_aggregated.md')
+print(md)
+``` -->
+
+
+{{< include tables/_sir_sensitivity_aggregated.md >}}
+
+## Sensitivity Analysis [(4) Plot and (6) Interpret]{.nord-light}
+
+<br>
+
+We'll need to convert the `recovery_time_range` tuples into strings for plotting.
+
+```python
+aggregated_results['recovery_time_range_str'] = aggregated_results['recovery_time_range'].apply(lambda x: f"{x[0]}-{x[1]}")
+```
+
+<br>
+
+And then we can set up the plot.
+
+```python
+fig, axes = plt.subplots(2, 2, figsize=(16, 12), sharey=True)
+
+# infection rate
+sns.boxplot(ax=axes[0, 0], x="infection_rate", y="peak_infected", data=aggregated_results)
+axes[0, 0].set_title("\n(a) Sensitivity to Infection Rate", loc="left")
+axes[0, 0].set_xlabel("\nInfection Rate")
+axes[0, 0].set_ylabel("Peak Infected\n")
+
+# recovery time range (use the string version we just created)
+sns.boxplot(ax=axes[0, 1], x="recovery_time_range_str", y="peak_infected", data=aggregated_results)
+axes[0, 1].set_title("\n(b) Sensitivity to Recovery Time Range", loc="left")
+axes[0, 1].set_xlabel("\nRecovery Time Range")
+axes[0, 1].set_ylabel("Peak Infected\n")
+
+# max agent step size
+sns.boxplot(ax=axes[1, 0], x="max_agent_step_size", y="peak_infected", data=aggregated_results)
+axes[1, 0].set_title("\n(c) Sensitivity to Max Agent Step Size", loc="left")
+axes[1, 0].set_xlabel("\nMax Agent Step Size")
+axes[1, 0].set_ylabel("Peak Infected\n")
+
+# initial infections
+sns.boxplot(ax=axes[1, 1], x="n_initial_infections", y="peak_infected", data=aggregated_results)
+axes[1, 1].set_title("\n(d) Sensitivity to Initial Infections", loc="left")
+axes[1, 1].set_xlabel("\nInitial Infections")
+axes[1, 1].set_ylabel("Peak Infected\n")
+
+plt.tight_layout()
+plt.savefig("media/sir_sensitivity_analysis.png", dpi=300)
+```
+
+## Sensitivity Analysis [(4) Plot the results]{.nord-light}
+
+![Sensitivity plot for our SIR model parameters and peak proportion infected across all model runs.](media/sir_sensitivity_analysis.png){width="50%" #fig-sir_sensitivity_analysis}
+
+## Sensitivity Analysis [(5) Correlate]{.nord-light}
+
+<br>
+
+As an additional step, we can correlate our parameters with the peak proportion infected to get a sense of relative influence. To do so, we have to transform the recovery time ranges into a single number. There are a few ways we could do this, but to keep things simple we'll take the mean of the two values.
+
+```python
+aggregated_results["recovery_time_range_numeric"] = aggregated_results["recovery_time_range"].apply(lambda x: sum(x) / len(x))
+```
+
+<br>
+
+Once we've done that, we'll drop the original tuple (`recovery_time_range`) and it's string representation (`recovery_time_range_str`). I'll create a new dataframe for these modifications, since we'll use the dropped variables in our second sensitivity analysis.
+
+```python
+aggregated_results_4corr = aggregated_results.copy()
+aggregated_results_4corr.drop(['recovery_time_range', 'recovery_time_range_str'], axis=1, inplace=True)
+```
+
+## Sensitivity Analysis [(5) Correlate]{.nord-light}
+
+<br>
+
+And now we can correlate!
+
+```python
+correlation_matrix = aggregated_results_4corr.corr()
+peak_infected_correlations = correlation_matrix["peak_infected"].drop(
+    ["peak_infected", "RunId"]
+)
+```
+
+<br>
+
+It's common to visualize the results with a bar chart, but I prefer to compare the correlations using the same line comparison plots we used for model comparison in the module on generative network modelling. To create it, we'll create a dict with the parameter names and correlations.
+
+```python
+for_plotting = {}
+for parameter, correlation in zip(peak_infected_correlations.index, peak_infected_correlations.values):
+    for_plotting[parameter] = round(correlation, 4)
+
+plot_line_comparison(
+    for_plotting,
+    xrange=(0,1), # all positive correlations
+    print_decimals=True,
+    title="",
+    xlabel='\nCorrelations between model parameters and peak infection.',
+    filename="media/sir_correlations_params_peak_infection.png"
+)
+```
+
+## Sensitivity Analysis [(6) Interpret]{.nord-light}
+
+<br><br>
+
+![Correlations between model parameters and peak infection proportion.](media/sir_correlations_params_peak_infection.png){width="100%" #fig-sir_correlations_params_peak_infection}
+
+
+
+## Sensitivity Analysis [(7) Prepare the data]{.nord-light}<br>[Time to Peak Proportion Infected]{.small-text}
+
+
+<br>
+
+We have to do a bit more data prep.
+
+- Group the data by `RunId` and find the step with the maximum number of infections for each run
+- Extract the relevant columns: `RunId`, `Step` (time to peak), and `Infected` (peak infections)
+- Merge with the original parameter data
+
+After this, `time_to_peak_merged` will contain the data on time to peak infection along with the parameters used in each run.
+
+<br>
+
+```python
+time_to_peak = results_df.loc[results_df.groupby("RunId")["Infected"].idxmax()]
+time_to_peak = time_to_peak[["RunId", "Step", "Infected"]].rename(
+    columns={"Step": "time_to_peak", "Infected": "peak_infected"}
+)
+
+time_to_peak_merged = pd.merge(time_to_peak, aggregated_results, on="RunId")
+```
+
+## Sensitivity Analysis [(8) Plot and (9) Interpret]{.nord-light}<br>[Time to Peak Proportion Infected]{.small-text}
+
+
+<br>
+
+```python
+fig, axes = plt.subplots(2, 2, figsize=(16, 12), sharey=True)
+
+# Infection rate
+sns.boxplot(ax=axes[0, 0], x="infection_rate", y="time_to_peak", data=time_to_peak_merged)
+axes[0, 0].set_title("\n(a) Time to Peak Infection vs. Infection Rate", loc="left")
+axes[0, 0].set_xlabel("\nInfection Rate")
+axes[0, 0].set_ylabel("Time to Peak Infection\n")
+
+# Recovery time range
+sns.boxplot(ax=axes[0, 1], x="recovery_time_range_str", y="time_to_peak", data=time_to_peak_merged)
+axes[0, 1].set_title("\n(b) Time to Peak Infection vs. Recovery Time Range", loc="left")
+axes[0, 1].set_xlabel("\nRecovery Time Range")
+axes[0, 1].set_ylabel("Time to Peak Infection\n")
+
+# Max agent step size
+sns.boxplot(ax=axes[1, 0], x="max_agent_step_size", y="time_to_peak", data=time_to_peak_merged)
+axes[1, 0].set_title("\n(c) Time to Peak Infection vs. Max Agent Step Size", loc="left")
+axes[1, 0].set_xlabel("\nMax Agent Step Size")
+axes[1, 0].set_ylabel("Time to Peak Infection\n")
+
+# Initial infections
+sns.boxplot(ax=axes[1, 1], x="n_initial_infections", y="time_to_peak", data=time_to_peak_merged)
+axes[1, 1].set_title("\n(d) Time to Peak Infection vs. Initial Infections", loc="left")
+axes[1, 1].set_xlabel("\nInitial Infections")
+axes[1, 1].set_ylabel("Time to Peak Infection\n")
+
+plt.tight_layout()
+plt.savefig("media/sir_time_to_peak_analysis.png", dpi=300)
+```
+
+## Sensitivity Analysis [(8) Plot and (9) Interpret]{.nord-light}<br>[Time to Peak Proportion Infected]{.small-text}
+
+
+![Sensitivity plot for our SIR model parameters and time to peak proportion infected across all model runs.](media/sir_time_to_peak_analysis.png){width="50%" #fig-sir_time_to_peak_analysis}
+
 ##
 
 <br><br><br>
 
 :::: {.columns}
 ::: {.column width="55%"}
-There is much more we could do here, but let's move on to some different examples.
+There is much more we could do here,<br>**but let's move on to a different example.**
 :::
 ::: {.column width="45%"}
 :::

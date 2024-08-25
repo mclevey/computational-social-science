@@ -1,13 +1,12 @@
 # [What are<br>Agent-based Models<br>(ABMs)?]{.light-against-image} {background-image="media/flocking.jpg" background-opacity=1}
 
-## Modelling Complex Systems
+## What are ABMs?
 
 [[@macy2002factors; @squazzoni2012agent; @bruch2015agent; @wilensky2015introduction; @crooks2018agent; @railsback2019agent; @smaldino2023modeling]]{.nord-footer}
 
 ABMs have been central to computational social science from the start. There are plenty of good review articles, applications, and textbooks in just about any field going back 30 years or more.
 
 ![Sociology](media/factors_to_actors.png){.shadow-img width=17.75%} ![Political Science](media/abm-polisci.png){.shadow-img width=22%} ![Statistics](media/abms-micro-simulation.png){.shadow-img width=21.5%}
-
 
 ##
 
@@ -261,7 +260,7 @@ An [implicit assumption]{.kn-pink} is that the rate of interactions between indi
 ::: {.column width="55%"}
 Reducing physical contact reduces the **effective transmission rate** of a disease, which has a big impact on the number of sick people in a population.
 
-![Proportion of infected people in a population over time from two SIR simulations with different transmissability rates. [We'll develop the model this figure comes from later in the lecture.]{.nord-light}](media/sir_compare){width=75% #fig-sir_compare}
+![Proportion of infected people in a population over time from two SIR simulations with different transmissability rates. [We'll develop the model this figure comes from later in the lecture.]{.nord-light}](media/sir_compare_models_1-2){width=75% #fig-sir_compare_models_1-2}
 :::
 
 ::: {.column width="5%"}
@@ -273,13 +272,15 @@ Reducing physical contact reduces the **effective transmission rate** of a disea
 
 #### ~{{< var ontario_population >}}M people in Ontario, Canada [(as of 2024)]{.nord-light}
 
+
+<!--
 ```{python}
 #| echo: false
 import yaml
 with open('_variables.yml', 'r') as file:
     variables = yaml.safe_load(file)
 ```
-
+-->
 
 - A peak at `{python} variables['results_sir_model_1_max_infected']` in the high-transmissability model  $\approx$ `{python} round(variables['ontario_population'] * variables['results_sir_model_1_max_infected'], 2)`M infected people
 - A peak at `{python} variables['results_sir_model_2_max_infected']` in the low-transmissability model  $\approx$ `{python} round(variables['ontario_population'] * variables['results_sir_model_2_max_infected'], 2)`M infected people
@@ -307,7 +308,7 @@ A `{python} round(variables['results_sir_model_1_max_infected']-variables['resul
 ::::
 
 
-
+<!--
 ## Mixing and Flattening the Curve
 
 [More movement = more mixing = more exposures = more infections.]{.kn-pink}
@@ -330,19 +331,19 @@ But there are some qualifications that will come up a bit later in the lecture.
 | n_iterations        | {{< var model_4.n_iterations >}} |
 | recovery_time_range | (7, 14)                      |
 
-<!-- Quarto doesn't support tuples or lists; change this later if time -->
 :::
 
 ::: {.column width="55%"}
-![](media/sir_compare_models_3-6.png){width=42% #fig-sir_compare_models_3_6} &nbsp;&nbsp;&nbsp; ![](media/compare_agent_networks.png){width=36% #fig-compare_agent_networks}
+![](media/sir_compare_models_3-6.png){width=42% #sir_compare_models_3-6} &nbsp;&nbsp;&nbsp; ![](media/compare_agent_networks.png){width=36% #fig-compare_agent_networks}
 
-[**@fig-sir_compare_models_3_6** (left) Two SIR models with identical parameters other than max agent step size. **@fig-compare_agent_networks** (right) edge weight ECDF.]{.small-text}
+[@sir_compare_models_3-6 (left) Two SIR models with identical parameters other than max agent step size. @fig-compare_agent_networks (right) edge weight ECDF.]{.small-text}
 
 <br>
 
 {{< include tables/_sir_1_interaction_graph_summaries.md >}}
 :::
 ::::
+ -->
 
 
 ## Equation vs. Agent-based Models
@@ -370,7 +371,10 @@ Unlike equation-based models of systems, ABMs
 ![The ABM modelling cycle is a great fit with the Box and Wickham loops we've mentioned repeatedly throughout the course. [Figure reproduced from @railsback2019agent.]{.nord-light}](media/abm-cycle.png){width=100% #fig-abm-cycle}
 :::
 
-::: {.column width="55%"}
+::: {.column width="5%"}
+:::
+
+::: {.column width="50%"}
 ::: {.fragment}
 1. Formulate the question
 :::
@@ -378,7 +382,7 @@ Unlike equation-based models of systems, ABMs
 2. Assemble hypotheses for essential processes and structure
 :::
 ::: {.fragment}
-3. Choose scales, entities, state variables, processes, and parameters
+3. Choose model structure<br>[(scales, entities, state variables, processes, and parameters)]{.nord-footer}
 :::
 ::: {.fragment}
 4. Implement the model
@@ -391,6 +395,8 @@ Unlike equation-based models of systems, ABMs
 :::
 :::
 ::::
+
+We'll talk about [patterns]{.kn-pink} and the role they play in modelling shortly.
 
 ::: {.notes}
 The modeling cycle is a systematic and iterative process used to develop, implement, analyze, and refine **scientific** agent-based models. This cycle is essential for ensuring that models are well-designed, accurately reflect the system they are meant to represent, and are useful for answering specific research questions. The cycle typically involves the following key steps:
@@ -439,7 +445,7 @@ In short, the modeling cycle is a structured approach to developing scientific m
 
 :::: {.columns}
 ::: {.column width="45%"}
-A model does not truly exist until it has been explicitly formulated. Explicit model formulations are **essential** for understanding and thinking clearly about the model, implementing it in code, learning from it, and communicating it to others. In ABM, especially in the social and ecological sciences, this follows the **ODD protocol** [(Overview, Design concepts, and Details)]{.nord-light}, which provides a structured and systematic way to formulate, describe, and communicate ABMs, ensuring that the models are clear, complete, and reproducible.
+**Explicit** model formulations are **essential** for understanding and thinking clearly about the model, implementing it in code, learning from it, and communicating it to others. In ABM, especially in the social and ecological sciences, this follows the **ODD protocol** [(Overview, Design concepts, and Details)]{.nord-light}, which provides a structured and systematic way to formulate, describe, and communicate ABMs, ensuring that the models are clear, complete, and reproducible.
 
 <br>
 
@@ -548,16 +554,16 @@ ODD Protocol for SIR Model<br>$\longleftarrow$
 
 :::: {.columns}
 ::: {.column width="45%"}
-<br><br>
-
 Credible scientific models must be capable of reproducing multiple [(ideally diverse)]{.nord-light} observed patterns from the systems we want to model **without overfitting** to any given pattern.
+
+![](media/lego-bridge.png){width="100%" .shadow-img}
 :::
 
 ::: {.column width="10%"}
 :::
 
 ::: {.column width="45%"}
-![Like generative network analysis, the high-level objective is to deepen our understanding of the latent processes governing the system. Models of birds flocking and fish schooling are common examples in interdisciplinary introductions, and it's not really a lecture about agent-based modelling if there isn't at least one picture of birds flocking...](media/flocking.jpg){width=100% .shadow-img}
+![Like generative network analysis, the high-level objective is to deepen our understanding of the **latent processes governing the system**. Models of birds flocking and fish schooling are common examples in interdisciplinary introductions, and it's not really a lecture about agent-based modelling if there isn't at least one picture of birds flocking...](media/flocking.jpg){width=100% .shadow-img}
 :::
 ::::
 

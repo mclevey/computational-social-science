@@ -1,26 +1,26 @@
-# Reduction, Realism, and Model Tradeoffs
+# Reduction & Realism
 
-- agent cognition and preferences as binary or continuous but one-dimensional
-    - multiple opinions; modelling schemas; associative diffusion and learning
-- time, space, and especially interaction
-    - more realistic social network structures, movements through space and time
-- we can't do everything
+#### Model Tradeoffs
 
-## Fine-grained vs. Course-grained Models
+- all models **reduce**, but by how much?
+- tension between simple theoretical models on the one hand, and complex rich models on the other.
+    - Fine-grained vs. coarse-grained Models [[@bruch2015agent; @smaldino2023modeling]]{.nord-light}
+    - empirical data and calibration; Bayesian inference
 
-[[@bruch2015agent; @smaldino2023modeling]]
 
-- examples
-    - Improving cognition
-        - Associative Learning and Diffusion
-        - multiple opinions
-    - Improving Simulation of Network Societies
-        - better networks
-    - this is the state of the art: more realism, networks, cognition
+#### What's hot now?
 
-<!-- CUTTING -- OUT OF TIME TO FINISH THIS AND IT'S A LOT ANYWAY; THIS IS MORE ADVANCED -->
+- more realistic and empirically-calibrated models of:
+    - agent cognition, emotion, identity, and decision-making
+    - network structure, population dynamics
+- more sophisticated modelling of stochastic dynamics
+- multiple opinions at once
+- external / exogenous factors
+
+
+<!-- CUTTING -- OUT OF TIME TO FINISH THIS AND IT'S A LOT ANYWAY -->
 <!-- _day-5-copenhagen-networks-study-sbm.qmd -->
 
 ##
 
-The fucking end.
+That's all for now!

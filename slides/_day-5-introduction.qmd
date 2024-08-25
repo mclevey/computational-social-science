@@ -4,21 +4,19 @@
 ::: {.column width="30%"}
 ### Today
 Agent-based modelling with [Mesa]{.kn-pink}
-
-<!-- Learning Objectives? -->
 :::
 
 ::: {.column width="5%"}
 :::
 
 ::: {.column width="65%"}
-1. What are Agent-based Models (ABMs)?<br>[e.g., SIR models]{.nord-light} <!-- {{< include _day-5-abms-101.qmd >}} -->
-2. Simulation and the Modelling Cycle<br>[designing, documenting, and developing ABMs]{.nord-light} <!-- {{< include _day-5-modelling-cycle.qmd >}} -->
-3. Getting to Know Mesa<br>[developing your first ABM]{.nord-light} <!-- {{< include _day-5-mesa-sir.qmd >}} -->
-4. Adding Complexity<br>[complex contagions and spreading processes with threshold models]{.nord-light} <!-- {{< include _day-5-complex-contagions.qmd >}} -->
-5. Social Learning, Influence, and Opinion Dynamics<br>[continuous opinions with bounded confidence models]{.nord-light} <!-- {{< include _day-5-opinion-dynamics-bcm.qmd >}} -->
-6. Reduction, Realism, and Model Tradeoffs<br>[$\longleftarrow$ fine-grained vs. course-grained $\longrightarrow$<br>improving simulation of network societies<br>agent cognition and associative diffusion]{.nord-light} <!-- {{< include _day-5-reduction-realism-tradeoffs.qmd >}} -->
-7. Learning From ABMs<br>[design concepts and pattern-oriented modelling]{.nord-light} <!-- {{< include _day-5-learning-from-abms.qmd >}} -->
+1. What are agent-based [(individual-based)]{.nord-light} models?<br>[From equation-based models to agent-based models<br>Example: SIR models of disease diffusion]{.nord-footer}
+2. Designing, documenting, and developing ABMs<br>[The agent-based modelling cycle]{.nord-footer}
+3. Model design concepts and pattern-oriented modelling
+4. Developing your first ABM in Mesa<br>[OOP and Mesa 101<br>Extended example: developing a SIR model]{.nord-footer}
+5. Analyzing an ABM<br>[Parameter sweeps and sensitivity analysis]{.nord-footer}
+6. Social Learning, Influence, and Opinion Dynamics<br>[Bounded confidence models]{.nord-footer}
+7. Reduction, Realism, and Model Trade-offs<br>[$\longleftarrow$ Fine-grained vs. course-grained models $\longrightarrow$<br>What's hot now?]{.nord-footer}
 :::
 ::::
 
@@ -45,7 +43,7 @@ I will spend a lot of time explaining how the models are implemented in Python, 
 
 <br>
 
-[If you are in the R course, focus on the logic of the Python code to better understand the models themselves; there is no expectation that you will "learn Python." Johannes will show you how to setup, run, and analyze these models using R.]{.nord-light}
+**If you are in the R course**, focus on the logic of the Python code to better understand the models themselves; there is no expectation that you will "learn Python." Johannes will still show you how to setup, run, and analyze these models using R.
 :::
 
 ::: {.column width="15%"}

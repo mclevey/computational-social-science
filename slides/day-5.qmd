@@ -17,7 +17,7 @@ format:
     height: 900
     # embed-resources: true  # not compatible with full-size background images!
     execute:
-      enabled: false
+      enabled: true #false
       echo: true
       warning: false
       freeze: true
@@ -47,7 +47,7 @@ bibliography: references.bib
 {{< include _day-5-introduction.qmd >}}
 {{< include _day-5-abms-101.qmd >}}
 {{< include _day-5-mesa-sir.qmd >}}
-{{< include _day-5-opinion-dynamics-bcm.qmd >}}
+{{< include _day-5-mesa-bcm.qmd >}}
 {{< include _day-5-reduction-realism-tradeoffs.qmd >}}
 
 # References
