@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import graph_tool.all as gt
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+import networkx as nx
 import numpy as np
 import pandas as pd
 from graph_tool.all import Graph, GraphView
@@ -618,3 +619,28 @@ def plot_line_comparison(
 
     if filename is not None:
         plt.savefig(filename, dpi=300)
+
+
+def graph_tool_to_networkx(gt_graph):
+    """
+    Converts a graph-tool Graph object to a networkx Graph object.
+
+    Parameters:
+    gt_graph (gt.Graph): The graph-tool graph to convert.
+
+    Returns:
+    nx.Graph: The converted networkx graph.
+    """
+    nx_graph = nx.DiGraph() if gt_graph.is_directed() else nx.Graph()
+
+    # Add nodes
+    for v in gt_graph.vertices():
+        nx_graph.add_node(int(v))
+
+    # Add edges
+    for e in gt_graph.edges():
+        source = int(e.source())
+        target = int(e.target())
+        nx_graph.add_edge(source, target)
+
+    return nx_graph

@@ -45,15 +45,9 @@ bibliography: references.bib
 ---
 
 {{< include _day-5-introduction.qmd >}}
-<!-- slow examples -->
 {{< include _day-5-abms-101.qmd >}}
 {{< include _day-5-mesa-sir.qmd >}}
-
-<!-- quick examples -->
-{{< include _day-5-complex-contagions.qmd >}}
 {{< include _day-5-opinion-dynamics-bcm.qmd >}}
-
-<!-- bonus material -- empericially calibrated networks -->
 {{< include _day-5-reduction-realism-tradeoffs.qmd >}}
 
 # References

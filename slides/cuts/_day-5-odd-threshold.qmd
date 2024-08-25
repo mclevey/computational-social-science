@@ -1,0 +1,92 @@
+### **ODD Protocol for Threshold Model**
+
+#### **1. Purpose**
+
+The purpose of this model is to simulate a the spread of complex contagions (e.g., opinions, behaviors) on social networks. It is threshold-based, meaning agents agree/adopt only when a certain proportion of their neighbors have already agreed/adopted. As a threshold-based complex contagion model, it can be applied to study social phenomena such as the spread of opinions, social norms, innovations, or collective behavior, particularly in contexts where agreement/adoption requires repeated exposures and social reinforcement.
+
+#### **2. Entities, State Variables, and Scales**
+
+- **Agents**: Represent individual entities in the network (e.g., people) who can agree/disagree with an opinion adopt/not adopt a behavior or innovation.
+  - **State**:
+    - **AGREE**: The agent has adopted the behavior.
+    - **DISAGREE**: The agent has not adopted the behavior.
+  - **Threshold**: A value between 0 and 1 that represents the proportion of neighbors who must adopt the behavior before the agent will also adopt it.
+
+- **Environment**:
+  - **Network**: A graph structure where agents are nodes, and edges represent social ties. The network structure can vary.
+
+- **Global Variables**:
+  - **num_initial_agree**: The number of agents initially agreeing (adopting the behavior).
+  - **threshold_alpha**: Alpha parameter of the Beta distribution used to generate agent thresholds.
+  - **threshold_beta**: Beta parameter of the Beta distribution used to generate agent thresholds.
+  - **saturation_point**: The proportion of the population adopting/not adopting the behavior at which the simulation stops.
+  - **max_steps**: The maximum number of steps to run the simulation.
+
+- **Temporal Scales**:
+  - **Time Steps**: The simulation proceeds in discrete time steps, with each step representing one iteration of agent decisions.
+
+#### **3. Process Overview and Scheduling**
+
+- **Initialization**:
+  - The NetworkGrid is constructed based on the provided network structure.
+  - Agents are assigned to nodes in the network.
+  - **num_initial_agree** agents are randomly chosen to start in the **AGREE** state.
+  - All agents are assigned a threshold, drawn from a Beta distribution with parameters **threshold_alpha** and **threshold_beta**.
+
+- **Process Execution**:
+  - At each time step:
+    1. **Agent Decisions**: Each agent evaluates its neighbors' states. If the proportion of neighbors in the **AGREE** state meets or exceeds the agent's threshold, the agent adopts the **AGREE** state.
+    2. **Data Collection**: After all agents have updated their states, relevant metrics (e.g., number of agents in the **AGREE** state) are recorded.
+    3. **Stopping Conditions**: The simulation stops if either the proportion of agents in the **AGREE** or **DISAGREE** states meet or exceeds the **saturation_point**, or if **max_steps** is reached.
+
+#### **4. Design Concepts**
+
+- **Basic Principles**:
+  - The model is grounded in the theory of complex contagions, where the spread of behavior depends not just on single contacts but on the cumulative influence of multiple contacts. There are a variety of proposed mechanisms (e.g., social proof).
+
+- **Emergence**:
+  - The overall adoption of behavior in the population emerges from the interactions of individual agents with their neighbors.
+
+- **Adaptation**:
+  - Agents adapt their behavior based on the state of their neighbors relative to their threshold.
+
+- **Objectives**:
+  - Agents adopt the opinion/behavior if enough of their neighbors have done so, as determined by their individual thresholds.
+
+- **Learning**:
+  - The model does not incorporate learning in the strict sense; agents follow fixed decision rules based on their initial threshold.
+
+- **Prediction**:
+  - The model itself is not predictive; it is used to explore the dynamics of behavior spread under different conditions.
+
+- **Sensing**:
+  - Agents can "sense" the state of their direct neighbors in the network.
+
+- **Interaction**:
+  - Interaction occurs through the network, where an agent’s state can influence its neighbors in subsequent time steps.
+
+- **Stochasticity**:
+  - Stochasticity is introduced in the initial assignment of agreeing agents and the generation of thresholds.
+
+- **Collectives**:
+  - There are no explicit collectives, though the model can observe emergent groups of agreeing agents.
+
+- **Observation**:
+  - Key metrics observed include the proportion of agents in the **AGREE** and **DISAGREE** states over time and the distribution of thresholds across the population.
+
+#### **5. Initialization**
+
+- The network is created with a specified structure (e.g., small-world).
+- **num_initial_agree** agents are randomly selected to start in the **AGREE** state.
+- Each agent is assigned a threshold drawn from a Beta distribution with specified **threshold_alpha** and **threshold_beta**.
+- The simulation runs for up to **max_steps** or until the **saturation_point** is reached.
+
+#### **6. Input Data**
+
+- No external data is required to run the model. The model's behavior is driven entirely by the initial conditions and parameter settings specified at the start of the simulation.
+
+#### **7. Submodels**
+
+- **Threshold Calculation**: Determines the threshold for each agent based on the Beta distribution.
+- **Agent Update Rule**: Decides whether an agent will adopt the behavior based on the proportion of its neighbors who have adopted it.
+- **Data Collection**: Records the state of the system (e.g., the number of agents agreeing) at each time step for later analysis.

@@ -10,13 +10,17 @@
 
 [[@bruch2015agent; @smaldino2023modeling]]
 
-## Associative Learning and Diffusion
-
-## Improving Simulation of Network Societies
-
-- cite CNS example
-- if I do cut this, include the plots I made of co-presence, etc. but don't show all the code
+- examples
+    - Improving cognition
+        - Associative Learning and Diffusion
+        - multiple opinions
+    - Improving Simulation of Network Societies
+        - better networks
+    - this is the state of the art: more realism, networks, cognition
 
 <!-- CUTTING -- OUT OF TIME TO FINISH THIS AND IT'S A LOT ANYWAY; THIS IS MORE ADVANCED -->
+<!-- _day-5-copenhagen-networks-study-sbm.qmd -->
 
-{{< include _day-5-copenhagen-networks-study-sbm.qmd >}}
+##
+
+The fucking end.

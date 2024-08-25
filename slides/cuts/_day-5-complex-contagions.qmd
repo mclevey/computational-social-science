@@ -1,0 +1,375 @@
+# Diffusion and Complex Contagions
+
+## Damon Centola
+
+- one slide overview, relate to what we have done in lecture to this point
+- assitned reading
+
+## Threshold Models
+
+- one slide overview, relate to what we have done in lecture to this point
+- use the code I wrote for this already -- package + talk
+
+## Developing and Analyzing Threshold Models
+
+- build on the simple contagion SIR models fit earlier; mostly about changing what happens when agents interact
+- see the threshold model I already developed for this course! needs to be polished, I think. but runs.
+= load from functions; hide complexity in course packahe
+- just a slide for overview; for the model loading nd run, and a couple plots. Quijc.
+
+
+## Imports
+
+```{python}
+import networkx as nx
+import numpy as np
+import pandas as pd
+import yaml
+import seaborn as sns
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
+from mesa.batchrunner import batch_run
+import pydot
+import graph_tool.all as gt
+from networkx.drawing.nx_pydot import graphviz_layout
+
+
+import icsspy
+from icsspy.abms.threshold import ThresholdModel
+from icsspy.simulations import run_threshold_model_experiment
+from icsspy.simulations import generate_thresholds_distribution
+from icsspy.networks import graph_tool_to_networkx
+
+icsspy.set_style()
+import icsspy.simulations
+```
+
+## {background-color="#F0F0F0"}
+
+:::: {.columns}
+::: {.column width="75%"}
+<div style="background-color: white; padding: 80px; width: 75%; height: 600px; overflow-y: scroll; border-radius: 10px; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);">
+
+<!-- {{< include _day-5-odd-threshold.qmd >}} -->
+
+</div>
+:::
+
+::: {.column width="25%"}
+Example ODD Protocol for Threshold Model<br>$\longleftarrow$
+
+<br>
+
+![[Figure reproduced from @railsback2019agent.]{.nord-light}](media/odd.png){width="100%" .shadow-img}
+:::
+::::
+
+
+
+## Two Simple-ish Experiments
+
+- First, vary number of people who initially agree.
+- Second, vary distributions of individual thresholds.
+
+
+
+## [(A Bad)]{.nord-light} Simulated Network Society
+
+```{python}
+G = nx.connected_watts_strogatz_graph(n=100, k=6, p=0.5, seed=42)
+```
+
+Visualize
+
+```{python}
+fig, axes = plt.subplots(1, 2, figsize=(15, 7))
+
+# Subplot 1: Graph
+# pos = graphviz_layout(G, prog='dot')
+pos = nx.spring_layout(G)
+nx.draw(G, pos, with_labels=False, node_size=100, node_color="#2e3440", edge_color="#2e3440", ax=axes[0])
+axes[0].set_title("(a)")
+
+# Subplot 2: ECDF of Node Degrees
+node_degrees = [degree for node, degree in G.degree()]
+sns.ecdfplot(node_degrees, ax=axes[1], color="#2e3440")
+axes[1].set_title("(b)")
+axes[1].set_xlabel("Node Degree")
+axes[1].set_ylabel("ECDF")
+
+# Adjust layout
+plt.tight_layout()
+plt.savefig("media/G_subplots.png", dpi=300)
+```
+
+##
+
+![Subplot (a) graph visualization. Subplot (b) degree distribution of nodes. Network is constructed from 17.36 days of text message data between SMS particpants.](media/G_subplots.png){#fig-er_network_simulation}
+
+
+
+<!--
+##
+
+<br>
+
+:::: {.columns}
+::: {.column width="45%"}
+
+<!-- from _day-5-copenhagen-networks-study-sbm.qmd -->
+
+```{python}
+df = pd.read_csv('output/cns_sms_edgelist.csv')
+G = nx.from_pandas_edgelist(df, 'source', 'target')
+G = G.to_undirected()
+G = nx.Graph(G) # in case multigraph
+
+len(G.nodes()), len(G.edges())
+```
+
+:::
+
+::: {.column width="10%"}
+:::
+
+::: {.column width="45%"}
+![Network is constructed from 17.36 days of text message data between SMS particpants.](media/cns_sms_filtered.png){width="100%" #fig-cns_sms_filtered}
+:::
+:::: -->
+
+
+## Understanding Threshold Distributions
+
+```{python}
+threshold_pairs = [
+    (2, 2), (2, 4), (2, 6), (2, 8), (2, 10),
+    (2, 12), (2, 14), (2, 16), (4, 2), (6, 2),
+    (8, 2), (10, 2), (12, 2), (14, 2), (16, 2)
+]
+
+# Create a figure with subplots for each alpha-beta pair
+fig, axes = plt.subplots(3, 5, figsize=(20, 10), sharex=True, sharey=True)
+axes = axes.flatten()
+
+# Generate and plot the Beta distributions
+for i, (alpha, beta) in enumerate(threshold_pairs):
+    beta_dist = np.random.beta(alpha, beta, 1000)
+    sns.kdeplot(beta_dist, ax=axes[i], fill=True)
+    axes[i].set_title(f"α={alpha}, β={beta}")
+    axes[i].set_xlim(0, 1)
+
+    # Add vertical grid lines at specific points
+    axes[i].xaxis.set_major_locator(plt.MultipleLocator(0.25))
+    axes[i].grid(True, which='major', axis='x', linestyle='--', linewidth=0.5)
+    axes[i].set_ylabel('')
+
+    # Add a thin dotted vertical grey line at 0.5
+    axes[i].axvline(x=0.5, color='black', linestyle=':', linewidth=1)
+
+    # Remove y-axis ticks, labels, etc.
+    axes[i].tick_params(left=False, labelleft=False)
+
+plt.tight_layout()
+plt.savefig("media/thresholds.png", dpi=300)
+```
+
+##
+
+![These threshold distributions are drawn from a beta probability distribution with different combinations of $\alpha$ and $\beta$ parameters. The combinations of $\alpha$ and $\beta$ parameters you see here were selected specifically to generate threshold distributions such as these. Thresholds range from 0-1. The vertical gray lines mark 0.5.](media/thresholds.png){width="100%" #fig-thresholds}
+
+
+## Experiment 1
+
+Parameters for the [(custom)]{.nord-light} batch run. Put this in the \_variables.qmd?
+
+```{python}
+# num_initial_agree_values
+num_initial_agree_values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25]
+# num_initial_agree_values = range(1, 50, 2)
+
+# beta distribution parameters to sample thresholds
+threshold_alpha = 2
+threshold_beta = 5
+
+# n_runs, max_steps and saturation_point for stopping condition
+n_runs = 10
+max_steps = 100
+saturation_point = 0.95
+```
+
+## Experiment 1
+
+Using `run_threshold_model_experiment()` from the course package because `run_batch()` doesn't work well with NetworkGrids (likely a bug).
+
+```{python}
+results_df = run_threshold_model_experiment(
+    G,
+    num_initial_agree_values,
+    threshold_alpha,
+    threshold_beta,
+    saturation_point,
+    max_steps,
+    n_runs
+)
+
+results_df
+```
+
+```{python}
+#| echo: false
+from icsspy.utils import markdown_table
+md = markdown_table(results_df.head(10), 'tables/_threshold_models.md')
+print(md)
+```
+
+{{< include tables/_threshold_models.md >}}
+
+## Experiment 1
+
+```{python}
+# no. subplots based on no. of unique 'num_initial_agree' values
+unique_initial_agrees = results_df['num_initial_agree'].unique()
+num_plots = len(unique_initial_agrees)
+
+fig, axes = plt.subplots(num_plots, 1, figsize=(8, num_plots * 2), sharex=True, sharey=True)
+
+# iterate through the unique values of 'num_initial_agree'; create subplot for each
+for i, num_initial_agree in enumerate(unique_initial_agrees):
+    sns.lineplot(
+        data=results_df[results_df['num_initial_agree'] == num_initial_agree],
+        x='Step',
+        y='frac_agree',
+        ax=axes[i],
+        color=sns.color_palette("bright", num_plots)[i]
+    )
+    axes[i].set_ylim(0, 1)
+    axes[i].set_title(f"Initial Agreeing Agents: {int(num_initial_agree)} ({round(int(num_initial_agree)/G.number_of_nodes()*100)}% of the population)", fontsize=10)
+    axes[i].set_ylabel("")
+    axes[i].tick_params(left=False)
+
+    axes[i].yaxis.set_major_locator(ticker.MultipleLocator(0.25))
+    axes[i].grid(True, which='major', axis='y', linestyle='--', linewidth=0.5)
+
+plt.xlabel("\nTime Steps")
+
+plt.tight_layout()
+plt.savefig('media/threshold_e1.png', dpi=300)
+```
+
+![](media/threshold_e1.png)
+
+::: {notes}
+In this plot, we're examining the effect of varying the number of initially agreeing agents on the spread of agreement across a network over time. Here’s how you can interpret the results:
+
+### 1. **Impact of the Number of Initial Agreeing Agents:**
+   - **Low Number of Initial Agreeing Agents (1–5 agents):**
+     - The spread of agreement starts at a lower fraction (e.g., 0.25), indicating that even with a small number of initial agreeing agents, the influence is somewhat limited.
+     - There is some variability in how the agreement spreads, as shown by the shaded regions (standard deviation) around the lines. This suggests that different runs with the same initial conditions can lead to different outcomes.
+     - Eventually, the fraction of agreeing agents stabilizes, often below 1.0 (i.e., not all agents in the network agree).
+
+   - **Moderate Number of Initial Agreeing Agents (6–10 agents):**
+     - The spread of agreement starts at a higher fraction and stabilizes more quickly, often reaching closer to 1.0, meaning that most agents in the network agree by the end of the simulation.
+     - Variability decreases as the number of initial agreeing agents increases. The shaded regions become narrower, indicating more consistent outcomes across different runs.
+
+   - **High Number of Initial Agreeing Agents (15–25 agents):**
+     - The spread of agreement is almost immediate, and the fraction of agreeing agents quickly reaches 1.0. This indicates a strong influence of the initial agreeing agents on the rest of the network.
+     - There is very little to no variability, as shown by the narrow or nearly non-existent shaded regions. This suggests that the outcome is very predictable when the initial agreeing agents constitute a larger portion of the population.
+
+### 2. **Threshold of Agreement:**
+   - **Critical Mass Effect:**
+     - The plots demonstrate a “critical mass effect,” where once the number of initial agreeing agents reaches a certain threshold, agreement quickly spreads to the entire network. This is evident in the plots where the initial agreeing agents number is higher (e.g., 10 and above), and agreement spreads rapidly to the entire network.
+
+   - **Slower Spread with Fewer Initial Agreeing Agents:**
+     - With fewer initial agreeing agents, the spread is slower and may not reach the entire network, suggesting that in a population with higher thresholds or resistance to change, more initial agreeing agents are needed to trigger widespread agreement.
+
+### 3. **Saturation Points:**
+   - In many of the plots, the agreement fraction quickly reaches a saturation point (either 1.0 or stabilizes at a lower value). This indicates that the network reaches a stable state where no further spread of agreement occurs. The specific saturation point depends on the initial number of agreeing agents and the network's structure and thresholds.
+
+### 4. **Variability Across Runs:**
+   - The shaded regions (standard deviation) show the variability across different runs with the same initial conditions. Wider shaded regions indicate higher variability, meaning that the outcome can differ significantly from run to run. Narrower shaded regions suggest more consistent outcomes.
+
+### Overall Interpretation:
+- This plot illustrates the significant impact that the initial number of agreeing agents can have on the overall spread of agreement within a network. It shows that there is a threshold effect, where having more initial agreeing agents leads to a more predictable and faster spread of agreement. The variability across different runs decreases as the number of initial agreeing agents increases, indicating that in a population with a critical mass of agreeing agents, agreement is likely to spread uniformly across the network.
+:::
+
+## Experiment 2
+
+```{python}
+# num_initial_agree_values
+num_initial_agree_values = [10, 20, 30, 40, 50, 60, 70, 80, 90]
+
+# List of (alpha, beta) pairs for threshold distribution
+threshold_pairs = [
+    (2, 2), (2, 4), (2, 6), (2, 8), (2, 10), (2, 12), (2, 14), (2, 16),
+    (2, 2), (4, 2), (6, 2), (8, 2), (10, 2), (12, 2), (14, 2), (16, 2),
+]
+
+# n_runs, max_steps and saturation_point for stopping condition
+n_runs = 10
+max_steps = 100
+saturation_point = 0.95
+```
+
+## Experiment 2
+
+```{python}
+results_df = run_threshold_model_experiment(
+    G,
+    num_initial_agree_values,
+    threshold_pairs,  # Pass the list of (alpha, beta) pairs
+    None,  # Set to None because threshold_pairs are provided
+    saturation_point,
+    max_steps,
+    n_runs
+)
+```
+
+
+## Experiment 2
+
+```{python}
+# create a column to represent each combination of (alpha, beta)
+results_df['alpha_beta'] = results_df.apply(lambda row: f"α={row['threshold_alpha']}, β={row['threshold_beta']}", axis=1)
+
+# create a FacetGrid, with 'alpha_beta' as rows and 'num_initial_agree' as hue
+g = sns.FacetGrid(results_df, col='alpha_beta', hue='num_initial_agree', col_wrap=4, height=4, aspect=1.5, sharey=True)
+g.map(sns.lineplot, 'Step', 'frac_agree', errorbar='sd').add_legend()
+
+# set titles and adjust layout
+g.set_axis_labels("Time Steps", "Fraction of Agreement")
+g.set_titles("{col_name}")
+g.fig.subplots_adjust(top=0.9)
+g.fig.suptitle(r"Effect of Different $\alpha$ and $\beta$ on Agreement Over Time", fontsize=16)
+
+plt.savefig('media/threshold_e2.png', dpi=300)
+```
+
+![](media/threshold_e2.png)
+
+::: {.notes}
+These results show the effect of different combinations of \(\alpha\) and \(\beta\) parameters from the Beta distribution on the spread of agreement among agents in a simulated network. Here’s how you can interpret the findings:
+
+### 1. **Effect of Different \(\alpha\) and \(\beta\) Values:**
+   - **High \(\alpha\) and Low \(\beta\)**: In these cases, agents tend to have higher thresholds for agreeing. This is shown by the fact that even as the number of agreeing agents increases, the fraction of agents agreeing only increases slowly or not at all. This is evident in the plots with combinations like \(\alpha = 2\), \(\beta = 10\), where agreement among agents is slow or stagnant.
+   - **Low \(\alpha\) and High \(\beta\)**: When \(\alpha\) is low and \(\beta\) is high, agents tend to have lower thresholds for agreeing, leading to a rapid increase in the fraction of agreeing agents, which saturates quickly. For example, in the case of \(\alpha = 10\), \(\beta = 2\), agreement spreads quickly across the network.
+   - **Moderate \(\alpha\) and \(\beta\)**: When \(\alpha\) and \(\beta\) are moderate, there is a balanced threshold, and agreement spreads at a moderate rate, with the possibility of variability based on the initial number of agreeing agents.
+
+### 2. **Variability Across Runs:**
+   - **Wide Shaded Regions:** The shaded regions around the lines represent the standard deviation (SD) across different runs. Wider shaded regions indicate higher variability in how the agreement spreads across the network for that particular combination of \(\alpha\) and \(\beta\). For example, the plot with \(\alpha = 2\), \(\beta = 4\) shows significant variability, indicating that depending on initial conditions, the spread of agreement could be faster or slower.
+   - **Narrow Shaded Regions:** Narrow shaded regions indicate that the model’s behavior is more consistent across different runs, with less variability. This is seen in cases where agreement spreads quickly or barely spreads at all.
+
+### 3. **Impact of the Number of Initial Agreeing Agents:**
+   - **Low Initial Agreeing Agents**: When the number of initial agreeing agents is low, the spread of agreement is generally slower and shows more variability.
+   - **High Initial Agreeing Agents**: When the number of initial agreeing agents is high, agreement spreads quickly, and the model reaches saturation faster with less variability. The influence of \(\alpha\) and \(\beta\) becomes less significant as the initial agreeing agents drive the process.
+
+### 4. **Edge Cases:**
+   - **Stagnant or No Agreement:** In some plots, regardless of the \(\alpha\) and \(\beta\) combination, there is no significant spread of agreement. This occurs when the threshold for agreeing is too high relative to the influence of neighboring agents, leading to a lack of consensus.
+
+These results help to illustrate how the parameters of the Beta distribution and the initial conditions can greatly influence the dynamics of agreement spread in a networked population. Depending on the context (e.g., social, biological systems), understanding this behavior could be critical for predicting outcomes or designing interventions.
+:::
+
+## Other Experiments
+
+- More realistic network structures
+    - Could fit an SBM to a network and then generate networks from it
+- More systematic exploration

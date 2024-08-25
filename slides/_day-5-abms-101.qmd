@@ -310,18 +310,15 @@ A `{python} round(variables['results_sir_model_1_max_infected']-variables['resul
 
 ## Mixing and Flattening the Curve
 
+[More movement = more mixing = more exposures = more infections.]{.kn-pink}
+
+But there are some qualifications that will come up a bit later in the lecture.
+
 <br>
 
 :::: {.columns}
-::: {.column width="55%"}
-![A comparison of three SIR models with identical parameters other than how much distance an agent can move around in our simulated world. More movement = more mixing = more exposures = more infections. But there are some qualifications that will come up a bit later in the lecture.](media/sir_compare_models_3-6.png){width=100% #fig-sir_compare_models_3-6}
-:::
-
-::: {.column width="5%"}
-:::
-
-::: {.column width="40%"}
-Shared Parameters
+::: {.column width="45%"}
+#### Shared Parameters
 
 | Parameter             | Value                        |
 |-----------------------|------------------------------|
@@ -335,22 +332,13 @@ Shared Parameters
 
 <!-- Quarto doesn't support tuples or lists; change this later if time -->
 :::
-::::
 
-##
-
-:::: {.columns}
 ::: {.column width="55%"}
-![This is the general point I want to make on this slide, come back later.](media/compare_agent_networks.png){width=100% #fig-compare_agent_networks}
-:::
+![](media/sir_compare_models_3-6.png){width=42% #fig-sir_compare_models_3_6} &nbsp;&nbsp;&nbsp; ![](media/compare_agent_networks.png){width=36% #fig-compare_agent_networks}
 
-::: {.column width="5%"}
-:::
+[**@fig-sir_compare_models_3_6** (left) Two SIR models with identical parameters other than max agent step size. **@fig-compare_agent_networks** (right) edge weight ECDF.]{.small-text}
 
-::: {.column width="40%"}
-#### Come back to this
-
-- present this a different way if I don't do the 6 models manually?
+<br>
 
 {{< include tables/_sir_1_interaction_graph_summaries.md >}}
 :::
@@ -364,8 +352,8 @@ Shared Parameters
 Unlike equation-based models of systems, ABMs
 
 - do not rely on aggregated variables to represent system components
-- emphasize heterogeneity by directly represent individual agents and their iteractions
-- focuses on emergent outcomes and adaptive. comntextuialized behaviours
+- emphasize heterogeneity by directly representing individual agents and their iteractions
+- focuses on emergent outcomes and contextualized adaptive behaviours
 - are not contrained by mathematical tractability
 - etc.
 
@@ -379,7 +367,7 @@ Unlike equation-based models of systems, ABMs
 
 :::: {.columns}
 ::: {.column width="45%"}
-![The ABM modelling cycle. [Figure reproduced from @railsback2019agent.]{.nord-light}](media/abm-cycle.png){width=100% #fig-abm-cycle}
+![The ABM modelling cycle is a great fit with the Box and Wickham loops we've mentioned repeatedly throughout the course. [Figure reproduced from @railsback2019agent.]{.nord-light}](media/abm-cycle.png){width=100% #fig-abm-cycle}
 :::
 
 ::: {.column width="55%"}
@@ -569,7 +557,7 @@ Credible scientific models must be capable of reproducing multiple [(ideally div
 :::
 
 ::: {.column width="45%"}
-![Like generative network analysis, the high-level objective is to deepen our understanding of the latent processes governing the system.](media/flocking.jpg){width=100% .shadow-img}
+![Like generative network analysis, the high-level objective is to deepen our understanding of the latent processes governing the system. Models of birds flocking and fish schooling are common examples in interdisciplinary introductions, and it's not really a lecture about agent-based modelling if there isn't at least one picture of birds flocking...](media/flocking.jpg){width=100% .shadow-img}
 :::
 ::::
 
@@ -587,18 +575,18 @@ In POM, the focus is on identifying and reproducing multiple, often diverse, pat
 
 :::: {.columns}
 ::: {.column width="45%"}
-These **real-world patterns** can take many forms, such as spatial distributions, temporal sequences, or system-level properties. We want to observe and document patterns from empirical data, prior research, etc. Use these patterns to guide the design of the model structure. Then we select and organize entities, processes, and interactions in such a way tha the model is capable of generating the observed patterns. In the **SIR model example**,
+These **real-world patterns** can take many forms, such as spatial distributions, temporal sequences, or system-level properties. We want to observe and document patterns from empirical data, prior research, etc. and then use them to guide the design of the model structure. They is to select and organize our entities, processes, and interactions in a way that the model is capable of generating the observed patterns.
 
-- the key **patterns** are observed epidemic behaviors, such as the rise and fall of infected individuals over time, especially the occurrence of an infection peak.
-- these are **incorporated into the SIR model** via the transmission rate $\beta$ [(to simulate the infection spread)]{.nord-light} and recovery rate $\gamma$ [(to simulate recovery)]{.nord-light}.
-- if the model can't reproduce the observed epidemic behaviours, we **refine** it.
+<br>
+
+In the **SIR model example**, the key **patterns** are observed epidemic behaviors, such as the rise and fall of infected individuals over time, especially the occurrence of an infection peak. These are incorporated into the SIR model via the transmission rate $\beta$ [(simulating infection spread)]{.nord-light} and recovery rate $\gamma$ [(simulating recovery)]{.nord-light}. If the model can't reproduce the observed epidemic behaviours, we **refine** it.
 :::
 
 ::: {.column width="10%"}
 :::
 
 ::: {.column width="45%"}
-![Like generative network analysis, the high-level objective is to deepen our understanding of the latent processes governing the system.](media/flocking.jpg){width=100% .shadow-img}
+![Like generative network analysis, the high-level objective is to deepen our understanding of the latent processes governing the system.](media/sir_compare.png){width=100% .shadow-img}
 :::
 ::::
 
@@ -622,13 +610,17 @@ We use ABMs to **formulate**, **test**, and **refine** mechanistic theories of *
 
 <br>
 
-In the **SIR model example**, patterns like the peak of infections or the eventual stabilization of the population into susceptible and recovered groups are used to test and refine theories of disease spread. Theories about how individuals become infected (e.g., transmission rate) and recover (e.g., recovery rate) are tested by checking whether the model can replicate these observed patterns. If the model consistently reproduces these patterns, it supports the validity of the theory. If not, the theory needs to be adjusted—perhaps by considering factors like varying contact rates or the impact of interventions, and the process is repeated until the model behaves as expected.
+In the **SIR model example**, patterns like the peak of infections or the eventual stabilization of the population into susceptible and recovered groups are used to test and refine theories of disease spread.
+
+<br>
+
+Theories about how individuals become infected and recover are tested by checking whether the model can replicate these observed patterns. If the model consistently reproduces the patterns, it supports the validity of the theory. If not, it needs to be adjusted -- perhaps by considering factors like varying contact rates or the impact of interventions. The process repeats until the model behaves as expected.
 :::
 
 ::: {.column width="10%"}
 :::
 
 ::: {.column width="45%"}
-![Like generative network analysis, the high-level objective is to deepen our understanding of the latent processes governing the system.](media/flocking.jpg){width=100% .shadow-img}
+![Like generative network analysis, the high-level objective is to deepen our understanding of the latent processes governing the system.](media/sir_compare.png){width=100% .shadow-img}
 :::
 ::::

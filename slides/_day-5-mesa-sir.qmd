@@ -122,13 +122,15 @@ conda activate gt
 
 :::: {.columns}
 ::: {.column width="40%"}
-<br><br>
-
 Let's develop the
 
 ### SIR model
 
 we've been using as an example so far.
+
+<br>
+
+![[Important!]{.kn-pink} Some of the code that follows is more complex than anything we've done in the course so far. By way of analogy, I'm popping the hood of an old car to show you what key components of the machine look like and how they work together. However, **the main goal is for you to learn how to drive these machines safely**, so focus on understanding the logic of the modelling cycle and feel free to temporarily set aside any details that get in the way of that goal.](media/lady-gaga-carpool-karoake.jpg){width="100%" .shadow-img}
 :::
 
 ::: {.column width="5%"}
@@ -170,6 +172,8 @@ icsspy.set_style()
 
 <br>
 
+Remember that the agent class is like a blueprint for creating agents. Here, each agent can be in one of three states: susceptible, infected, or recovered. The agent interacts with its environment by moving, tracking its position, and interacting with other agents. The agent can get infected, spread the infection to others, and eventually recover based on a random chance within a specified recovery time range.
+
 ```{python}
 class SIRAgent(Agent):
     def __init__(
@@ -181,43 +185,43 @@ class SIRAgent(Agent):
     ):
 
         super().__init__(unique_id, model)
-        self.state = "S"  # All agents start as susceptible
-        self.infected_time = 0  # Counter for how long the agent has been infected
-        self.recovery_time_range = recovery_time_range  # Tuple for min and max recovery times
-        self.max_agent_step_size = max_agent_step_size  # Step size for movement
-        self.pos_history = []  # Track agent's position over time
-        self.interactions = {}  # Track interactions with a count
-        self.infection_duration = 0  # Track how long the agent has been sick
+        self.state = "S"
+        self.infected_time = 0
+        self.recovery_time_range = recovery_time_range
+        self.max_agent_step_size = max_agent_step_size
+        self.pos_history = []
+        self.interactions = {}
 
     def step(self):
         if self.state == "I":
-            self.infected_time += 1  # Increment the time the agent has been infected
-            self.infection_duration += 1  # Increment the infection duration
-
-            # Check if agent is within the recovery window
+            self.infected_time += 1
+            # check if agent is within the recovery window
             if self.infected_time >= self.recovery_time_range[0]:
+                # if so, recover probabilistically
                 if self.random.random() < 0.5 or self.infected_time >= self.recovery_time_range[1]:
-                    self.state = "R"  # Recover if within the window or if max time reached
+                    self.state = "R"
 
-            if self.state == "I":  # Only try to infect others if still infected
-                # Try to infect neighbors
+            # if still infected, try to infect others
+            if self.state == "I":
                 neighbors = self.model.grid.get_neighbors(self.pos, moore=True, include_center=False)
                 for neighbor in neighbors:
                     if neighbor.state == "S" and self.random.random() < self.model.infection_rate:
                         neighbor.state = "I"
 
-        # Move to a random neighboring cell with the given step size
+        # move to a random neighboring cell with the given step size; record the new position
         possible_moves = self.model.grid.get_neighborhood(
             self.pos, moore=True, include_center=False, radius=self.max_agent_step_size
         )
+
         new_position = self.random.choice(possible_moves)
         self.model.grid.move_agent(self, new_position)
-        self.pos_history.append(new_position)  # Record the new position
+        self.pos_history.append(new_position)
 
-        # Record interactions
+        # record interactions with other agents in this step
         neighbors = self.model.grid.get_neighbors(
             self.pos, moore=True, include_center=False
         )
+
         for neighbor in neighbors:
             if neighbor.unique_id in self.interactions:
                 self.interactions[neighbor.unique_id] += 1
@@ -225,9 +229,25 @@ class SIRAgent(Agent):
                 self.interactions[neighbor.unique_id] = 1
 ```
 
+::: {.notes}
+I'm not going to explain every line of this code, since that's not the point of popping the hood and showing it to you, but I do want to highlight a few key pieces.
+
+- Line 1 defines a new class called SIRAgent. The Agent in parentheses means that SIRAgent is a subclass of Agent, meaning it inherits properties and behaviors from the Agent class provided by Mesa.
+- Lines 2-8 is the constructor method that gets called when a new SIRAgent object is created. It initializes the agent with specific attributes. It has parameters for:
+    - unique_id: A unique identifier for the agent.
+	- model: The model (environment) in which the agent exists.
+	- recovery_time_range: A tuple representing the minimum and maximum time (in steps) it takes for the agent to recover after being infected.
+	- max_agent_step_size: The maximum distance the agent can move in one step.
+- Line 10 calls the constructor of the parent Agent class to give the agent a unique ID within the model.
+- Lines 11 to 16 set the initial attributes of the agent. Lines 15 and 16 collect information about each agent's local and neighboring agents at each step. This will come up a bit later.
+- Starting on Line 18, we define the agent's step function, which determines what how the agent's states are updated and the actions they take when it's their turn to act in the model. In this case, we first check our agent's state. If they are infected, we increment the days infected counter and check whether they are in the recovery window. If so, we flip a coin to see if they recover. If the agent is still infected, they try to infect their neighbors. We iterate over the neighbors and, if the infection conditions are met (random), then we switch the neighbors status to ifnected. Then the agent moves to a new location on the grid that is within a pre-defined number of steps. The interactions and movement is logged.
+:::
+
 ## Second, define the [model class]{.kn-pink}
 
 <br>
+
+Remember that the SIRModel is a blueprint for creating a model in which agents interact and spread infections. Any ABMs we create are created by this class. It inherits from Mesa's more general Model class, which provides basic functionality for simulation modelling that we don't need to design or develop ourselves.
 
 ```{python}
 class SIRModel(Model):
@@ -254,29 +274,32 @@ class SIRModel(Model):
         self.max_iterations = max_iterations
         self.current_iteration = 0
         self.change_threshold = change_threshold
-        self.previous_infected_ratio = None  # Track the ratio of infected agents in the previous step
+        # track the ratio of infected agents in the previous step
+        self.previous_infected_ratio = None
 
-        # Create agents
+        # create agents
         for i in range(self.num_agents):
-            step_size = max_agent_step_size if i % 2 == 0 else 1  # Half agents have large step size, half small
+            # half the agents will have a large step size, half small
+            step_size = max_agent_step_size if i % 2 == 0 else 1
             a = SIRAgent(i, self, recovery_time_range, max_agent_step_size=step_size)
             self.grid.place_agent(a, (self.random.randrange(self.grid.width),
                                       self.random.randrange(self.grid.height)))
-            a.pos_history.append(a.pos)  # Initialize the position history with the starting position
+            # initialize the position history with the starting position
+            a.pos_history.append(a.pos)
             self.schedule.add(a)
 
-        # Infect a specified number of random agents
+        # randomly infect a specified number of agents
         initial_infected_agents = self.random.sample(
             self.schedule.agents, n_initial_infections
         )
         for agent in initial_infected_agents:
             agent.state = "I"
-            agent.infected_time = 0  # Initialize infection duration
+            agent.infected_time = 0 # initialize infection duration
 
         self.datacollector = DataCollector(
             model_reporters={
                 "Susceptible": lambda m: self.count_state("S"),
-                "Infected": lambda m: self.compute_infected(),
+                "Infected": lambda m: self.count_state("I"),
                 "Recovered": lambda m: self.count_state("R")
             },
             agent_reporters={
@@ -284,44 +307,54 @@ class SIRModel(Model):
                 "Infection_Duration": "infection_duration"
             }
         )
-        self.running = True  # Ensure the model runs by default
+        # this line is necessary for doing multiple model runs simultaneously
+        # we will do this later in the lecture
+        self.running = True
 
     def step(self):
         self.datacollector.collect(self)
         self.schedule.step()
         self.current_iteration += 1
 
-        # Check for stopping condition based on maximum iterations
+        # check for stopping condition based on maximum iterations
         if self.current_iteration >= self.max_iterations:
             self.running = False
 
-        # Check for stopping condition based on change in infected ratio
-        current_infected_ratio = self.compute_infected()
+        # check for stopping condition based on change in infected ratio
+        current_infected_ratio = self.count_state('I')
         if self.previous_infected_ratio is not None:
             change = abs(current_infected_ratio - self.previous_infected_ratio)
             if change < self.change_threshold:
                 self.running = False
         self.previous_infected_ratio = current_infected_ratio
 
-    def compute_infected(self):
-        infected = sum([1 for a in self.schedule.agents if a.state == "I"])
-        return infected / self.num_agents
-
     def count_state(self, state_name):
         count = sum([1 for a in self.schedule.agents if a.state == state_name])
         return count / self.num_agents
 
-    def get_interaction_graph(self):
-        G = nx.Graph()
-        for agent in self.schedule.agents:
-            G.add_node(agent.unique_id)
-            for interacted_agent, count in agent.interactions.items():
-                if G.has_edge(agent.unique_id, interacted_agent):
-                    G[agent.unique_id][interacted_agent]['weight'] += count
-                else:
-                    G.add_edge(agent.unique_id, interacted_agent, weight=count)
-        return G
+    # def get_interaction_graph(self):
+    #     G = nx.Graph()
+    #     for agent in self.schedule.agents:
+    #         G.add_node(agent.unique_id)
+    #         for interacted_agent, count in agent.interactions.items():
+    #             if G.has_edge(agent.unique_id, interacted_agent):
+    #                 G[agent.unique_id][interacted_agent]['weight'] += count
+    #             else:
+    #                 G.add_edge(agent.unique_id, interacted_agent, weight=count)
+    #     return G
 ```
+
+::: {.notes}
+- Lines 1-13 define a new class called SIRModel. It inherits from the Model class in Mesa, so it starts with some basic functionality for running simulations.
+- Line 15 is the constructor method that initializes the model with specific settings when you create a new instance of SIRModel. It calls the constructor of the parent Model class to make sure the SIRModel is set up correctly with inherited attributes.
+- Lines 16-26 are for the model parameters, which we set when we initialize a new model.
+- Lines 28-37 create the agents using the AgentClass, adds them to the model grid (space) and schedule (time)
+- Lines 39-45 randomly infect an initial set of agents
+- Lines 47-57 set up automated data collection throughout the simulation
+- Line 60 is necessary for running multiple simulations at once, which we will see a little later in the lecture.
+- Lines 62-77 defines what happens for each time of time we step through in the model, including running the agent steps, collecting data on what happened, and checking the stopping conditions to see whether the model should continue running.
+- The remaining code defines some methods that are used to compute the number or infected nodes
+:::
 
 ## Third, load the [model parameters]{.kn-pink}
 
@@ -335,7 +368,14 @@ model_1_params = params.get('model_1')
 pprint(model_1_params)
 ```
 
-> output
+> {'N': 100,
+>  'grid_height': 40,
+>  'grid_width': 40,
+>  'infection_rate': 0.3,
+>  'max_agent_step_size': 1,
+>  'n_initial_infections': 2,
+>  'n_iterations': 150,
+>  'recovery_time_range': [14, 24]}
 
 <br>
 
@@ -344,15 +384,20 @@ model_2_params = params.get('model_2')
 pprint(model_2_params)
 ```
 
-> output
+> {'N': 100,
+>  'grid_height': 40,
+>  'grid_width': 40,
+>  'infection_rate': 0.15,
+>  'max_agent_step_size': 1,
+>  'n_initial_infections': 2,
+>  'n_iterations': 150,
+>  'recovery_time_range': [14, 24]}
 
 ## Forth, [run the model(s)]{.kn-pink}
 
-<br>
-
-We'll run two models here to reproduce @fig-sir_compare.
-
-Here's **Model 1**
+:::: {.columns}
+::: {.column width="65%"}
+We'll run two models here to reproduce @fig-sir_compare. Here's **Model 1**!
 
 <br>
 
@@ -371,20 +416,38 @@ for i in range(model_1_params['n_iterations']):
     model_1.step()
 
 m1res = model_1.datacollector.get_model_vars_dataframe()
+m1res
+```
+:::
+
+::: {.column width="5%"}
+:::
+
+::: {.column width="30%"}
+```{python}
+#| echo: false
+from icsspy.utils import markdown_table
+md = markdown_table(m1res.sample(10), 'tables/_sir_1_m1res.md')
+print(md)
 ```
 
-## Forth, [run the model(s)]{.kn-pink}
+Random sample (N=10)
 
 <br>
 
-- MODEL 1 DATAFRAME OUTPUT
+{{< include tables/_sir_1_m1res.md >}}
+
+:::
+::::
+
+
 
 
 ## Forth, [run the model(s)]{.kn-pink}
 
-<br>
-
-And here's **Model 2**
+:::: {.columns}
+::: {.column width="65%"}
+And here's **Model 2**!
 
 <br>
 
@@ -403,18 +466,31 @@ for i in range(model_2_params['n_iterations']):
     model_2.step()
 
 m2res = model_2.datacollector.get_model_vars_dataframe()
+m2res
+```
+:::
+
+::: {.column width="5%"}
+:::
+
+::: {.column width="30%"}
+```{python}
+#| echo: false
+md = markdown_table(m2res.sample(10), 'tables/_sir_1_m2res.md')
+print(md)
 ```
 
-## Forth, [run the model(s)]{.kn-pink}
+Random sample (N=10)
 
 <br>
 
-- MODEL 2 DATAFRAME OUTPUT
+{{< include tables/_sir_1_m2res.md >}}
+
+:::
+::::
 
 
 ## Plot the results
-
-Recall: [Design patterns]{.kn-pink}
 
 <br>
 
@@ -432,11 +508,15 @@ plt.savefig('media/sir_compare_models_1-2.png')
 
 :::: {.columns}
 ::: {.column width="25%"}
-![](media/sir_compare){width=100%}
+![](media/sir_compare){width=100% .shadow-img}
+
+Recall [design patterns]{.kn-pink}
 :::
 
 ::: {.column width="75%"}
-$\longleftarrow$<br>This is @fig-sir_compare from earlier in the lecture. Proportion of infected people in a population over time from two SIR simulations with different transmissability rates.
+<br>
+
+$\longleftarrow$<br>@fig-sir_compare from earlier in the lecture. Proportion of infected people in a population over time from two SIR simulations with different transmissability rates. Not (yet) shown: proportion of susceptible and recovered.
 :::
 ::::
 
@@ -485,17 +565,11 @@ interaction_graph_summaries
 
 ```{python}
 #| echo: false
-from icsspy.utils import markdown_table
-md = markdown_table(interaction_graph_summaries, 'tables/_sir_1_interaction_graph_summaries.md')
+md = markdown_table(interaction_graph_summaries, 'tables/_sir_1_interaction_graph_summaries.md', indexed=True)
 # print(md)
 ```
 
-|   No. Nodes |   No. Edges |   Avg. Degree |
-|------------:|------------:|--------------:|
-|         100 |         984 |         19.68 |
-|         100 |         997 |         19.94 |
-
-<!-- won't load external table for some reason... -->
+{{< include tables/_sir_1_interaction_graph_summaries.md >}}
 
 <br>
 
@@ -533,9 +607,32 @@ for agent in model_2.schedule.agents:
 :::
 ::::
 
-## Analysis Chapter Summary
+## Model Analysis
 
-- TODO
+<br><br>
+
+- Understand and interpret model behavior to better understand the system being modeled
+- Validate the model against real-world data, check robustness and reliability
+- Explore the effects of different parameters and conditions and identify key drivers of model outcomes
+
+- Track agent states, interactions, and other metrics
+- Visualize model dynamics over time
+- Use statistical or other approaches
+
+::: {.notes}
+So far we have not been very systematic in how we've approaches analyzing the outputs of our SIR model. What's involved in more systematic analyses?
+
+The primary goal of analyzing an agent-based model is to gain insights into how the model behaves and how well it represents the real-world system it’s designed to simulate. This involves understanding the dynamics of the model, validating it against empirical data, and exploring the implications of different parameter settings.
+
+We can break ABM model analysis down into several types. Descriptive analysis helps summarize what’s happening in the model, while exploratory analysis digs deeper into patterns and relationships within the data. Comparative analysis is useful when we want to understand how different scenarios or versions of the model compare, and predictive analysis leverages the model to forecast future outcomes.
+
+Usually, we use several techniques at once to analyze ABMs effectively. Data collection is crucial for tracking the various states and interactions within the model, often using tools like Mesa’s DataCollector. Visualization helps us see the trends and dynamics within the model, and statistical analysis allows us to quantify and interpret the data meaningfully.
+
+Ultimately, the goal of analyzing an ABM is to ensure that the model is providing accurate, reliable insights into the system being studied. This includes identifying the key factors that drive model outcomes and ensuring that the model can withstand scrutiny through robust analysis.
+
+This high-level overview sets the stage for more detailed discussions on specific analysis methods like sensitivity analysis, parameter sweeps, and computational experiments, which are essential for thoroughly understanding and validating our ABMs.
+:::
+
 
 ## Model Analysis
 
@@ -609,6 +706,8 @@ params = {
     "n_initial_infections": [1, 5, 10, 15, 20, 25]
 }
 ```
+
+<!-- _variables! update. -->
 
 :::
 
@@ -707,27 +806,41 @@ results_df.tail()
 |    2879 |           9 |     29 | 100 |            40 |           40 |              0.8 | (14, 24)              |                    12 |                     25 |          0.04 |       0.02 |        0.94 |        68 | R       |                   16 |
 
 
-[Be selective about the data you collect during a batch run. I collected everything (including things that don't vary) here for pedagogical reasons only! Another run I did with this model produced a 4GB text file with only 6 variables. So, yeah.]{.nord-footer}
+[Be selective about the data you collect during a batch run. I collected everything (including things that don't vary) here for pedagogical reasons only!]{.nord-footer}
 
-##
+<!-- Another run I did with this model produced a 4GB text file with only 6 variables. So, yeah. -->
+
+## High-level patterns
+
+We can compare some high-level patterns by creating a **small multiples** plot. We'll use Seaborn's **FacePlot** for this. It's a more complex setup than other plotting code we've used so far, so if it's a bit overwhelming just focus on interpreting the output. Note that this code will take a little while to run.^[It takes a couple of minutes to run on my MacBook Air.]
 
 <br>
 
 ```{python}
 melted_df = pd.melt(
     results_df,
-    id_vars=['n_initial_infections', 'infection_rate', 'Step'],
+    # include 'RunId' to differentiate runs
+    id_vars=['n_initial_infections', 'infection_rate', 'Step', 'RunId'],
     value_vars=['Susceptible', 'Infected', 'Recovered'],
     var_name='State',
     value_name='Proportion'
 )
 
+# create the FacetGrid
 g = sns.FacetGrid(
-    melted_df, col="n_initial_infections", hue="State", col_wrap=3, height=4, aspect=1.5
+    melted_df, col="n_initial_infections", hue="State",
+    col_wrap=3, height=4, aspect=1.5
 )
 
-# map the data to the grid
-g.map_dataframe(sns.lineplot, x='Step', y='Proportion')
+# map the scatterplot for individual observations
+g.map_dataframe(
+    sns.scatterplot, x='Step', y='Proportion', alpha=0.005, edgecolor=None
+)
+
+# map the lineplot for aggregated data
+g.map_dataframe(
+    sns.lineplot, x='Step', y='Proportion', linewidth=2,
+)
 
 g.add_legend()
 g.set_axis_labels("Time Step", "Proportion")
@@ -738,11 +851,16 @@ plt.savefig("media/sir_subplots.png", dpi=300)
 
 ##
 
-![](media/sir_subplots.png){width="100%"}
-
+![Batch results for Model 2 with mean trends emphasized.](media/sir_subplots.png){width="100%" #fig-sir_subplots}
 
 ##
 
-- final comparison with recovery window variability?
-- say more coming in other models
-- make some bonus? thi sis a LOT and the core concepts are already hammered in here. Just ht eother models are more interesting.
+<br><br><br>
+
+:::: {.columns}
+::: {.column width="55%"}
+There is much more we could do here, but let's move on to some different examples.
+:::
+::: {.column width="45%"}
+:::
+::::

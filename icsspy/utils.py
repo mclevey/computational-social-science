@@ -9,9 +9,9 @@ from typing import Any, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
+import yaml
 from dotenv import load_dotenv
 from rich.logging import RichHandler
-import yaml
 
 from .paths import root
 
@@ -134,7 +134,7 @@ def run_in_conda(script: str, conda_env_name: str = "gt") -> None:
         )
 
 
-def markdown_table(df: pd.DataFrame, filepath: str = None) -> str:
+def markdown_table(df: pd.DataFrame, filepath: str = None, indexed=False) -> str:
     """
     Convert a pandas DataFrame to a markdown table.
 
@@ -142,17 +142,26 @@ def markdown_table(df: pd.DataFrame, filepath: str = None) -> str:
     df (pd.DataFrame): The DataFrame to convert to markdown.
     filepath (str, optional): The path where the markdown file should be saved.
     Defaults to None.
+    indexed (bool, optional): Whether to include the DataFrame index in the markdown
+    table.
+    Defaults to False.
 
     Returns:
     str: The markdown formatted table as a string.
     """
-    pd.set_option('display.float_format', lambda x: '%.0f' % x)
-    
-    md = df.to_markdown(index=False)
+    pd.set_option("display.float_format", lambda x: "%.0f" % x)
+
+    md = df.to_markdown(
+        index=indexed
+    )  # Convert the DataFrame to markdown with or without index
+
     if filepath is not None:
         with open(filepath, "w") as file:
-            file.write(md)
-    return md
+            file.write(
+                md
+            )  # Write the markdown string to the file if a filepath is provided
+
+    return md  # Return the markdown string
 
 
 def estimate_meters_from_rssi(df, rssi_col, A=-40, n=2):
@@ -164,13 +173,12 @@ def estimate_meters_from_rssi(df, rssi_col, A=-40, n=2):
     return estimated_meters
 
 
-
 def update_quarto_variables(new_key, new_value, path="_variables.yml"):
-    with open(path, 'r') as file:
+    with open(path, "r") as file:
         quarto_variables = yaml.safe_load(file)
 
     # add a new key-value pair or update an existing key
-    quarto_variables[new_key] = new_value 
-    
-    with open(path, 'w') as file:
+    quarto_variables[new_key] = new_value
+
+    with open(path, "w") as file:
         yaml.dump(quarto_variables, file, default_flow_style=False)

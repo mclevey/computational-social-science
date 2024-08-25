@@ -1,122 +1,86 @@
-import logging
 import random
 
-import networkx as nx
 import numpy as np
 from mesa import Model
 from mesa.datacollection import DataCollector
 from mesa.space import NetworkGrid
 from mesa.time import RandomActivation
 
-from .agents import Ego, State
-
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
-
-
-def sample_threshold(distribution_of_thresholds, idx):
-    if len(distribution_of_thresholds) > idx:
-        return distribution_of_thresholds[idx]
-    else:
-        raise ValueError("Threshold distribution index out of range")
-
-
-def generate_network(n, k, p, tries):
-    return nx.connected_watts_strogatz_graph(n, k, p, tries, seed=36)
-
-
-def initial_agree_random_selection(G, n_agree):
-    return random.sample(list(G.nodes()), n_agree)
-
-
-def generate_thresholds_distribution(network, alpha, beta):
-    return list(np.random.beta(alpha, beta, network.number_of_nodes()))
+from .agents import State, ThresholdAgent
 
 
 class ThresholdModel(Model):
+    """Model simulating a threshold-based decision-making process on a network."""
+
     def __init__(
         self,
-        num_initial_AGREE,
         network,
-        thresholds=None,
-        threshold_alpha_beta=None,
-        saturation_point=None,
-        max_step_end_run=100,
+        num_initial_agree,
+        threshold_alpha=2,
+        threshold_beta=5,
+        saturation_point=0.95,
+        max_steps=100,
     ):
         super().__init__()
-        self.G = network
-        self.number_of_nodes = len(self.G.nodes())
-        self.nodes = list(self.G.nodes())
-        self.num_initial_AGREE = num_initial_AGREE
+        self.network = network
+        self.num_initial_agree = num_initial_agree
         self.saturation_point = saturation_point
-        self.grid = NetworkGrid(self.G)
+        self.max_steps = max_steps
+        self.grid = NetworkGrid(self.network)
         self.schedule = RandomActivation(self)
-        self.max_step_end_run = max_step_end_run
         self.running = True
 
-        initial_agree_agents = self.random.sample(self.nodes, self.num_initial_AGREE)
+        # Convert nodes to a list for random sampling
+        nodes_list = list(self.network.nodes())
 
-        if thresholds is None:
-            self.threshold_alpha = threshold_alpha_beta[0]
-            self.threshold_beta = threshold_alpha_beta[1]
+        # Assign initial states and thresholds
+        initial_agents = random.sample(nodes_list, self.num_initial_agree)
+        threshold_dist = self.generate_thresholds_distribution(
+            len(nodes_list), threshold_alpha, threshold_beta
+        )
 
-            self.distribution_of_thresholds = generate_thresholds_distribution(
-                self.G, self.threshold_alpha, self.threshold_beta
-            )
-            logging.debug(f"Generated thresholds: {self.distribution_of_thresholds}")
-        else:
-            self.distribution_of_thresholds = thresholds
-            logging.debug(
-                f"Using external thresholds: {self.distribution_of_thresholds}"
-            )
-
-        if len(self.distribution_of_thresholds) < self.number_of_nodes:
-            raise ValueError(
-                "Threshold distribution does not have enough elements for all nodes"
-            )
-
-        for idx, node in enumerate(self.G.nodes()):
-            state = State.AGREE if node in initial_agree_agents else State.DISAGREE
-            threshold = sample_threshold(self.distribution_of_thresholds, idx)
-            if threshold is None:
-                raise ValueError(f"Threshold for node {node} is None")
-            logging.debug(f"Assigning threshold {threshold} to node {node}")
-            agent = Ego(node, self, state=state, threshold=threshold)
+        for i, node in enumerate(nodes_list):
+            state = State.AGREE if node in initial_agents else State.DISAGREE
+            threshold = threshold_dist[i]
+            agent = ThresholdAgent(node, self, state=state, threshold=threshold)
             self.schedule.add(agent)
             self.grid.place_agent(agent, node)
 
+        # Data collection
         self.datacollector = DataCollector(
-            {
-                "num_agree": lambda m: self.count_type(m, State.AGREE),
-                "num_disagree": lambda m: self.count_type(m, State.DISAGREE),
-                "frac_agree": lambda m: self.count_type(m, State.AGREE)
-                / self.number_of_nodes,
-                "frac_disagree": lambda m: self.count_type(m, State.DISAGREE)
-                / self.number_of_nodes,
+            model_reporters={
+                "num_agree": lambda m: self.count_type(State.AGREE),
+                "num_disagree": lambda m: self.count_type(State.DISAGREE),
+                "frac_agree": lambda m: self.count_type(State.AGREE)
+                / len(self.schedule.agents),
+                "frac_disagree": lambda m: self.count_type(State.DISAGREE)
+                / len(self.schedule.agents),
             }
         )
 
+    @staticmethod
+    def generate_thresholds_distribution(num_agents, alpha, beta):
+        """Generate a list of threshold values based on a Beta distribution."""
+        return list(np.random.beta(alpha, beta, num_agents))
+
+    def count_type(self, state):
+        """Count the number of agents in a given state."""
+        return sum(1 for agent in self.schedule.agents if agent.state == state)
+
     def step(self):
+        """Advance the model by one step and check for stopping conditions."""
         self.datacollector.collect(self)
         self.schedule.step()
+
+        # Get the most recent collected data for frac_agree and frac_disagree
+        model_data = self.datacollector.get_model_vars_dataframe().iloc[-1]
+        frac_agree = model_data["frac_agree"]
+        frac_disagree = model_data["frac_disagree"]
+
+        # Check if agreement or disagreement fraction has reached the saturation point
         if (
-            self.saturation_point
-            and self.count_type(self, State.AGREE) / self.number_of_nodes
-            > self.saturation_point
+            frac_agree >= self.saturation_point
+            or frac_disagree >= self.saturation_point
+            or self.schedule.steps >= self.max_steps
         ):
             self.running = False
-        if self.count_type(self, State.DISAGREE) / self.number_of_nodes == 1:
-            self.running = False
-        if self.count_type(self, State.AGREE) / self.number_of_nodes == 1:
-            self.running = False
-        if self.schedule.steps >= self.max_step_end_run:
-            self.running = False
-
-    @staticmethod
-    def count_type(model, node_state):
-        count = 0
-        for node in model.schedule.agents:
-            if node.state == node_state:
-                count += 1
-        return count

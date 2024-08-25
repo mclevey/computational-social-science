@@ -1,9 +1,63 @@
-# Opinion Dynamics
+# [Social Learning, Influence, and]{.small-text}<br>Opinion Dynamics
 
-- thresholds were binary
-- now we look at continuous opinion space
+## Opinion Dynamics
 
-## Bounded Confidence Models
+<br><br>
+
+:::: {.columns}
+::: {.column width="25%"}
+Central Questions
+:::
+
+::: {.column width="5%"}
+:::
+
+::: {.column width="70%"}
+How do opinions form, change, and reach consensus or polarization in social systems?
+
+<br>
+
+[Bounded Confidence Models]{.large-text .kn-pink}
+
+BCMs simulate opinion evolution in a continuous opinion space.
+
+Key idea: People interact and influence each other if their opinions are within a certain threshold (ε).
+:::
+::::
+
+::: {.notes}
+Opinion dynamics research is a key area in computational social science, focusing on how individuals’ opinions are shaped and how these opinions influence group decisions.
+
+This research is especially relevant to understanding phenomena like political polarization, consensus formation in teams, and the spread of misinformation.
+
+In this part of the lecture, we’ll explore one of the foundational models in opinion dynamics: the Bounded Confidence Model (BCM), which offers a way to understand how opinions evolve when individuals are influenced only by those with similar views.
+
+The Bounded Confidence Model was introduced as a way to simulate how people influence each other’s opinions when they only engage with those who hold similar views.
+
+This model is particularly powerful for studying polarization, where society splits into groups with opposing opinions, and for understanding the conditions under which consensus can be reached.
+:::
+
+
+## {background-color="#F0F0F0"}
+
+:::: {.columns}
+::: {.column width="75%"}
+<div style="background-color: white; padding: 80px; width: 75%; height: 600px; overflow-y: scroll; border-radius: 10px; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);">
+
+{{< include _day-5-odd-bcm.md >}}
+
+</div>
+:::
+
+::: {.column width="25%"}
+ODD Protocol for Bounded Confidence Model<br>$\longleftarrow$
+
+<br>
+
+![[Figure reproduced from @railsback2019agent.]{.nord-light}](media/odd.png){width="100%" .shadow-img}
+:::
+::::
+
 
 ## Imports
 
@@ -16,6 +70,7 @@ from mesa.datacollection import DataCollector
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
+import numpy as np
 from pprint import pprint
 import yaml
 
@@ -23,7 +78,7 @@ import icsspy
 icsspy.set_style()
 ```
 
-## [(BCM)]{.lightgray} The Agent Class 
+## [(BCM)]{.lightgray} The Agent Class
 
 ```{python}
 class BCMAgent(Agent):
@@ -56,17 +111,23 @@ class BCMAgent(Agent):
                 self.interactions[neighbor.unique_id] = 1
 ```
 
-## [(BCM)]{.lightgray} The Model Class 
+
+## [(BCM)]{.lightgray} The Model Class
 
 ```{python}
 class BoundedConfidenceModel(Model):
-    def __init__(self, grid_width, grid_height, N, epsilon, max_agent_step_size=1):
+    def __init__(self, grid_width, grid_height, N, epsilon, max_agent_step_size=1, max_steps=1000, convergence_threshold=0.001):
         super().__init__()
         self.num_agents = N
         self.grid = MultiGrid(grid_width, grid_height, True)
         self.schedule = RandomActivation(self)
         self.epsilon = epsilon
         self.max_agent_step_size = max_agent_step_size
+        self.max_steps = max_steps
+        self.convergence_threshold = convergence_threshold
+
+        # Initialize step_count
+        self.step_count = 0  # This will track the number of steps taken
 
         # Create agents
         for i in range(self.num_agents):
@@ -78,24 +139,32 @@ class BoundedConfidenceModel(Model):
             self.schedule.add(agent)
 
         self.datacollector = DataCollector(
-            agent_reporters={"Opinion": "opinion"}
+            agent_reporters={"Opinion": "opinion"},
+            model_reporters={"Avg_Similarity": self.calculate_similarity}
         )
+
+    def calculate_similarity(self):
+        """Calculate average pairwise similarity in agent opinions."""
+        opinions = np.array([agent.opinion for agent in self.schedule.agents])
+        pairwise_diffs = np.abs(opinions[:, None] - opinions[None, :])
+        similarity = 1 - pairwise_diffs  # Similarity is inverse of difference
+        avg_similarity = np.mean(similarity)
+        return avg_similarity
 
     def step(self):
         self.datacollector.collect(self)
         self.schedule.step()
+        self.step_count += 1
 
-    def get_interaction_graph(self):
-        G = nx.Graph()
-        for agent in self.schedule.agents:
-            G.add_node(agent.unique_id)
-            for interacted_agent, count in agent.interactions.items():
-                if G.has_edge(agent.unique_id, interacted_agent):
-                    G[agent.unique_id][interacted_agent]['weight'] += count
-                else:
-                    G.add_edge(agent.unique_id, interacted_agent, weight=count)
-        return G
+        # Check stopping conditions
+        if self.check_convergence() or self.step_count >= self.max_steps:
+            self.running = False
 
+    def check_convergence(self):
+        """Check if the opinions have converged."""
+        opinions = np.array([agent.opinion for agent in self.schedule.agents])
+        max_diff = np.max(np.abs(opinions[:, None] - opinions[None, :]))
+        return max_diff < self.convergence_threshold
 ```
 
 ## [(BCM)]{.lightgray} Model Parameters
@@ -104,12 +173,23 @@ class BoundedConfidenceModel(Model):
 with open('_variables.yml', 'r') as file:
     params = yaml.safe_load(file)
 
-model_params = params.get('model_0')
+model_params = params.get('bounded_confidence_model_1')
 pprint(model_params)
 ```
 
-# Run the Model & Collect Data
+[{'N': 100,
+ 'epsilon': 0.5,
+ 'grid_height': 40,
+ 'grid_width': 40,
+ 'max_agent_step_size': 1,
+ 'n_iterations': 1500}]{.monospace}
 
+
+## Run the Model & Collect Data
+
+:::: {.columns}
+::: {.column width="75%"}
+<br>
 ```{python}
 model = BoundedConfidenceModel(
     grid_width=model_params['grid_width'],
@@ -126,15 +206,32 @@ results = model.datacollector.get_agent_vars_dataframe().reset_index()
 results.head(10)
 ```
 
+```{python}
+#| echo: false
+from icsspy.utils import markdown_table
+md = markdown_table(results.sample(10), 'tables/_bcm_1.md')
+print(md)
+```
+
+
+:::
+
+::: {.column width="25%"}
+{{< include tables/_bcm_1.md >}}
+:::
+::::
+
+
+
 ## Plot Opinion Distributions
 
 ```{python}
 grouped = results.groupby('Step')
 
-plt.figure(figsize=(10, 6))  
+plt.figure(figsize=(10, 6))
 
 for name, group in grouped:
-    sns.kdeplot(group['Opinion'], color='C0', alpha=0.2) # clip=(-1,1) 
+    sns.kdeplot(group['Opinion'], color='C0', alpha=0.2)
 
 plt.xlabel('\nOpinion')
 plt.ylabel('Density\n')
@@ -144,12 +241,13 @@ plt.grid(True)
 plt.savefig('media/bounded-confidence-opinion-distribution-evolution.png', dpi=300)
 ```
 
+##
+
+![Caption](media/bounded-confidence-opinion-distribution-evolution.png){width="75%" #fig-bcmevo}
+
 ## Plot Opinions Over Time
 
 ```{python}
-import matplotlib.pyplot as plt
-import numpy as np
-
 time_steps = results['Step']
 opinions = results['Opinion']
 title = "Bounded Confidence Model\n" + r"$\epsilon$" + f" = {model_params['epsilon']}\n"
@@ -162,9 +260,13 @@ plt.xlabel('Time (Steps)')
 plt.ylabel('Opinion')
 plt.title(title, loc='left')
 plt.xlim(time_steps.min(), time_steps.max())
-plt.ylim(-1.01, 1) 
-plt.savefig(f'media/bpunded_confidence_epsilon_{model_params['epsilon']}_one_run.png', dpi=300)
+plt.ylim(-1.01, 1)
+plt.savefig('media/bounded_confidence_epsilon_one_run.png', dpi=300)
 ```
+
+##
+
+![Caption](media/bounded_confidence_epsilon_one_run.png){width="75%" #fig-bounded_confidence_epsilon_one_run}
 
 ## Experimenting with $\epsilon$
 
@@ -182,7 +284,7 @@ def run_simulation_with_different_epsilons(model_params, epsilon_values):
             epsilon=epsilon,
             max_agent_step_size=model_params['max_agent_step_size'],
         )
-        
+
         for i in range(model_params['n_iterations']):
             model.step()
 
@@ -208,6 +310,17 @@ epsilon_results = run_simulation_with_different_epsilons(
 epsilon_results.sample(10)
 ```
 
+
+```{python}
+#| echo: false
+from icsspy.utils import markdown_table
+md = markdown_table(epsilon_results.sample(10), 'tables/_bcm_2.md')
+print(md)
+```
+
+{{< include tables/_bcm_2.md >}}
+
+
 ```{python}
 epsilon_results.info()
 epsilon_results.to_csv('output/bcm_epsilon_results.csv', index=False)
@@ -221,170 +334,56 @@ Let's create some subplots to compare runs for each of our $\epsilon$ values.
 grouped = epsilon_results.groupby('Epsilon')
 
 fig, axs = plt.subplots(
-    11, 1, 
-    figsize=(12, 30), 
-    sharex=True, sharey=True, 
+    11, 1,
+    figsize=(12, 30),
+    sharex=True, sharey=True,
     constrained_layout=True
 )
 
 for (epsilon, group), ax in zip(grouped, axs):
     time_steps = group['Step']
     opinions = group['Opinion']
-    
+
     sc = ax.scatter(
-        time_steps, 
-        opinions, 
-        c=opinions, 
-        cmap='coolwarm', 
-        alpha=0.5, 
+        time_steps,
+        opinions,
+        c=opinions,
+        cmap='coolwarm',
+        alpha=0.5,
         s=10
     )
-    
+
     cbar = fig.colorbar(sc, ax=ax)
     # cbar.set_label('Opinion')
-    
+
     ax.set_title(r"$\epsilon$" + f" = {epsilon}", loc='left')
-    
+
     ax.set_xlim(time_steps.min(), time_steps.max())
     ax.set_ylim(-1.01, 1)
 
 # custom positions for shared x and y labels
 fig.text(
-    0.5, -0.01, 
-    'Time (Steps)', 
-    ha='center', 
-    va='center', 
+    0.5, -0.01,
+    'Time (Steps)',
+    ha='center',
+    va='center',
     fontsize=18
 )
 
 fig.text(
-    -0.01, 0.5, 
-    'Opinion', 
-    ha='center', 
-    va='center', 
-    rotation='vertical', 
+    -0.01, 0.5,
+    'Opinion',
+    ha='center',
+    va='center',
+    rotation='vertical',
     fontsize=18
 )
 
-plt.savefig('output/epsilon_comparison_one_run.png', dpi=300)
+plt.savefig('media/epsilon_comparison_one_run.png', dpi=300)
 ```
-
-
-## Batch Runs
-
-So far we've just done single runs, but this is *not* the way to do things!
-
-```{python}
-def run_batch_simulation(model_params, n_runs):
-    all_results = []
-
-    for run_id in range(n_runs):
-        model = BoundedConfidenceModel(
-            grid_width=model_params['grid_width'],
-            grid_height=model_params['grid_height'],
-            N=model_params['N'],
-            epsilon=model_params['epsilon'],
-            max_agent_step_size=model_params['max_agent_step_size'],
-        )
-        
-        for i in range(model_params['n_iterations']):
-            model.step()
-
-        run_results = model.datacollector.get_agent_vars_dataframe().reset_index()
-        run_results['Run_ID'] = run_id  # Add run ID to track different runs
-        run_results['Epsilon'] = model_params['epsilon']  # Add epsilon value to track each simulation
-        all_results.append(run_results)
-
-    # Combine all results into a single DataFrame
-    combined_results = pd.concat(all_results, ignore_index=True)
-    return combined_results
-
-# Example usage
-n_runs = 10  # Number of simulation runs
-batch_results = run_batch_simulation(model_params, n_runs)
-batch_results.head(10)  # Display the first 10 rows of the combined results
-```
-
-If we do 1,000 runs, the resulting csv file has 150,000,000 rows and is 4.5 GB despite only 4 numerical variables! This is a LOT of output! That's what we get from running the model 1,000 times with 100 nodes and 1,500 iterations for each model (1500*1000*100).
-
-```{python}
-batch_results.info()
-```
-
-- parameter sweeps
-- analysis methods (not conventional stats -- see chapter 10)
 
 ##
 
-Still working on the code below. I need to implement similarity calculations, etc. Mirror Smaldino here.
+![Caption](media/epsilon_comparison_one_run.png){width="100%" #fig-epsilon_comparison_one_run}
 
-```python
-def plot_batch_results(
-    batch_results, 
-    grouping_var, 
-    x_var, 
-    y_var, 
-    hue_var, 
-    n_runs, 
-    title_prefix
-):
-    """
-    Plots the results of a batch run, showing the mean and confidence intervals.
-    
-    Parameters:
-    - batch_results: DataFrame containing the results from the batch run.
-    - grouping_var: The variable to group by (e.g., 'Epsilon').
-    - x_var: The variable to plot on the x-axis (e.g., 'similarity-threshold').
-    - y_var: The variable to plot on the y-axis (e.g., 'average-similarity').
-    - hue_var: The variable to use for color coding (e.g., 'density').
-    - n_runs: Number of runs per combination to show in the title.
-    - title_prefix: Prefix for the title to indicate the number of runs.
-    """
-    # Group the data and calculate means and standard deviations
-    grouped = batch_results.groupby([grouping_var, x_var, hue_var])[y_var].agg(['mean', 'std']).reset_index()
-    
-    # Plot
-    plt.figure(figsize=(10, 8))
-    sns.lineplot(
-        data=grouped, 
-        x=x_var, 
-        y='mean', 
-        hue=hue_var, 
-        marker="o", 
-        ci=None,  # disable automatic confidence interval plotting
-        palette="tab10"
-    )
-    
-    # Add error bars (standard deviation)
-    for _, row in grouped.iterrows():
-        plt.errorbar(
-            row[x_var], row['mean'], 
-            yerr=row['std'], 
-            fmt='o', 
-            color=sns.color_palette("tab10")[int(row[hue_var] * 10) % len(sns.color_palette("tab10"))],
-            alpha=0.5
-        )
-    
-    plt.title(f"{title_prefix} {n_runs} runs per combo", loc='center')
-    plt.xlabel(x_var.replace('_', ' '))
-    plt.ylabel(y_var.replace('_', ' '))
-    plt.legend(title=hue_var.replace('_', ' '), loc='best')
-    plt.grid(True)
-    plt.show()
-```
-
-```python
-plot_batch_results(
-    batch_results, 
-    grouping_var='Epsilon', 
-    x_var='similarity-threshold',
-    y_var='average-similarity', 
-    hue_var='density', 
-    n_runs=100,
-    title_prefix='100 runs per combo'
-)
-plt.show()
-```
-
-
-<!-- diffusion_of_innovations.png -->
+##
