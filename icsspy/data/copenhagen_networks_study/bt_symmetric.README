@@ -1,7 +1,7 @@
 column names:
 	- timestamp
-	- user A 
-	- user B 
+	- user A
+	- user B
 	- received signal strength
 
 Notes:

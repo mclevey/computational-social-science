@@ -53,7 +53,7 @@
 #         if isinstance(v, dict):
 #             items.extend(flatten_dict(v, new_key, sep=sep).items())
 #         elif isinstance(v, list):
-#             # Join list items into a string separated by ', ' and enclose in double quotes
+#             # Join list items into a string separated by ', ' and enclose in ""
 #             joined_list = ", ".join(map(str, v))
 #             items.append((new_key, f'"{joined_list}"'))
 #         else:

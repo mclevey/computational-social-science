@@ -3,41 +3,41 @@ repos:
     rev: v4.6.0
     hooks:
       - id: check-added-large-files
-        exclude: '^.*\.pdpp.*|.*\.ipynb$|.*/\.jupyter_cache/|^docs/'
+        exclude: '^.*\.pdpp.*|.*\.ipynb$|.*/\.jupyter_cache/|^docs/|.*/.*_files/.*'
         args: ['--maxkb=102400']  # 100 MB
       - id: check-executables-have-shebangs
-        exclude: '^.*\.pdpp.*|.*\.ipynb$|.*/\.jupyter_cache/|^docs/'
+        exclude: '^.*\.pdpp.*|.*\.ipynb$|.*/\.jupyter_cache/|^docs/|.*/.*_files/.*'
       - id: check-merge-conflict
-        exclude: '^.*\.pdpp.*|.*\.ipynb$|.*/\.jupyter_cache/|^docs/'
+        exclude: '^.*\.pdpp.*|.*\.ipynb$|.*/\.jupyter_cache/|^docs/|.*/.*_files/.*'
       - id: check-symlinks
-        exclude: '^.*\.pdpp.*|.*\.ipynb$|.*/\.jupyter_cache/|^docs/'
+        exclude: '^.*\.pdpp.*|.*\.ipynb$|.*/\.jupyter_cache/|^docs/|.*/.*_files/.*'
       - id: check-toml
-        exclude: '^.*\.pdpp.*|.*\.ipynb$|.*/\.jupyter_cache/|^docs/'
+        exclude: '^.*\.pdpp.*|.*\.ipynb$|.*/\.jupyter_cache/|^docs/|.*/.*_files/.*'
       - id: check-yaml
-        exclude: '^.*\.pdpp.*|.*\.ipynb$|.*/\.jupyter_cache/|^docs/|^setup/'
+        exclude: '^.*\.pdpp.*|.*\.ipynb$|.*/\.jupyter_cache/|^docs/|^setup/|.*/.*_files/.*'
       - id: detect-private-key
-        exclude: '^.*\.pdpp.*|.*\.ipynb$|.*/\.jupyter_cache/|^docs/'
+        exclude: '^.*\.pdpp.*|.*\.ipynb$|.*/\.jupyter_cache/|^docs/|.*/.*_files/.*'
       - id: end-of-file-fixer
-        exclude: '^.*\.pdpp.*|.*\.ipynb$|.*/\.jupyter_cache/|^docs/'
+        exclude: '^.*\.pdpp.*|.*\.ipynb$|.*/\.jupyter_cache/|^docs/|.*/.*_files/.*'
       - id: trailing-whitespace
-        exclude: '^.*\.pdpp.*|.*\.ipynb$|.*/\.jupyter_cache/|^docs/'
+        exclude: '^.*\.pdpp.*|.*\.ipynb$|.*/\.jupyter_cache/|^docs/|.*/.*_files/.*'
 
   - repo: git@github.com:psf/black.git
     rev: 24.8.0
     hooks:
       - id: black
         args: ['--config', '.black.toml']
-        exclude: '^.*\.pdpp.*|.*\.ipynb$|.*/\.jupyter_cache/|^docs/'
+        exclude: '^.*\.pdpp.*|.*\.ipynb$|.*/\.jupyter_cache/|^docs/|.*/.*_files/.*'
 
   - repo: git@github.com:pre-commit/mirrors-isort.git
     rev: v5.10.1
     hooks:
       - id: isort
-        exclude: '^.*\.pdpp.*|.*\.ipynb$|.*/\.jupyter_cache/|^docs/'
+        exclude: '^.*\.pdpp.*|.*\.ipynb$|.*/\.jupyter_cache/|^docs/|.*/.*_files/.*'
 
   - repo: git@github.com:pycqa/flake8.git
     rev: 7.1.1
     hooks:
       - id: flake8
         args: ['--config', '.flake8']
-        exclude: '^.*\.pdpp.*|.*\.ipynb$|.*/\.jupyter_cache/|^docs/'
+        exclude: '^.*\.pdpp.*|.*\.ipynb$|.*/\.jupyter_cache/|^docs/|.*/.*_files/.*'
