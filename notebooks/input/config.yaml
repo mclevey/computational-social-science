@@ -1,0 +1,12 @@
+channels:
+  - "PyDataTV"
+  - "talksatgoogle"
+list_youtube_api_key_names:
+  - "GESIS"
+  - "GESISPY"
+  - "INTRO_CSS"
+  - "INTROCSS2024"
+  - "YouTubeAPILecture"
+  - "metascience_golems"
+  - "McLevey"
+  - "MSGD"

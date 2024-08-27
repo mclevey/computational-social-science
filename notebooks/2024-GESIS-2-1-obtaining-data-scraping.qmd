@@ -1,0 +1,622 @@
+---
+title: "Web Scraping 101"
+description: "Module 2.1, Introduction to Computational Social Science (Python), GESIS Fall Seminar 2024"
+author:
+  - name: John McLevey
+    url: https://johnmclevey.com
+    email: john.mclevey@uwaterloo.ca
+    corresponding: true
+    affiliations:
+      - name: University of Waterloo
+date: "08/26/2024"
+date-modified: last-modified
+categories:
+  - Python
+  - GESIS
+  - computational social science
+  - data science
+  - data collection
+  - web scraping
+  - apis
+  - tutorial
+tags:
+  - Python
+  - GESIS
+bibliography: references.bib
+reference-location: margin
+citation-location: margin
+freeze: true
+license: "CC BY-SA"
+---
+
+# Introduction
+
+In this tutorial, you'll learn some foundational web scraping skills using Python, focusing specifically on working with static web pages. To help you develop your skills, we'll work through an extended example of extracting data from the World Happiness Report Wikipedia page. We'll start with the basics -- loading and parsing HTML -- and gradually move on to more complex tasks like handling nested tables and creating visualizations from the data we collect. By the end of this tutorial, you know how to navigate the structure of an HTML page, extract specific pieces of data such as headers, body text, and tables, and clean the data for analysis.
+
+## Learning Objectives
+
+In this tutorial, you will learn how to:
+
+- Load a static website using requests to obtain the HTML content of a webpage.
+- Parse HTML using BeautifulSoup to structure and navigate the content.
+- Extract headers and body text from a webpage for further analysis.
+- Extract and process links from the webpage, including differentiating between relative, full, and internal links.
+- Create a DataFrame from extracted data, making it easier to analyze and visualize.
+- Handle and clean HTML tables, including dealing with nested tables that may complicate data extraction.
+- Visualize data by creating simple plots from the cleaned and processed information.
+
+# Scraping The Happiness Report Wikipedia Page
+
+We'll use the World Happiness Report Wikipedia page to demonstrate some simple web scraping techniques. We'll use [an earlier version of the page](https://en.wikipedia.org/w/index.php?title=World_Happiness_Report&oldid=1241093905) rather than the version that is currently live.
+
+## Setup
+
+As always, we'll start by importing packages, including
+
+- `requests` for making HTTP requests,
+- `urllib` for processing URL data, and
+- `BeautifulSoup` from the `bs4` package for parsing HTML.
+
+```{python}
+from collections import Counter
+import re
+import requests
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from io import StringIO
+from urllib.parse import urljoin, urlparse
+from bs4 import BeautifulSoup
+
+from icsspy import set_style
+
+set_style()
+```
+
+## Loading Static Websites with `requests`
+
+The first step in scraping a website is to inspect its source code in your browser and load its content in a way Python can access. We can do the latter using the `requests` library. The `get()` function sends a request to the specified URL and returns a response object, which contains all the information sent back from the server, including the HTML source code.
+
+```{python}
+url = "https://en.wikipedia.org/w/index.php?title=World_Happiness_Report&oldid=1241093905"
+
+response = requests.get(url)
+response
+```
+
+If you print `response.text`, you'll see the raw HTML of the webpage. This is the data we'll be working with in the rest of this tutorial.
+
+## Parsing HTML with `BeautifulSoup`
+
+Now that we have the HTML content, we need to parse it into a structured format. `BeautifulSoup` helps us do this by converting the HTML string into a navigable tree structure. This allows us to easily search for and extract specific elements, such as headers, paragraphs, and links.
+
+### Extracting Text with `BeautifulSoup`
+
+First, we create a `BeautifulSoup` object by passing the HTML content to the `BeautifulSoup` constructor along with the desired parser. We'll use the `html.parser`, which is the default option.
+
+```{python}
+html_content = response.text
+soup = BeautifulSoup(html_content, 'html.parser')
+```
+
+### Extracting Headers
+
+To extract headers, we can search the `soup` object for all header tags (`h1` to `h6`). Below, we loop through the results and extract the text content of each header.^[By default, the `.get_text()` methods removes leading and training whitespace from each header. If we want to be more aggressive about removing whitespace (e.g., replace double spaces with single spaces), we can set the `.get_text()` method's `strip` argument to `True`.]
+
+```{python}
+headers = []
+
+for header in soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6']):
+    headers.append(header.get_text())
+
+headers
+```
+
+In my experience, this argument often ends up removing meaningful whitespace, which can causes headaches downstream when doing things like text analysis. For that reason, I prefer not to use it and simply do additional cleaning if/when it is needed.
+
+This code collects all headers into a list.
+
+### Extracting Body Text
+
+Similarly, we can extract all paragraphs (`<p>` tags) from the HTML document. We'll collect the text from each paragraph into a list.
+
+```{python}
+body_text = []
+for paragraph in soup.find_all(['p']):
+    body_text.append(paragraph.get_text())
+
+print(f'Found {len(body_text)} paragraphs')
+```
+
+There are `{python} len(body_text)` paragraphs in this document. Let's preview the first 5.
+
+```{python}
+body_text[:5]
+```
+
+Extracting text like this is useful for text analysis, which we'll cover in the next module. For now, we'll create a dataframe from this data
+
+```{python}
+ordered_text = pd.DataFrame(body_text)
+ordered_text.columns = ['paragraph']
+ordered_text['sequence'] = ordered_text.index.to_list()
+
+ordered_text.head(10)
+```
+
+and write it to disk for later use.
+
+```{python}
+ordered_text.to_csv(
+  'output/happiness_report_wikipedia_paragraphs.csv', index=False
+)
+```
+
+### Extracting Links
+
+Next, let's extract all the links on the page. Once again, we can use the `find_all()` method to find all the anchor tags (`<a>`), i.e., links.
+
+```{python}
+urls = []
+for link in soup.find_all('a'):
+    url = link.get('href')
+
+    # check if valid href
+    if url:
+        urls.append(url)
+
+print(f'Found {len(urls)} urls')
+```
+
+When we print these URLs, we'll see that many are **relative links** (i.e., links to other Wikipedia pages that start with `/`). These links won't work properly if clicked as-is because they're not full URLs.
+
+```{python}
+for url in urls[:10]:
+    print(url)
+```
+
+To fix this, we need to prepend the base URL for Wikipedia (`https://en.wikipedia.org`) to any relative URLs. Let's iterate over the URLs, identify which ones are relative, and prepend the base URL to them. We'll create a new list of URLs called `full_urls` and append each all our full URLs, whether it was full from the start or expanded by prepending the base URL.
+
+```{python}
+base_url = "https://en.wikipedia.org"
+
+full_urls = []
+for url in urls:
+    if url.startswith('/'): # relative URL
+        full_url = urljoin(base_url, url)
+    else:
+        full_url = url
+    full_urls.append(full_url)
+```
+
+Let's see what they look like now.
+
+```{python}
+for url in full_urls[:10]:
+    print(url)
+```
+
+#### Processing Links
+
+Next, we'll filter out any internal page links (e.g., links to sections within the same page) by excluding URLs that start with `#`.
+
+```{python}
+print(f'{len(full_urls)} URLs before removing internal page links.')
+full_urls = [url for url in full_urls if not url.startswith('#')]
+print(f'{len(full_urls)} URLs after removing internal page links.')
+```
+
+```{python}
+for url in full_urls[:10]:
+    print(url)
+```
+
+
+#### Creating a DataFrame from Links
+
+Now, let's use what we've learned to write a clean code block that:
+
+1. Finds all the `a` tags (URLs)
+2. Ignores internal links to sections of the source document
+3. Adds the base Wikipedia URL to any relative links
+4. Collects the link data into a list called `link_data`
+5. Creates a dataframe from `link_data`
+
+Additionally, we'll include a Boolean column indicating whether the link is external (`True` for external, `False` otherwise).
+
+```{python}
+link_data = []
+
+for link in soup.find_all('a', href=True):
+    if not link['href'].startswith('#'): # ignore internal links
+        text = link.get_text()
+        href = link['href']
+        if href.startswith('/'): # add base URL to relative links
+            href = "https://en.wikipedia.org" + href
+            link_data.append((text, href, False))
+        else:
+            link_data.append((text, href, True))
+```
+
+Let's create a dataframe from this list.
+
+```{python}
+link_df = pd.DataFrame(link_data, columns=['link-text', 'href', "external"])
+link_df.head(10)
+```
+
+Now, let's count the number of internal and external links.
+
+```{python}
+link_df['external'].value_counts().reset_index()
+```
+
+#### Extracting Primary Domains
+
+Let's extract and count primary domains for external links. We'll define a simple function to do this.
+
+```{python}
+def extract_primary_domain(url):
+    """
+    Extracts the primary domain from a URL by splitting the netloc by '.'
+    and taking the second-to-last element. Returns the primary domain.
+    """
+    netloc = urlparse(url).netloc
+    parts = netloc.split('.')
+    if len(parts) > 1:
+        primary_domain = parts[-2]
+    else:
+        primary_domain = parts[0]
+    return primary_domain
+```
+
+We can use the `apply()` methods for dataframes to apply our function to each row in the `href` column and then add the extracted primary domain to a new column.
+
+```{python}
+link_df['primary_domain'] = link_df['href'].apply(extract_primary_domain)
+link_df
+```
+
+Finally let's count the number of times each primary domain appears and print any that appear twice or more.
+
+```{python}
+primary_domain_counts = link_df.value_counts('primary_domain')
+primary_domain_counts = primary_domain_counts.sort_values(ascending=False)
+primary_domain_counts = primary_domain_counts.reset_index()
+
+primary_domain_counts[primary_domain_counts['count'] >= 2]
+```
+
+## Extracting Tables
+
+Next, let's learn how to extract and process table data from a static website.
+
+### Finding and Parsing Tables with `BeautifulSoup` and `Pandas`
+
+We'll start by locating all tables within the HTML document. As you might expect, `BeautifulSoup` allows us to search for all `table` tags in the HTML.^[In some cases, it may be easier to skip `BeautifulSoup` entirely when working with tables and instead pass the HTML directly to Pandas. This approach is particularly useful when you're confident that the page contains well-structured tables. If you run `tables = pd.read_html(StringIO(response.text))`, Pandas will return a list of dataframes corresponding to each table on the page.]
+
+```{python}
+tables = soup.find_all('table')
+print(f'Found {len(tables)} table(s)')
+```
+
+At this point, we've identified how many tables are present on the page -- `{python} len(tables)` -- but we aren't interested in all of them. Let's take a look at what we have and make a decision about how to proceed.
+
+```{python}
+for index, table in enumerate(tables):
+    headers = []
+    for th in table.find_all('th'):
+        headers.append(th.get_text(strip=True))
+    print(f"Table {index+1} Column Names: {headers}")
+```
+
+This loop extracts the headers from each table, which can help us identify the tables we want.^[You may notice that I'm using the `strip` argument for `.get_text()` this time. I do find it useful in situations like these, where I want to see the column names (which rarely contain spaces) without any additional characters (such as `\n`, etc.).] Suppose we're looking for a table that contains information related to "Freedom to make life choices" or other specific indicators. We can easily find tables that contain the relevant column.
+
+```{python}
+tables_filtered = [
+    table
+    for table in tables
+    if "Freedom to make life choices" in table.get_text(strip=True)
+]
+
+len(tables_filtered)
+```
+
+Now that we've filtered the relevant tables, we can convert them into a format that's easier to work with, such as a Pandas DataFrame.
+
+```{python}
+dfs = pd.read_html(StringIO(str(tables_filtered)))
+len(dfs)
+```
+
+Pandas' `read_html()` function is quite powerful and can automatically extract tables from HTML content. However, sometimes it might pick up more than we expect. In this case, it found an additional `{python} len(dfs) - len(tables_filtered)` tables in the same HTML string!
+
+Let's explore the extracted dataframes to see what we've got.
+
+```{python}
+for df in dfs:
+    print(list(df.columns))
+```
+
+### Cleaning Up Extracted Tables
+
+We can see that some of our dataframes have columns that are `Unnamed`. This generally indicates that the table contains multiple headers; we'll need to inspect the dataframes to see what's going on. The first dataframe illustrates the problem:
+
+```{python}
+example_df = dfs[0]
+example_df.head()
+```
+
+If we just had one table, such as the one we're looking at here, we could easily clean it up by setting the second row as the header and dropping the irrelevant rows.
+
+```{python}
+example_df.columns = example_df.iloc[1]
+example_df.drop([0, 1], inplace=True)
+example_df = example_df.reset_index()
+example_df.head()
+```
+
+This looks much better, but... we aren't ready to do this for all dataframes just yet. As part of diagnosing the problem, we can spend a bit more time inspecting the page's source code using our web browser's developer tools. This reveals the underlying source of the problem: **these tables are nested**! The tables we want are nested inside tables we don't care about. How do we get them out?
+
+To address this problem, we can update our approach to identify the outer tables and then, if and when it finds one, look for an inner table. Let's check the logic of this approach before implementing it.
+
+```{python}
+# Find all the outer tables
+outer_tables = soup.find_all('table')
+
+# Loop through all outer tables
+for outer_table in outer_tables:
+    # Try to find a nested table inside the outer table
+    inner_table = outer_table.find('table')
+
+    if inner_table:
+        # Convert the inner table to a DataFrame
+        table_df = pd.read_html(StringIO(str(inner_table)))[0]
+        print(table_df.head(3), '\n')
+```
+
+It appears that finding the inner table gets us the data we want. Before we implement this solution, let's do one more important bit of data processing: associating tables with the dates of the reports they came from.
+
+### Associating Tables with Dates
+
+The main data processing we want to do here is associate each table with the corresponding report year. By inspecting the HTML, we can identify the year each table belongs to by looking at the headers.
+
+Our goal is to extract tables from the webpage and associate each with the publication year of the report the data come from, and we will do that by using information in the section headers preceding the tables we collect. In other words, we want to capture the year from `h3` headers and link it to the subsequent table element. We also know that some tables might contain nested tables, and that the data we are interested in is stored in the inner table. We want our code to extract and process these inner tables as needed.
+
+Our code is getting a bit more complex here. If you're new to Python, it's helps to know exactly what we are trying to do and why. Here it is, in brief:
+
+1. **Identify the year**. We can do this by looking for `h3` headers that contain a year (formatted as `YYYY`) followed by the word 'report.' We'll use a regular expression to identify the pattern. We'll keep track of the current year as we move through the document.
+2. **Associate tables with years**. After identifying a year, we check for the next table element. If a table is found, we associate it with the most recently identified year.
+3. **Handle Nested Tables**. We now know that some tables contain nested tables, and that the data we want is in the inner table. If a nested table is found, we'll keep and process the inner table and discard the outer table.
+
+```{python}
+# Initialize variables
+tables_with_years = []
+year_pattern = re.compile(r'(\d{4}) report')  # Regex pattern to identify years
+current_year = None
+
+# Loop through all elements, capturing headings and tables
+for element in soup.find_all(['h3', 'table']):
+    # Check if the element is an h3 heading containing the year pattern
+    if element.name == 'h3':
+        header_text = element.get_text(strip=True)
+        match = year_pattern.search(header_text)
+        if match:
+            current_year = match.group(1)  # Track the year
+
+    # If the element is a table, associate it with the current year
+    elif element.name == 'table' and current_year:
+        # Convert the outer table element to a DataFrame
+        outer_html_string = str(element)
+        outer_table_df = pd.read_html(StringIO(outer_html_string))[0]
+
+        # Check for a nested table within the outer table
+        inner_table = element.find('table')
+        if inner_table:
+            # Convert the inner table to a DataFrame
+            inner_html_string = str(inner_table)
+            inner_table_df = pd.read_html(StringIO(inner_html_string))[0]
+            inner_table_df['Year'] = current_year
+            tables_with_years.append(inner_table_df)
+        else:
+            # If no nested table, add the outer table DataFrame
+            outer_table_df['Year'] = current_year
+            tables_with_years.append(outer_table_df)
+
+# Check the number of tables collected
+len(tables_with_years)
+```
+
+Now that we've collected the tables and associated them with their respective years, let's inspect them to ensure the data was extracted correctly. We'll loop through the list of tables and check their column names.
+
+```{python}
+for i, table in enumerate(tables_with_years):
+    print(f"Table {i} columns:", list(table.columns))
+```
+
+Most of these tables look good, although there are two tables that look like they may need some additional work (14 and 15), and we seem to have some duplicate tables.
+
+```{python}
+tables_with_years[14].head()
+```
+
+```{python}
+tables_with_years[15].head()
+```
+
+We'll set tables 14 and 15 aside for now.
+
+```{python}
+del tables_with_years[15] # higher index first!
+del tables_with_years[14]
+
+for i, table in enumerate(tables_with_years):
+    print(f"Table {i} columns:", list(table.columns))
+```
+
+What about the potential duplicate tables? Let's take a look.
+
+```{python}
+tables_with_years[0].head()
+```
+
+```{python}
+tables_with_years[1].head()
+```
+
+```{python}
+tables_with_years[0] == tables_with_years[1]
+```
+
+It looks like we do have duplicated data. There are a few ways we can deal with this, but the easiest way is to leave things as they are and proceed. Once we've got everything in one clean dataframe, we can solve our duplicate data problem by dropping duplicate rows.
+
+Our next steps, then, are as follows:
+
+- select the final dataframes,
+- align their column names,
+- concatenate them into one master dataframe, and
+- drop duplicate rows.
+
+Let's select the dataframes with a "Life evaluation" column.^[Gallupe's **Life evaluation index** is a measure of subjective wellbeing based on how people rate their current and expected future lives. Gallupe asks people to pick a number between 0 and 10 where 0 represents their worst possible life and 10 represents their best possible life. Participants say where they feel they are now, and where they thing they will be in 5 years. You can learn a bit more about the index from [Gallupe](https://www.gallup.com/394505/indicator-life-evaluation-index.aspx#:~:text=What%20We%20Measure-,The%20Life%20Evaluation%20Index%20measures%20how%20people%20rate%20their%20current,Global%20Life%20Evaluation%20Index), or by browsing the World Happiness Reports [here](https://worldhappiness.report/archive/).] It appears that only two of our dataframes contain this data, but that's due to inconsistent naming; the "Life evaluation" score is simply labelled "Score" in some dataframes. Additionally, some dataframes have a column called 'Country or region' and others have "Country." Let's align these column names.
+
+```{python}
+new_columns = {
+  "Country": "Country or region",
+  "Score": "Life evaluation"
+}
+
+for df in tables_with_years:
+    df.rename(columns=new_columns, inplace=True)
+```
+
+```{python}
+for i, table in enumerate(tables_with_years):
+    print(f"Table {i} columns:", list(table.columns))
+```
+
+```{python}
+final_dfs = []
+for df in tables_with_years:
+    if 'Life evaluation' in df.columns:
+        final_dfs.append(df[['Country or region', "Year", "Life evaluation"]])
+
+final_df = pd.concat(final_dfs)
+final_df.drop_duplicates(inplace=True)
+final_df.dropna(inplace=True)
+final_df = final_df.reset_index()
+final_df.info()
+```
+
+It *looks* good, but there's actually a problem lurking in this dataframe. If you inspect the output from `info()`, you'll see that `Life evaluation` is actually an object / string, not a float. If we convert it to a float, most of our data gets converted to `NaN`s! 😲
+
+```{python}
+will_have_nans = final_df.copy()
+will_have_nans['Life evaluation'] = will_have_nans['Life evaluation'].str.strip()
+
+# Try to reapply the extraction and conversion
+will_have_nans['Life evaluation'] = will_have_nans['Life evaluation'].str.extract(r'([\d\.]+)')
+will_have_nans['Life evaluation'] = pd.to_numeric(will_have_nans['Life evaluation'], errors='coerce')
+will_have_nans.info()
+```
+
+What's going on here!
+
+If you print the unique values, you'll see that Python recognizes some observations as floats while others are floats that Python thinks are strings. And then there is one observation that we can be sure is causing trouble: `5.305[b]`.
+
+```{python}
+print(final_df['Life evaluation'].unique())
+```
+
+If we handle this situation carefully, we'll get back the data we expect. To target our problematic observation(s), we'll temporarily create a list, iterate over it to handle each observation as it needs to be handled, and then add the clean values back to our dataframe.
+
+```{python}
+vals = final_df['Life evaluation'].tolist()
+len(vals)
+```
+
+As we process these values, we'll check their type. If it's already a float, we'll do nothing. If it's a string, we'll target the problem we know about and then attempt to convert it to a float. Then we'll check the outcome.
+
+```{python}
+cleaned = []
+
+for val in vals:
+    if isinstance(val, float):  # Check if the value is already a float
+        cleaned.append(val)
+    elif isinstance(val, str):  # Check if the value is a string
+        cleaned.append(float(val.replace('[b]', '')))  # Remove '[b]' and convert to float
+    else:
+        print(f"Unexpected type: {type(val)}")  # Handle unexpected types
+
+final_df['Life evaluation'] = pd.Series(cleaned)
+final_df.info()
+```
+
+We now have a float without missing values! 🔥😎
+
+```{python}
+final_df.sort_values('Life evaluation', ascending=False, inplace=True)
+final_df.head(30)
+```
+
+### Visualization
+
+Before we move on to an example of collecting data from an API, let's create a visualization of the data we just scraped and processed. We're going to create a small multiples plot. The code below looks a bit complex, but it's just calculating the size of the figure needed and then looping over each country to create a plot.
+
+```python
+sorted_data = final_df.sort_values(['Country or region', 'Year'])
+sorted_data = sorted_data[sorted_data['Country or region'] != "World"]
+countries = sorted_data['Country or region'].unique()
+
+# Define the number of rows and columns for the subplots
+n_cols = 4  # You can adjust this based on how many plots you want per row
+n_rows = len(countries) // n_cols + (len(countries) % n_cols > 0)
+
+# Create the figure and subplots
+fig, axes = plt.subplots(n_rows, n_cols, figsize=(16, n_rows * 2.5), constrained_layout=True, sharex=True, sharey=True)
+
+# Flatten the axes array for easier indexing
+axes = axes.flatten()
+
+# Loop through each country and create a subplot
+for i, country in enumerate(countries):
+    country_data = sorted_data[sorted_data['Country or region'] == country]
+    axes[i].plot(country_data['Year'], country_data['Life evaluation'], marker='o')
+    axes[i].set_title(f'\n{country}', fontsize=12)
+    axes[i].set_xlabel('')
+    axes[i].set_ylabel('')
+    axes[i].set_xlim(final_df['Year'].min(), final_df['Year'].max())
+    axes[i].set_ylim(0, final_df['Life evaluation'].max() + 1)
+
+    axes[i].set_yticks(
+      np.arange(
+        int(final_df['Life evaluation'].min()),
+        int(final_df['Life evaluation'].max()) + 1,
+        1
+      )
+    )
+    axes[i].tick_params(axis='x', labelsize=12)
+    axes[i].tick_params(axis='y', labelsize=12)
+    axes[i].grid(True)
+
+# Hide any unused subplots
+for j in range(i + 1, len(axes)):
+    fig.delaxes(axes[j])
+
+plt.savefig("output/happiness_report_small_multiples.png", dpi=300)
+```
+
+![Looking pretty good!](output/happiness_report_small_multiples.png)
+
+# Conclusion
+
+In this tutorial, we learned how to scrape data from a static website by working with the Wikipedia page on the World Happiness Report. We learned how to:
+
+- Load a static website with `requests`
+- Parse HTML with `BeautifulSoup` to extract headers, body text, and links
+- Handle relative and internal links
+- Extract and process HTML tables, including handling nested tables
+- Clean and structure the extracted data, preparing it for analysis
+- Create a small multiples plot using `matplotlib` and `seaborn`
+
+We've just scratched the surface of what's possible with web scraping. With the skills you've learned here, you'll be able to collect data from a wide variety of static web pages. If you want to learn more, I recommend consulting @mitchell2024web and @mclevey2022doing. In the next tutorial, we'll learn about collecting data from APIs, which are another powerful tool in your data collection toolkit!
