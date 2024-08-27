@@ -87,7 +87,6 @@ api_key = load_api_key('YOUTUBE_API_KEY')
 
 The `.env` file is ignored by `git`. Good to go!
 
-
 # Misc Notes
 
 ## Running on a Different Machine

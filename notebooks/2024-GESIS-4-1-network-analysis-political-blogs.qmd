@@ -1,0 +1,40 @@
+---
+title: "Network Analysis with Graph-Tool (Political Blogs Network)"
+description: "Module 4, Introduction to Computational Social Science (Python), GESIS Fall Seminar 2024"
+author:
+  - name: John McLevey
+    url: https://johnmclevey.com
+    email: john.mclevey@uwaterloo.ca
+    corresponding: true
+    affiliations:
+      - name: University of Waterloo
+date: "08/26/2024"
+date-modified: last-modified
+categories:
+  - Python
+  - GESIS
+  - computational social science
+  - data science
+  - tutorial
+tags:
+  - Python
+  - GESIS
+  - computational social science
+  - data science
+  - tutorial
+bibliography: references.bib
+reference-location: margin
+citation-location: margin
+freeze: true
+license: "CC BY-SA"
+---
+
+#
+
+## Learning Objectives
+
+## Setup
+
+...
+
+## Conclusion
