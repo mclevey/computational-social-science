@@ -4,7 +4,7 @@
 
 Dr. **John McLevey**<br>University of Waterloo<br>Waterloo, ON, Canada<br>[johnmclevey.com](https://www.johnmclevey.com)<br><john.mclevey@uwaterloo.ca>
 
-Hi! This repository contains a Python package and course materials for my [GESIS Fall Seminar](https://www.gesis.org/en/gesis-training/what-we-offer/fall-seminar-in-computational-social-science) course **Introduction to Computational Social Science with Python**. This course is taught in parallel with Dr. **[Johannes Gruber](https://www.johannesbgruber.eu)**, who is teaching a similar [introductory course in R](https://github.com/JBGruber/computational-social-science-r/tree/main). You'll find the course overview and details below, along with details instructions on how to setup your computing environment.
+Hi! This repository contains a Python package and course materials for my [GESIS Fall Seminar](https://www.gesis.org/en/gesis-training/what-we-offer/fall-seminar-in-computational-social-science) course **Introduction to Computational Social Science with Python**. This course is taught in parallel with Dr. [Johannes Gruber](https://www.johannesbgruber.eu), who is teaching a similar [introductory course in R](https://github.com/JBGruber/computational-social-science-r/tree/main). You'll find the course overview and details below, along with details instructions on how to setup your computing environment.
 
 - [Course Description](#course-description)
 - [Course Schedule](#course-schedule)
