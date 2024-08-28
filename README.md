@@ -9,6 +9,7 @@ Hi! This repository contains a Python package and course materials for my [GESIS
 - [Course Description](#course-description)
 - [Course Schedule](#course-schedule)
 - [Download the Course Materials](#download-the-course-materials)
+- [Using the Course Materials](#using-the-course-materials)
 - [Required Software](#required-software)
   - See the [Setup Guide](setup/setup-guide.md) for more a detailed guide
 
@@ -23,14 +24,14 @@ The Digital Revolution has produced unprecedented amounts of data that are relev
 GESIS Fall Seminar in Computational Social Science<br>
 August 30 - September 6, 2024
 
-| time  | Session                                      |
-| ----- | -------------------------------------------- |
-| Day 1 | Introduction to Computational Social Science |
-| Day 2 | Obtaining Data                               |
-| Day 3 | Computational Text Analysis                  |
-| Day 4 | Computational Network Analysis               |
-| Day 5 | Social Simulation & Agent-based Models       |
-| Day 6 | Project Work Day and Outlook                 |
+| time  | Session                                      | Notebooks                                                                                                                        | Videos      |
+| ----- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| Day 1 | Introduction to Computational Social Science | [1.1](notebooks/2024-GESIS-1-setup.qmd)                                                                                          | Moodle Site |
+| Day 2 | Obtaining Data                               | [2.1](notebooks/2024-GESIS-2-1-obtaining-data-scraping.qmd), [2.2](notebooks/2024-GESIS-2-2-obtaining-data-apis.qmd)             | Moodle Site |
+| Day 3 | Computational Text Analysis                  | [3.1](notebooks/2024-GESIS-3-1-text-analysis-foundations.qmd), [3.2](notebooks/2024-GESIS-3-2-text-analysis-transformers.qmd)    | Moodle Site |
+| Day 4 | Computational Network Analysis               | [4.1](notebooks/2024-GESIS-4-1-network-analysis-political-blogs.qmd), [4.2](notebooks/2024-GESIS-4-2-network-analysis-enron.qmd) | Moodle Site |
+| Day 5 | Social Simulation & Agent-based Models       | [5.1](notebooks/2024-GESIS-5-1-abms.qmd)                                                                                         | Moodle Site |
+| Day 6 | Project Work Day and Outlook                 | [6.1](notebooks/2024-GESIS-6-1-project.qmd)                                                                                      | Moodle Site |
 
 # Download the Course Materials
 
@@ -62,10 +63,33 @@ git clone https://github.com/mclevey/computational-social-science.git
 cd computational-social-science-python
 ```
 
+# Using the Course Materials
+
+There are a lot of files in this repo, most of which you'll need in some capacity but won't need to access directly (e.g., source code for the Python package I developed specifically for this course, `icsspy`.) Feel free to poke around, or go straight to the notebooks you'll be using as you work your way through the course. You'll find that content in the `notebooks/` directory, or linked directly in the [Course Schedule table above](#course-schedule).
+
+The source code for the lecture slides is available in the [slides](slides) directory. Once you've installed Quarto, you can display the slides yourself by running the following commands from the command line:
+
+```zsh
+cd slides
+```
+
+- Lecture 1 Slides: `quarto preview day-1.qmd`
+- Lecture 2 Slides: `quarto preview day-2.qmd`
+- Lecture 3 Slides: `quarto preview day-3.qmd`
+- Lecture 4 Slides: `quarto preview day-4.qmd`
+- Lecture 5 Slides: `quarto preview day-5.qmd`
+- Lecture 6 Slides: `quarto preview day-6.qmd`
+
+Quarto will compile the source code and open the slides in a browser tab. Note that some lectures may take a while to compile, especially if you have code execution on. If you do have code execution on, you'll need to activate the course virtual environment before running the Quarto commands. More information about this is available in [the setup guide](notebooks/2024-GESIS-1-setup.qmd).
+
 # Required Software
 
-See the [setup guide](setup/setup-guide.md) for detailed instructions on how to setup the required software for this course.
+See the [setup guide](notebooks/2024-GESIS-1-setup.qmd) for detailed instructions on how to setup the required software for this course.
 
 - [VS Code](https://code.visualstudio.com) (text editor / IDE)
 - Python 3.11+ (via [Miniconda](https://docs.anaconda.com/miniconda/))
 - [Quarto](https://quarto.org)
+
+# Contributing to the Course Development
+
+These course materials are available for reuse under the [CC BY-SA 4.0 license](LICENSE). If you would like to contribute to course development, you can consult the [contributor guide](setup/contributor-guide.md).
