@@ -90,6 +90,16 @@ See the [setup guide](notebooks/2024-GESIS-1-setup.qmd) for detailed instruction
 - Python 3.11+ (via [Miniconda](https://docs.anaconda.com/miniconda/))
 - [Quarto](https://quarto.org)
 
+# Course Virtual Environment
+
+There is a virtual environment you can use to easily access all the packages we will use in this course. If you are familiar with virtual environments, you can install and activate the environment as follows. More detailed instructions are provided in the lecture videos.
+
+```{zsh}
+cd computational-social-science
+conda env create -f setup/graphtool.yaml
+conda activate gt
+```
+
 # Contributing to the Course Development
 
 These course materials are available for reuse under the [CC BY-SA 4.0 license](LICENSE). If you would like to contribute to course development, you can consult the [contributor guide](setup/contributor-guide.md).
