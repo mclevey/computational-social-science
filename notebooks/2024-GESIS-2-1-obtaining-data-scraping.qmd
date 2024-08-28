@@ -563,7 +563,7 @@ final_df.head(30)
 
 Before we move on to an example of collecting data from an API, let's create a visualization of the data we just scraped and processed. We're going to create a small multiples plot. The code below looks a bit complex, but it's just calculating the size of the figure needed and then looping over each country to create a plot.
 
-```python
+```{python}
 sorted_data = final_df.sort_values(['Country or region', 'Year'])
 sorted_data = sorted_data[sorted_data['Country or region'] != "World"]
 countries = sorted_data['Country or region'].unique()

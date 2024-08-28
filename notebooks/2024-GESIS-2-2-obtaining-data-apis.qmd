@@ -115,7 +115,6 @@ Now that you have your API keys setup, load the packages we'll use in this tutor
 
 ```{python}
 import pandas as pd
-import yaml
 
 import icsspy
 import icsspy.utils as utils
@@ -126,10 +125,7 @@ import icsspy.cleaners as clean
 We can load our API key(s) using a utility function from icsspy and then initialize the YouTubeAPI class I developed to simplify using multiple API keys at once,^[Follow the instructions above to make sure you have your .env file setup correctly.] which is useful if you need to switch between them due to rate limits.
 
 ```{python}
-with open("input/config.yaml", "r") as file:
-    config = yaml.safe_load(file)
-
-KEY_NAMES = config.get("list_youtube_api_key_names", "YOUTUBE_API_KEY")
+KEY_NAMES = ["GESIS", "GESISPY", "INTRO_CSS", "INTROCSS2024", "YouTubeAPILecture", "metascience_golems", "McLevey", "MSGD"]
 API_KEYS = utils.load_api_key_list(KEY_NAMES)
 YOUTUBE_API = yt.YouTubeAPI(API_KEYS)
 ```
@@ -177,7 +173,7 @@ video_ids = yt.get_channel_video_ids(YOUTUBE_API, channel_id)
 video_details = yt.get_channel_video_data(YOUTUBE_API, video_ids)
 print(f"Collected data on {len(video_details)} videos from {channel}.")
 
-utils.save_json(video_details, 'output/talks_at_google_videos.json')
+utils.save_json(video_details, 'output/videos.json')
 ```
 
 Like most modern APIs, the YouTube API returns data in JSON format. We'll store this data by writing the JSON to disk, which will allow us to easily reload the data later without needing to re-query the YouTube API. For example, we can load the JSON data -- from disk or memory -- directly into a Pandas dataframe.
