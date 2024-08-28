@@ -4,26 +4,13 @@
 
 Dr. **John McLevey**<br>University of Waterloo<br>Waterloo, ON, Canada<br>[johnmclevey.com](https://www.johnmclevey.com)<br><john.mclevey@uwaterloo.ca>
 
-Hi! This repository contains a Python package and course materials for my [GESIS Fall Seminar](https://www.gesis.org/en/gesis-training/what-we-offer/fall-seminar-in-computational-social-science) course **Introduction to Computational Social Science with Python**. This course is taught in parallel with Dr. **Johannes Gruber**, who is teaching a similar introductory course in R. You'll find the course overview and details below, along with details instructions on how to setup your computing environment (local or remote) and guidelines if you would like to contribute to course development.
+Hi! This repository contains a Python package and course materials for my [GESIS Fall Seminar](https://www.gesis.org/en/gesis-training/what-we-offer/fall-seminar-in-computational-social-science) course **Introduction to Computational Social Science with Python**. This course is taught in parallel with Dr. **[Johannes Gruber](https://www.johannesbgruber.eu)**, who is teaching a similar [introductory course in R](https://github.com/JBGruber/computational-social-science-r/tree/main). You'll find the course overview and details below, along with details instructions on how to setup your computing environment.
 
-Contents
-
-- [Course Overview and Materials](#course-overview-and-materials)
-- [Computing Setup](#computing-setup)
-  - Required Software
-  - Poetry
-  - Poetry + Conda
-  - Poetry + Docker
-- [Remote Computing](#remote-computing)
-  - Google Colab
-  - etc.
-- [Additional Resources](#additional-resources)
-- [Contributing](#contributing)
-  - Additional Development Setup
-  - Git and Coding Conventions
-  - Scripts (Installed in Poetry)
-  - `pdpp` Pipelines
-- [License](#license)
+- [Course Description](#course-description)
+- [Course Schedule](#course-schedule)
+- [Download the Course Materials](#download-the-course-materials)
+- [Required Software](#required-software)
+  - See the [Setup Guide](setup/setup-guide.md) for more a detailed guide
 
 # Course Description
 
@@ -37,14 +24,13 @@ GESIS Fall Seminar in Computational Social Science<br>
 August 30 - September 6, 2024
 
 | time  | Session                                      |
-|-------|----------------------------------------------|
+| ----- | -------------------------------------------- |
 | Day 1 | Introduction to Computational Social Science |
 | Day 2 | Obtaining Data                               |
 | Day 3 | Computational Text Analysis                  |
 | Day 4 | Computational Network Analysis               |
 | Day 5 | Social Simulation & Agent-based Models       |
 | Day 6 | Project Work Day and Outlook                 |
-
 
 # Download the Course Materials
 
@@ -66,7 +52,6 @@ The screenshots below should help you find what you're looking for if this is yo
 Once you tell VS Code to open the repo, you're ready to go! You should see the repository contents in the file browser on the left.
 
 ![](setup/vs-code-clone-3.png)
-
 
 ## From the Command Line
 
