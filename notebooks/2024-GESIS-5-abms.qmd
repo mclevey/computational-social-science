@@ -29,12 +29,742 @@ freeze: true
 license: "CC BY-SA"
 ---
 
-#
+# Simulation and Agent-based Modelling
+
+This notebook accompanies the recorded lecture on "Simulation and Agent-based Modelling." It's intended to provide you with a hands-on experience in building and analyzing agent-based models using Python.
 
 ## Learning Objectives
 
+By the end of this workshop, you will be able to:
+
+1. Understand the basic concepts and components of agent-based modeling.
+2. Implement a simple SIR model using Mesa, a Python library for agent-based modeling.
+    - In this notebook, this is done via the course package `icsspy`, but the models we load here are the same ones I developed in the lecture.
+3. Analyze the behavior of the SIR model under different conditions and parameters.
+4. Explore a Bounded Confidence Model to understand opinion dynamics.
+5. Conduct sensitivity analysis and parameter sweeps to systematically investigate model behavior.
+
+
 ## Setup
 
-...
+Let's start by importing the necessary packages and configuring our environment.
 
-## Conclusion
+```{python}
+import mesa
+from mesa.batchrunner import batch_run
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import random
+import networkx as nx
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+import icsspy
+icsspy.set_style()
+from icsspy.networks import plot_line_comparison
+```
+
+
+## Load and Configure the Model(s)
+
+We'll begin by exploring a classic Susceptible-Infected-Recovered (SIR) model. This model is often used to simulate the spread of infectious diseases.
+
+### Model 1: SIR Model with High Transmissibility
+
+First, let's load the SIRModel class from the course package and define the parameters for our first model, which simulates a disease with a high infection rate.
+
+```{python}
+from icsspy.abms.sir import SIRModel
+
+model_1_params = {'N': 100,
+ 'grid_height': 40,
+ 'grid_width': 40,
+ 'infection_rate': 0.3,
+ 'max_agent_step_size': 1,
+ 'n_initial_infections': 2,
+ 'n_iterations': 150,
+ 'recovery_time_range': [14, 24]
+}
+
+print("Model 1 Params\n", model_1_params)
+```
+
+Here, we have a population of 100 agents on a 40x40 grid. The infection rate is set to 0.3, meaning there's a 30% chance that a susceptible agent will become infected when in contact with an infected agent. The agents can move to adjacent cells, and their recovery time is randomly chosen between 14 and 24 time steps.
+
+Now, let's run the model and store the results.
+
+```{python}
+model_1 = SIRModel(
+    n_initial_infections = model_1_params['n_initial_infections'],
+    grid_width = model_1_params['grid_width'],
+    grid_height = model_1_params['grid_height'],
+    N = model_1_params['N'],
+    infection_rate = model_1_params['infection_rate'],
+    recovery_time_range = model_1_params['recovery_time_range'],
+    max_agent_step_size = model_1_params['max_agent_step_size'],
+)
+
+for i in range(model_1_params['n_iterations']):
+    model_1.step()
+
+m1res = model_1.datacollector.get_model_vars_dataframe()
+m1res
+```
+
+### Model 2: SIR Model with Low Transmissibility
+
+```{python}
+model_2_params = {'N': 100,
+ 'grid_height': 40,
+ 'grid_width': 40,
+ 'infection_rate': 0.15,
+ 'max_agent_step_size': 1,
+ 'n_initial_infections': 2,
+ 'n_iterations': 150,
+ 'recovery_time_range': [14, 24]
+}
+
+print("\nModel 2 Params\n", model_2_params)
+```
+
+We have kept most of the parameters the same as in Model 1, except for the infection rate, which is now 0.15, to simulate a less contagious disease.
+
+Now, let's run Model 2.
+
+```{python}
+model_2 = SIRModel(
+    n_initial_infections = model_2_params['n_initial_infections'],
+    grid_width = model_2_params['grid_width'],
+    grid_height = model_2_params['grid_height'],
+    N = model_2_params['N'],
+    infection_rate = model_2_params['infection_rate'],
+    recovery_time_range = model_2_params['recovery_time_range'],
+    max_agent_step_size = model_2_params['max_agent_step_size'],
+)
+
+for i in range(model_2_params['n_iterations']):
+    model_2.step()
+
+m2res = model_2.datacollector.get_model_vars_dataframe()
+m2res
+```
+
+### Comparing the Two Models
+
+Let's compare the infection curves from both models to see how the different infection rates affect the spread of the disease.
+
+```{python}
+fig, ax = plt.subplots()
+ax.plot(m1res['Infected'], label=r'High transmissibility, $\beta$=0.3')
+ax.plot(m2res['Infected'], label=r'Low transmissibility $\beta$=0.15')
+plt.xlabel("\nDiscrete Steps in Time")
+plt.ylabel("Proportion Infected\n")
+plt.legend(loc='upper right', fontsize=10)
+plt.savefig('output/sir_compare_models_1-2.png')
+```
+
+### Analyzing Agent Interactions
+
+In addition to tracking the number of infected agents, it's also useful to analyze how agents interact with each other during the simulation.
+
+```{python}
+interaction_graphs = {}
+interaction_graph_summaries = {}
+
+models = [model_1, model_2]
+for i, model in enumerate(models, start=1):
+    wel = []
+    for agent in model.schedule.agents:
+        for k, v in agent.interactions.items():
+            wel.append((int(agent.unique_id), k, v))
+
+    G = nx.Graph()
+    G.add_weighted_edges_from(wel)
+    interaction_graphs[f'M{i}'] = G
+
+    avg_degree = round(sum(dict(G.degree()).values()) / float(G.number_of_nodes()), 2)
+    interaction_graph_summaries[f'M{i}'] = (G.number_of_nodes(), G.number_of_edges(), avg_degree)
+```
+
+```{python}
+interaction_graph_summaries = pd.DataFrame(interaction_graph_summaries).T
+interaction_graph_summaries.columns = ['No. Nodes', 'No. Edges', 'Avg. Degree']
+interaction_graph_summaries
+```
+
+```{python}
+# Initialize an empty graph
+G = interaction_graphs['M2']
+weights = [d['weight'] for u, v, d in G.edges(data=True)]
+
+plt.figure(figsize=(8, 6))
+sns.ecdfplot(weights)
+plt.xlabel('Interaction Weight')
+plt.ylabel('ECDF')
+plt.title('ECDF of Interaction Weights')
+plt.grid(True)
+plt.savefig('output/compare_agent_networks.png', dpi=300)
+```
+
+
+## Model Analysis
+
+Model analysis is critical for understanding the behavior of an ABM and ensuring that it accurately reflects the real-world system being modeled. In this section, we'll cover various analysis techniques, including descriptive, exploratory, comparative, and predictive analyses.
+
+Sensitivity Analysis: Peak Proportion Infected
+Sensitivity analysis helps determine how changes in model parameters affect the outcomes. Here, we'll focus on the peak proportion of infected agents as our outcome of interest.
+
+First, let's set up a parameter sweep for the sensitivity analysis.
+
+<!--
+
+- Understand and interpret model behavior to better understand the system being modeled
+- Validate the model against real-world data, check robustness and reliability
+- Explore the effects of different parameters and conditions and identify key drivers of model outcomes
+
+- Track agent states, interactions, and other metrics
+- Visualize model dynamics over time
+- Use statistical or other approaches
+
+So far we have not been very systematic in how we've approaches analyzing the outputs of our SIR model. What's involved in more systematic analyses?
+
+The primary goal of analyzing an agent-based model is to gain insights into how the model behaves and how well it represents the real-world system it's designed to simulate. This involves understanding the dynamics of the model, validating it against empirical data, and exploring the implications of different parameter settings.
+
+We can break ABM model analysis down into several types. Descriptive analysis helps summarize what's happening in the model, while exploratory analysis digs deeper into patterns and relationships within the data. Comparative analysis is useful when we want to understand how different scenarios or versions of the model compare, and predictive analysis leverages the model to forecast future outcomes.
+
+Usually, we use several techniques at once to analyze ABMs effectively. Data collection is crucial for tracking the various states and interactions within the model, often using tools like Mesa's DataCollector. Visualization helps us see the trends and dynamics within the model, and statistical analysis allows us to quantify and interpret the data meaningfully.
+
+Ultimately, the goal of analyzing an ABM is to ensure that the model is providing accurate, reliable insights into the system being studied. This includes identifying the key factors that drive model outcomes and ensuring that the model can withstand scrutiny through robust analysis.
+
+This high-level overview sets the stage for more detailed discussions on specific analysis methods like sensitivity analysis, parameter sweeps, and computational experiments, which are essential for thoroughly understanding and validating our ABMs.
+
+- Sensitivity Analysis helps determine which model parameters are most important and/or uncertain, and which require careful estimation and interpretation.
+- Parameter Sweeps allow for a systematic exploration of how different settings influence model behavior, which helps in understanding the model's response landscape.
+- Computational Experiments involve systematically investigating the model's behavior to answer specific questions, understand mechanisms, or test hypotheses.
+
+When iteratively analyzing models, we can use Sensitivity Analysis, Parameter Sweeps, and Computational Experiments to understand, test, and analyze the behavior of the model under various conditions. These methods are essential for ensuring the model's reliability and for interpreting its results. Here's what they mean:
+
+### Sensitivity Analysis
+
+Sensitivity analysis involves systematically varying model parameters to assess how changes in these parameters affect the model's output. It helps identify which parameters are most influential in determining model behavior and which ones have less impact.
+
+The main goal is to understand how robust the model's results are. If small changes in a parameter lead to significant changes in outcomes, for example, that parameter is considered sensitive and could indicate areas where the model might need refinement or better data.
+
+Local Sensitivity Analysis involves small variations in one parameter at a time to observe the local impact on the model, whereas Global Sensitivity Analysis considers a broader range of variations and the combined effects of multiple parameters.
+
+### Parameter Sweeps
+
+This allows us to map out the response of the model across the entire space of possible parameter values, which helps identify trends, tipping points, or regions of parameter space where the model behaves in a particular way. Typically, this is done by running a series of simulations where one or more parameters are adjusted incrementally. The results are then analyzed to understand the relationship between parameters and outcomes.
+
+### Computational Experiments:
+
+In the context of ABM, computational experiments refer to the process of systematically testing the model by varying initial conditions, parameter values, or model structures to observe the resulting behavior. Most importantly, this is done with the goal of answering scientific questions, understanding mechanisms, or testing hypotheses. Sometimes this is explicitly causal and may be similar to laboratory experiments, only in a simulated environment where variables can easily be manipulated and controlled. Other times it is more exploratory, with the goal of mapping out the model's behavior across a wide range of conditions.
+
+## Sensitivity Analysis: Peak Proportion Infected
+
+Let's do a sensitivity analysis! We'll follow these steps:
+
+1. Set up the **parameter sweep** dictionary
+2. Run the model according to the sweep dictionary<br>[+ plot results from batch run]{.nord-light}
+3. Aggregate the model results
+4. Plot the results
+5. Correlate parameters with peak proportion infected^[This is an additional step, not necessarily part of a sensitivity analysis but often done alongside.]
+6. Interpret, critique... *repeat*
+7. Prepare the data
+8. Plot the results
+9. Interpret, critique... *repeat*
+
+First, we'll focus on peak proportion infected as the outcome of interest.
+
+Sensitivity plots will show how the peak number of infections varies with changes in each parameter. Parameters with more spread (higher variability in the boxplots) are more sensitive.
+
+The correlation analysis will help identify which parameters have the most substantial impact on the peak number of infections.
+
+Let's set up our parameter sweep dict for the sensitivity analysis. In the fict, values that are single elements represent fixed parameters (the dimensions of the grid, etc.) and lists `[]` represent groups of parameters to iterate over. The model's response space is made up of every combination of these fixed and global parameters.
+-->
+
+```{python}
+params = {
+    "N": 100,
+    "grid_height": 40,
+    "grid_width": 40,
+    "infection_rate": [0.2, 0.4, 0.6, 0.8,],
+    "recovery_time_range": [(7,14), (14,24)],
+    "max_agent_step_size": [2, 4, 6, 8, 10, 12],
+    "n_initial_infections": [1, 5, 10, 15, 20, 25]
+}
+```
+
+Then we can run multiple mpdels for every combination of parameters using the batch_run() function.
+
+```{python}
+results = mesa.batch_run(
+    model_cls=SIRModel,
+    parameters=params,
+    iterations=10,
+    max_steps=100,
+    number_processes=1,
+    data_collection_period=1,  # collect data at every step
+    display_progress=True,
+)
+
+results_df = pd.DataFrame(results)
+results_df.info()
+```
+
+```{python}
+results_df.head()
+```
+
+Let's create a small multiples plot to compare some high-level patterns across different parameter settings.
+
+```{python}
+melted_df = pd.melt(
+    results_df,
+    # include 'RunId' to differentiate runs
+    id_vars=['n_initial_infections', 'infection_rate', 'Step', 'RunId'],
+    value_vars=['Susceptible', 'Infected', 'Recovered'],
+    var_name='State',
+    value_name='Proportion'
+)
+
+# create the FacetGrid
+g = sns.FacetGrid(
+    melted_df, col="n_initial_infections", hue="State",
+    col_wrap=3, height=4, aspect=1.5
+)
+
+# map the scatterplot for individual observations
+g.map_dataframe(
+    sns.scatterplot, x='Step', y='Proportion', alpha=0.005, edgecolor=None
+)
+
+# map the lineplot for aggregated data
+g.map_dataframe(
+    sns.lineplot, x='Step', y='Proportion', linewidth=2,
+)
+
+g.add_legend()
+g.set_axis_labels("Time Step", "Proportion")
+g.set_titles("Initial Infections: {col_name}")
+
+plt.savefig("images/sir_subplots.png", dpi=300)
+```
+
+
+![Batch results for Model 2 with mean trends emphasized.](images/sir_subplots.png)
+
+Next, we aggreate the results for the sensitivity analysis.
+
+```{python}
+aggregated_results = results_df.groupby(["RunId", "infection_rate", "recovery_time_range", "max_agent_step_size", "n_initial_infections"]).agg(
+    peak_infected=("Infected", "max")
+).reset_index()
+
+aggregated_results.head()
+```
+
+Let's plot the sensitivity analysis results. We'll need to convert the `recovery_time_range` tuples into strings first.
+
+```{python}
+aggregated_results['recovery_time_range_str'] = aggregated_results['recovery_time_range'].apply(lambda x: f"{x[0]}-{x[1]}")
+```
+
+And then we can set up the plot.
+
+```{python}
+fig, axes = plt.subplots(2, 2, figsize=(16, 12), sharey=True)
+
+# infection rate
+sns.boxplot(ax=axes[0, 0], x="infection_rate", y="peak_infected", data=aggregated_results)
+axes[0, 0].set_title("\n(a) Sensitivity to Infection Rate", loc="left")
+axes[0, 0].set_xlabel("\nInfection Rate")
+axes[0, 0].set_ylabel("Peak Infected\n")
+
+# recovery time range (use the string version we just created)
+sns.boxplot(ax=axes[0, 1], x="recovery_time_range_str", y="peak_infected", data=aggregated_results)
+axes[0, 1].set_title("\n(b) Sensitivity to Recovery Time Range", loc="left")
+axes[0, 1].set_xlabel("\nRecovery Time Range")
+axes[0, 1].set_ylabel("Peak Infected\n")
+
+# max agent step size
+sns.boxplot(ax=axes[1, 0], x="max_agent_step_size", y="peak_infected", data=aggregated_results)
+axes[1, 0].set_title("\n(c) Sensitivity to Max Agent Step Size", loc="left")
+axes[1, 0].set_xlabel("\nMax Agent Step Size")
+axes[1, 0].set_ylabel("Peak Infected\n")
+
+# initial infections
+sns.boxplot(ax=axes[1, 1], x="n_initial_infections", y="peak_infected", data=aggregated_results)
+axes[1, 1].set_title("\n(d) Sensitivity to Initial Infections", loc="left")
+axes[1, 1].set_xlabel("\nInitial Infections")
+axes[1, 1].set_ylabel("Peak Infected\n")
+
+plt.tight_layout()
+plt.savefig("images/sir_sensitivity_analysis.png", dpi=300)
+```
+
+![Sensitivity plot for our SIR model parameters and peak proportion infected across all model runs.](images/sir_sensitivity_analysis.png)
+
+### Correlate the Parameters with the Outcomes
+
+As an additional step, we can correlate our parameters with the peak proportion infected to get a sense of the relative influence of each parameter. To do so, we have to transform the recovery time ranges into a single number. There are a few ways we could do this, but to keep things simple we'll take the mean of the two values.
+
+```{python}
+aggregated_results["recovery_time_range_numeric"] = aggregated_results["recovery_time_range"].apply(lambda x: sum(x) / len(x))
+```
+
+Once we've done that, we'll drop the original tuple (`recovery_time_range`) and it's string representation (`recovery_time_range_str`). I'll create a new dataframe for these modifications, since we'll use the dropped variables in our second sensitivity analysis.
+
+```{python}
+aggregated_results_4corr = aggregated_results.copy()
+aggregated_results_4corr.drop(['recovery_time_range', 'recovery_time_range_str'], axis=1, inplace=True)
+```
+
+And now we can correlate!
+
+```{python}
+correlation_matrix = aggregated_results_4corr.corr()
+peak_infected_correlations = correlation_matrix["peak_infected"].drop(
+    ["peak_infected", "RunId"]
+)
+```
+
+Let's visualize the correlations using a line comparison plot.
+
+```{python}
+for_plotting = {}
+for parameter, correlation in zip(peak_infected_correlations.index, peak_infected_correlations.values):
+    for_plotting[parameter] = round(correlation, 4)
+
+plot_line_comparison(
+    for_plotting,
+    xrange=(0,1), # all positive correlations
+    print_decimals=True,
+    title="",
+    xlabel='\nCorrelations between model parameters and peak infection.',
+    filename="images/sir_correlations_params_peak_infection.png"
+)
+```
+
+![Correlations between model parameters and peak infection proportion.](images/sir_correlations_params_peak_infection.png){width="100%" #fig-sir_correlations_params_peak_infection}
+
+
+
+## Sensitivity Analysis: Time to Peak Proportion Infected
+
+Next, let's analyze how different parameters affect the time it takes for the infection to reach its peak.
+<!--
+We have to do a bit more data prep.
+
+- Group the data by `RunId` and find the step with the maximum number of infections for each run
+- Extract the relevant columns: `RunId`, `Step` (time to peak), and `Infected` (peak infections)
+- Merge with the original parameter data
+
+After this, `time_to_peak_merged` will contain the data on time to peak infection along with the parameters used in each run. -->
+
+```{python}
+time_to_peak = results_df.loc[results_df.groupby("RunId")["Infected"].idxmax()]
+time_to_peak = time_to_peak[["RunId", "Step", "Infected"]].rename(
+    columns={"Step": "time_to_peak", "Infected": "peak_infected"}
+)
+
+time_to_peak_merged = pd.merge(time_to_peak, aggregated_results, on="RunId")
+```
+
+Let's visualize how the time to peak infection varies with different parameters.
+
+```{python}
+fig, axes = plt.subplots(2, 2, figsize=(16, 12), sharey=True)
+
+# Infection rate
+sns.boxplot(ax=axes[0, 0], x="infection_rate", y="time_to_peak", data=time_to_peak_merged)
+axes[0, 0].set_title("\n(a) Time to Peak Infection vs. Infection Rate", loc="left")
+axes[0, 0].set_xlabel("\nInfection Rate")
+axes[0, 0].set_ylabel("Time to Peak Infection\n")
+
+# Recovery time range
+sns.boxplot(ax=axes[0, 1], x="recovery_time_range_str", y="time_to_peak", data=time_to_peak_merged)
+axes[0, 1].set_title("\n(b) Time to Peak Infection vs. Recovery Time Range", loc="left")
+axes[0, 1].set_xlabel("\nRecovery Time Range")
+axes[0, 1].set_ylabel("Time to Peak Infection\n")
+
+# Max agent step size
+sns.boxplot(ax=axes[1, 0], x="max_agent_step_size", y="time_to_peak", data=time_to_peak_merged)
+axes[1, 0].set_title("\n(c) Time to Peak Infection vs. Max Agent Step Size", loc="left")
+axes[1, 0].set_xlabel("\nMax Agent Step Size")
+axes[1, 0].set_ylabel("Time to Peak Infection\n")
+
+# Initial infections
+sns.boxplot(ax=axes[1, 1], x="n_initial_infections", y="time_to_peak", data=time_to_peak_merged)
+axes[1, 1].set_title("\n(d) Time to Peak Infection vs. Initial Infections", loc="left")
+axes[1, 1].set_xlabel("\nInitial Infections")
+axes[1, 1].set_ylabel("Time to Peak Infection\n")
+
+plt.tight_layout()
+plt.savefig("images/sir_time_to_peak_analysis.png", dpi=300)
+```
+
+![Sensitivity plot for our SIR model parameters and time to peak proportion infected across all model runs.](images/sir_time_to_peak_analysis.png){width="50%" #fig-sir_time_to_peak_analysis}
+
+There is much more we could do here, but let's move on to a different example.
+
+# Social Learning, Influence, and Opinion Dynamics
+
+Opinion dynamics models explore how individual opinions form, cluster, and change over time, and how these dynamics lead to group-level outcomes such as consensus, polarization, or fragmentation. These models are crucial for understanding social phenomena like political polarization, consensus formation, and the spread of misinformation.
+
+The Bounded Confidence Model (BCM)
+The Bounded Confidence Model (BCM) simulates opinion evolution in a continuous opinion space. Agents interact and influence each other only if their opinions are within a certain confidence bound ($\epsilon$).
+
+ODD Protocol for Bounded Confidence Model
+Below is a simplified ODD (Overview, Design concepts, Details) protocol for the Bounded Confidence Model.
+
+<!--
+Some key questions in opinion dynamics: How do opinions form, cluster, and change in populations? How do populations reach opinion consensus, polarization, or fragmentation? What are the key drivers of formation, clustering, change, as well as population-level consensus, polarization, or fragmentation? What are the roles played by: the structure and dynamics of multi-layer social networks; disinformation and propaganda; echo chambers and filter bubbles; agent cognition, emotion, and identity, etc.? How do we best model diversity and heterogenous populations?
+
+BCMs simulate opinion evolution in a continuous opinion space. People interact and influence each other if their opinions are within a certain threshold ($\epsilon$).
+
+- Agents have continuous opinions (e.g., -1 to 1).
+- A Confidence Bound ($\epsilon$) determines the range within which agents are influenced by others.
+- In interactions, agents adjust opinions if the difference between their opinion and their alter's opinion is within their confidence bound.
+- The outcome is typically opinion clusters indicating polarization, fragmentation, or consensus.
+
+Opinion dynamics research is a key area in computational social science, focusing on how individuals' opinions are shaped and how these opinions influence group decisions.
+
+This research is especially relevant to understanding phenomena like political polarization, consensus formation in teams, and the spread of misinformation.
+
+In this part of the lecture, we'll explore one of the foundational models in opinion dynamics: the Bounded Confidence Model (BCM), which offers a way to understand how opinions evolve when individuals are influenced only by those with similar views.
+
+The Bounded Confidence Model was introduced as a way to simulate how people influence each other's opinions when they only engage with those who hold similar views.
+
+This model is particularly powerful for studying polarization, where society splits into groups with opposing opinions, and for understanding the conditions under which consensus can be reached.
+
+Let's break down the components of a Bounded Confidence Model:
+
+Agents: Each agent represents an individual with an opinion, typically modeled as a number between -1 and 1.
+
+Confidence Bound ($\epsilon$): This is a critical parameter. It represents how open an agent is to interacting with others. If another agent's opinion is within this bound, they will influence each other.
+
+Interaction: When two agents interact, they adjust their opinions towards each other. This models the idea of social influence, where people often adjust their views based on those they interact with.
+
+Outcome: Depending on the value of $\epsilon$ and the initial distribution of opinions, the model can result in different outcomes: the formation of distinct opinion clusters, complete polarization, or consensus. -->
+
+### ODD Protocol for Bounded Confidence Model
+
+- import or link here; readme in the package, maybe?
+
+![Figure reproduced from @railsback2019agent.](images/odd.png){width="100%" .shadow-img}
+
+## Bounded Confidence Models
+
+```{python}
+from mesa import Agent
+from mesa import Model
+from mesa.space import MultiGrid
+from mesa.time import RandomActivation
+from mesa.datacollection import DataCollector
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+import numpy as np
+from pprint import pprint
+import yaml
+
+import icsspy
+icsspy.set_style()
+```
+
+```{python}
+from icsspy.abms.bounded_confidence import BoundedConfidenceModel
+```
+
+```{python}
+#| echo: false
+with open('_variables.yml', 'r') as file:
+    params = yaml.safe_load(file)
+
+model_params = params.get('bounded_confidence_model_1')
+pprint(model_params)
+```
+
+```python
+model_params = {'N': 100,
+ 'epsilon': 0.5,
+ 'grid_height': 40,
+ 'grid_width': 40,
+ 'max_agent_step_size': 1,
+ 'n_iterations': 1500
+}
+pprint(model_params)
+```
+
+### Run the Model & Collect Data
+
+Let's run the model with the parameters we've defined and collect the data.
+
+```{python}
+model = BoundedConfidenceModel(
+    grid_width=model_params['grid_width'],
+    grid_height=model_params['grid_height'],
+    N=model_params['N'],
+    epsilon=model_params['epsilon'],
+    max_agent_step_size=model_params['max_agent_step_size'],
+)
+
+for i in range(model_params['n_iterations']):
+    model.step()
+
+results = model.datacollector.get_agent_vars_dataframe().reset_index()
+results.head(10)
+```
+
+### Plot Opinion Distributions
+
+Now, we'll visualize the evolution of the opinion distribution over time.
+
+```{python}
+grouped = results.groupby('Step')
+
+plt.figure(figsize=(10, 6))
+
+for name, group in grouped:
+    sns.kdeplot(group['Opinion'], color='C0', alpha=0.2)
+
+plt.xlabel('\nOpinion')
+plt.ylabel('Density\n')
+title = "Bounded Confidence Model\n" + r"$\epsilon$" + f" = {model_params['epsilon']}\n"
+plt.title(title, loc='left')
+plt.grid(True)
+plt.savefig('output/bounded-confidence-opinion-distribution-evolution.png', dpi=300)
+```
+
+![A collection of KDE plots showing the evolution of the opinion distribution at each time step in the model.](output/bounded-confidence-opinion-distribution-evolution.png){width="75%" #fig-bcmevo}
+
+
+### Plot Opinions Over Time
+
+Let's visualize how opinions change over time for individual agents.
+
+```{python}
+time_steps = results['Step']
+opinions = results['Opinion']
+title = "Bounded Confidence Model\n" + r"$\epsilon$" + f" = {model_params['epsilon']}\n"
+
+plt.figure(figsize=(12, 6))
+sc = plt.scatter(time_steps, opinions, c=opinions, cmap='coolwarm', alpha=0.5, s=10)
+cbar = plt.colorbar(sc)
+cbar.set_label('Opinion')
+plt.xlabel('Time (Steps)')
+plt.ylabel('Opinion')
+plt.title(title, loc='left')
+plt.xlim(time_steps.min(), time_steps.max())
+plt.ylim(-1.01, 1)
+plt.savefig('output/bounded_confidence_epsilon_one_run.png', dpi=300)
+```
+
+![Three opinion clusters forming over time in a single run of a BCM with $\epsilon$ = 5. Note the center and two extremes.](output/bounded_confidence_epsilon_one_run.png){width="75%" #fig-bounded_confidence_epsilon_one_run}
+
+
+### Experimenting with $\epsilon$
+
+Finally, let's run the simulation with different $\epsilon$ values and compare the results.
+
+<!-- Lets run the simulation with different $\epsilon$ values (e.g., -1 to 1 in steps) and collect the results in a DataFrame. The DataFrame will include an additional column to track the $\epsilon$ used in each run. -->
+
+```{python}
+def run_simulation_with_different_epsilons(model_params, epsilon_values):
+    all_results = []
+
+    for epsilon in epsilon_values:
+        model = BoundedConfidenceModel(
+            grid_width=model_params['grid_width'],
+            grid_height=model_params['grid_height'],
+            N=model_params['N'],
+            epsilon=epsilon,
+            max_agent_step_size=model_params['max_agent_step_size'],
+        )
+
+        for i in range(model_params['n_iterations']):
+            model.step()
+
+        epsilon_results = model.datacollector.get_agent_vars_dataframe().reset_index()
+        epsilon_results['Epsilon'] = epsilon  # Add epsilon to track different values
+        all_results.append(epsilon_results)
+
+    # Combine all results into a single DataFrame
+    combined_results = pd.concat(all_results, ignore_index=True)
+    return combined_results
+```
+
+Let's run the model for a range of $\epsilon$ values and then plot the results.
+
+```{python}
+epsilon_values = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+epsilon_results = run_simulation_with_different_epsilons(
+    model_params, epsilon_values
+)
+
+epsilon_results.sample(10)
+```
+
+Let's create some subplots to compare runs for each of our $\epsilon$ values.
+
+```{python}
+grouped = epsilon_results.groupby('Epsilon')
+
+fig, axs = plt.subplots(
+    11, 1,
+    figsize=(12, 30),
+    sharex=True, sharey=True,
+    constrained_layout=True
+)
+
+for (epsilon, group), ax in zip(grouped, axs):
+    time_steps = group['Step']
+    opinions = group['Opinion']
+
+    sc = ax.scatter(
+        time_steps,
+        opinions,
+        c=opinions,
+        cmap='coolwarm',
+        alpha=0.5,
+        s=10
+    )
+
+    cbar = fig.colorbar(sc, ax=ax)
+    # cbar.set_label('Opinion')
+
+    ax.set_title(r"$\epsilon$" + f" = {epsilon}", loc='left')
+
+    ax.set_xlim(time_steps.min(), time_steps.max())
+    ax.set_ylim(-1.01, 1)
+
+# custom positions for shared x and y labels
+fig.text(
+    0.5, -0.01,
+    'Time (Steps)',
+    ha='center',
+    va='center',
+    fontsize=18
+)
+
+fig.text(
+    -0.01, 0.5,
+    'Opinion',
+    ha='center',
+    va='center',
+    rotation='vertical',
+    fontsize=18
+)
+
+plt.savefig('output/epsilon_comparison_one_run.png', dpi=300)
+```
+
+![Results of a parameter sweep on $\epsilon$. Note tendencies towards fragmentation, polarization, and consensus at different $\epsilon$ values.](output/epsilon_comparison_one_run.png){width="100%" #fig-epsilon_comparison_one_run}
+
+# Conclusion
+
+We explored the basic components of agent-based models and how to implement them in Python using Mesa and icsspy, aa various techniques for analyzing the results. Through sensitivity analysis and parameter sweeps, we gained insights into how different parameters influence model outcomes.
+
+We've just scratched the surface of what's possible with agent-based models!

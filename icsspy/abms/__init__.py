@@ -1,4 +1,6 @@
-from .bounded_confidence.model import BoundedConfidenceModel
-from .threshold.model import ThresholdModel
+from .bounded_confidence import BoundedConfidenceModel
+from .sir import SIRModel
 
-__all__ = ["ThresholdModel", "BoundedConfidenceModel"]
+# from .threshold.model import ThresholdModel
+
+__all__ = ["SIRModel", "BoundedConfidenceModel"]  # ThresholdModel
