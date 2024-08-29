@@ -29,7 +29,7 @@ freeze: true
 license: "CC BY-SA"
 ---
 
-In this tutorial, we'll explore various approaches to modeling sentiment in text data. We'll start with simple dictionary-based methods for sentiment analysis, which rely on predefined lists of positive and negative words. While these methods are easy to understand and implement, they come with significant limitations. Next, we'll explore a more sophisticated approach using the VADER (Valence Aware Dictionary and Sentiment Reasoner) model, which combines dictionary-based methods with rules to improve accuracy. Third, we'll dive into transformer-based models, the state-of-the-art in sentiment analysis, which leverage deep learning to understand context and nuance in text data. Finally, we will see an example of how to do sentiment analysis within a supervised learning framework using a logistic regression classifier.
+In this tutorial, we'll explore various approaches to modeling sentiment in text data. We'll start with simple dictionary-based methods for sentiment analysis, which rely on predefined lists of positive and negative words. While these methods are easy to understand and implement, they come with significant limitations. Next, we'll explore a more sophisticated approach using the VADER (Valence Aware Dictionary and Sentiment Reasoner) model, which combines dictionary-based methods with rules to improve accuracy. Third, we'll dive into transformer-based models, the state-of-the-art in sentiment analysis, which leverage deep learning to understand context and nuance in text data.
 
 You can think of the evolution of approaches in this tutorial in the same general terms as the three waves of topic models I introduced in the previous tutorial.
 
@@ -49,9 +49,6 @@ By the end of this tutorial, you should be able to:
 3. Visualize and Interpret Sentiment Scores
     - Create histograms and bar charts to visualize sentiment distributions.
     - Compare the results of different sentiment analysis methods.
-4. Understand the Basics of Supervised Sentiment Analysis
-    - Train a supervised sentiment analysis model using annotated data.
-    - Evaluate the performance of a machine learning model on sentiment prediction tasks.
 
 # Setup
 
@@ -310,60 +307,6 @@ plt.suptitle('Distribution of Sentiment Scores')
 plt.show()
 ```
 
-
-# BONUS CONTENT: SUPERVISED LEARNING
-
-In this section, we’ll explore supervised learning for sentiment analysis using annotated data. We'll train a logistic regression model on the IMDb Movie Review dataset. This is the same data Johannes' used in his lecture content on supervised learning for text analysis.
-
-## Loading the IMDb Dataset
-
-We'll start by downloading the IMDb dataset from HuggingFace.
-
-The code block below will download the IMDB Movie Review dataset from HuggingFace.
-
-```{python}
-from datasets import load_dataset
-
-dataset = load_dataset("imdb")
-df_train = pd.DataFrame(dataset['train'])
-df_test = pd.DataFrame(dataset['test'])
-```
-
-## TF-IDF Vectorization
-
-We'll convert the text reviews into numerical features using TF-IDF.
-
-```{python}
-from sklearn.feature_extraction.text import TfidfVectorizer
-
-tfidf = TfidfVectorizer(max_features=5000)
-X_train = tfidf.fit_transform(df_train['text'])
-X_test = tfidf.transform(df_test['text'])
-```
-
-## Training a Logistic Regression Classifier
-
-Let's train a logistic regression model to classify the sentiment of the reviews.
-
-```{python}
-from sklearn.linear_model import LogisticRegression
-
-model = LogisticRegression()
-model.fit(X_train, df_train['label'])
-```
-
-## Evaluation
-
-Finally, we'll evaluate the model's performance on the test set.
-
-```{python}
-from sklearn.metrics import classification_report, accuracy_score
-
-y_pred = model.predict(X_test)
-print(f"Accuracy: {accuracy_score(df_test['label'], y_pred)}")
-print(classification_report(df_test['label'], y_pred))
-```
-
 # Conclusion
 
-It’s important to understand both the traditional and modern approaches to effectively apply them in your research, especially as transformer-based models become more common. In this tutorial notebook, we explored three different approaches to sentiment analysis: dictionary-based methods, VADER (which combines dictionary and rule-based approaches), and transformer-based models. Each method has its own strengths and weaknesses, and the choice of method should be guided by the specific requirements of your analysis. We also briefly touched on supervised learning for sentiment analysis using a logistic regression model trained on the IMDb dataset.
+It’s important to understand both the traditional and modern approaches to effectively apply them in your research, especially as transformer-based models become more common. In this tutorial notebook, we explored three different approaches to sentiment analysis: dictionary-based methods, VADER (which combines dictionary and rule-based approaches), and transformer-based models. Each method has its own strengths and weaknesses, and the choice of method should be guided by the specific requirements of your analysis.
