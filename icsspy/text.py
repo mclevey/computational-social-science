@@ -1,18 +1,24 @@
 import logging
 import os
+from itertools import chain
 from typing import Any, List, Optional, Tuple
 
+import matplotlib.pyplot as plt
 import pandas as pd
+import spacy
 from bertopic import BERTopic
 from bertopic.representation import (
     KeyBERTInspired,
     MaximalMarginalRelevance,
     PartOfSpeech,
 )
+from gensim.models import Phrases
+from gensim.models.phrases import Phraser
 from hdbscan import HDBSCAN
 from scipy.special import softmax
 from sentence_transformers import SentenceTransformer
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.preprocessing import LabelBinarizer
 from tqdm import tqdm
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, pipeline
 from umap import UMAP
@@ -464,3 +470,159 @@ def construct_entity_topic_edgelist(
     edge_df = pd.DataFrame(edge_list, columns=["topic", "entity"])
     edge_df = edge_df.groupby(["topic", "entity"]).size().reset_index(name="count")
     return edge_df
+
+
+# REFACTORING FROM DCSS
+
+
+def get_topic_word_scores(df, n_words, topic_column, all_topics=False, as_tuples=True):
+    df = df.sort_values(by=[topic_column], ascending=False)
+    if all_topics is True:
+        result = pd.concat([df.head(n_words), df.tail(n_words)]).round(4)
+    else:
+        result = pd.concat([df.head(n_words), df.tail(n_words)]).round(4)
+        result = result[topic_column]
+        if as_tuples is True:
+            result = list(zip(result.index, result))
+    return result
+
+
+def sparse_groupby(groups, sparse_m, vocabulary):
+    grouper = LabelBinarizer(sparse_output=True)
+    grouped_m = grouper.fit_transform(groups).T.dot(sparse_m)
+
+    df = pd.DataFrame.sparse.from_spmatrix(grouped_m)
+    df.columns = vocabulary
+    df.index = grouper.classes_
+
+    return df
+
+
+def bigram_process(
+    texts, nlp=None, threshold=0.75, scoring="npmi", detokenize=True, n_process=1
+):
+    if nlp is None:
+        nlp = spacy.load("en_core_web_sm")
+
+    sentences = []
+    docs = []
+
+    # sentence segmentation doesn't need POS tagging or lemmas.
+    for doc in tqdm(
+        nlp.pipe(texts, disable=["tagger", "lemmatizer", "ner"], n_process=n_process),
+        total=len(texts),
+        desc="Processing sentences",
+    ):
+        doc_sents = [
+            [
+                token.text.lower()
+                for token in sent
+                if token.text != "\n" and token.is_alpha
+            ]
+            for sent in doc.sents
+        ]
+        sentences.extend(doc_sents)
+        docs.append(doc_sents)
+
+    model = Phrases(sentences, min_count=1, threshold=threshold, scoring=scoring)
+    bigrammer = Phraser(model)
+    bigrammed_list = [
+        [bigrammer[sent] for sent in doc] for doc in tqdm(docs, desc="Applying bigrams")
+    ]
+
+    if detokenize:
+        bigrammed_list = [[" ".join(sent) for sent in doc] for doc in bigrammed_list]
+        bigrammed_list = [" ".join(doc) for doc in bigrammed_list]
+    elif detokenize == "sentences":
+        bigrammed_list = [[" ".join(sent) for sent in doc] for doc in bigrammed_list]
+    else:
+        bigrammed_list = list(chain(*bigrammed_list))
+
+    return model, bigrammed_list
+
+
+def preprocess(
+    texts, nlp=None, bigrams=False, detokenize=True, n_process=1, custom_stops=[]
+):
+    if nlp is None:
+        nlp = spacy.load("en_core_web_sm")
+
+    processed_list = []
+    allowed_postags = [92, 96, 84]  # 'NOUN', 'PROPN', 'ADJ'
+
+    if bigrams:
+        model, texts = bigram_process(texts, detokenize=True, n_process=n_process)
+
+    for doc in tqdm(
+        nlp.pipe(texts, disable=["ner", "parser"], n_process=n_process),
+        total=len(texts),
+        desc="Preprocessing documents",
+    ):
+        processed = [
+            token.lemma_
+            for token in doc
+            if not token.is_stop and len(token) > 1 and token.pos in allowed_postags
+        ]
+
+        if detokenize:
+            processed = " ".join(processed)
+            processed_list.append(processed)
+        else:
+            processed_list.append(processed)
+
+    if bigrams:
+        return model, processed_list
+    else:
+        return processed_list
+
+
+def plot_topic_distribution(topic_distr, topic_model, doc_index, filename=None):
+    """
+    Plots the topic probability distribution for a single document.
+
+    Parameters:
+    - topic_distr: The matrix of topic distributions for all documents.
+    - topic_model: The BERTopic model (or similar) used to generate the topics.
+    - doc_index: The index of the document in the topic_distr matrix to plot.
+
+    Returns:
+    - A horizontal bar chart of the topic probabilities for the specified document.
+    """
+
+    # Get the topic distribution for the specified document
+    doc_topics = topic_distr[doc_index]
+
+    # Filter out topics with zero probability
+    non_zero_topics = doc_topics > 0
+    doc_topics = doc_topics[non_zero_topics]
+
+    # Retrieve topic names or numbers
+    topic_names = [
+        f"Topic {i}: {topic_model.get_topic(i)[0][0]}"
+        for i in range(len(non_zero_topics))
+        if non_zero_topics[i]
+    ]
+
+    # Plot the horizontal bar chart
+    plt.figure(
+        figsize=(10, 8 + 0.2 * len(topic_names))
+    )  # Dynamic figure height based on number of topics
+    plt.barh(topic_names, doc_topics, color="C0")
+
+    # Set labels and title
+    plt.xlabel("\nTopic Probability")
+    plt.ylabel("")
+    plt.title(f"Topic Probability Distribution for Document {doc_index}\n", loc="left")
+
+    # Dynamically adjust the y-axis limits to avoid bars touching the plot edges
+    plt.ylim(-0.5, len(topic_names) - 0.5)
+
+    # Remove the top and bottom grid lines while keeping the x-axis grid lines
+    plt.grid(True, which="major", axis="x", linestyle="--", alpha=0.7)
+
+    # Dynamically adjust layout to avoid grid line issues at the top and bottom
+    plt.subplots_adjust(left=0.2, right=0.95, top=0.95, bottom=0.1)
+
+    # Display the plot
+    if filename is not None:
+        plt.savefig(filename, dpi=300)

@@ -39,6 +39,7 @@ pyyaml = "^6.0.1"
 arviz = "^0.19.0"
 python-louvain = "^0.16"
 ndlib = "^5.1.1"
+gensim = "^4.3.3"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.2"

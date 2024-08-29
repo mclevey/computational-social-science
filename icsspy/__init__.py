@@ -1,4 +1,4 @@
-from .paths import load_data
+from .paths import load_data, load_hansard
 from .style import set_style
 from .utils import initialize_logger, load_api_key, run_in_conda, set_torch_device
 
@@ -10,4 +10,5 @@ __all__ = [
     "run_in_conda",
     "load_data",
     "set_style",
+    "load_hansard",
 ]
