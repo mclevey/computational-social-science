@@ -310,6 +310,14 @@ plt.tight_layout()
 plt.show()
 ```
 
+Plots like this one highlight differences in how groups of people talk, or groups of documents are written, based on relative differences in the words they use. In this specific case, our plot compares the difference in proportions of word usage between the SNP and the Conservatives.
+
+The words we are comparing are on the y-axis. The x-axis shows the difference in proportions between the two parties, with a vertical line indicating 0. Negative values indicate words that are used more frequently by the SNP, whereas positive values indicate words more frequently used by the Conservatives.
+
+Each dot represents a word, and its position on the x-axis indicates the extent to which that word is used by one party relative to the other. For example, words like "scotland", "scottish", and "brexit" are on the far left, indicating that these terms are more commonly used by the SNP than by the Conservative Party.^[Obviously, the positive and negative signs are arbitrary.] On the other hand, words like "eu", "policy", and "impact" are on the right side, suggesting these are more commonly used by the Conservative Party. The further a dot is from the red line (0), the larger the difference in usage between the two parties. Words closer to the red line (0) have less different usage and could be used similarly by both parties.
+
+Try running this analysis this with other search terms!
+
 # First Wave Topic Models: Latent Semantic Analysis (LSA)
 
 Latent Semantic Analysis (LSA) is an early method for uncovering latent structures in text data. It uses dimensionality reduction methods -- specifically truncated Singular Value Decomposition (SVD) -- to decompose a (normalized) term-document matrix into a set of orthogonal components that are interpreted as latent topics.^[Why TF-IDF and normalization for LSA? LSA works by decomposing the term-document matrix (often a TF-IDF matrix) into a set of orthogonal factors, each of which represents a latent semantic dimension. By normalizing the TF-IDF matrix (e.g., applying L2 normalization to each document vector, as we have here), we make sure that each document contributes equally to the latent space, which is useful when there is variation in document lengths (which we saw in our data processing step). This improves the interpretability of the resulting semantic dimensions.] First, let's create a TF-IDF matrix, which, to oversimplify things, weights word counts by how common they are across documents.
