@@ -17,6 +17,7 @@ package.json
 slides/output/
 **/*_files/
 *.tar
+archive/
 
 # Environment variables (api keys, etc.)
 .env
