@@ -35,6 +35,8 @@ August 30 - September 6, 2024
 
 # Download the Course Materials
 
+> **Please consult the detailed [setup guide](setup/setup-guide.md) for more information.** If you run into any problems, I'll help you get them sorted in the live sessions or on the course forums on the Moodle site.
+
 ## VS Code
 
 The easiest way to get the course material is to clone this repository. If you aren’t already familiar with git, I recommend doing this via VS Code. Once you've downloaded VS Code and set it up according to the setup guide, you can clone the repo by
