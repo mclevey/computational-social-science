@@ -137,7 +137,7 @@ gt.graph_draw(
 :::
 
 ::: {.column width="32%"}
-![We could ignore isolates and rotate the graph's position.](../notebooks/4-computational-network-analysis/output/polblogs_0.png){width=100% #fig-polblogs_0}
+![We could ignore isolates and rotate the graph's position.](../notebooks/output/polblogs_0.png){width=100% #fig-polblogs_0}
 :::
 ::::
 
@@ -172,7 +172,7 @@ gt.graph_draw(
 :::
 
 ::: {.column width="32%"}
-![The giant component.](../notebooks/4-computational-network-analysis/output/polblogs_2.png){width=100% #fig-polblogs_2}
+![The giant component.](../notebooks/output/polblogs_2.png){width=100% #fig-polblogs_2}
 :::
 ::::
 
@@ -213,7 +213,7 @@ blockstate_level_0.draw(
 :::
 
 ::: {.column width="32%"}
-![The default force-directed layout with a Nested SBM for community detection.](../notebooks/4-computational-network-analysis/output/polblogs_3.png){width=100% #fig-polblogs_3}
+![The default force-directed layout with a Nested SBM for community detection.](../notebooks/output/polblogs_3.png){width=100% #fig-polblogs_3}
 :::
 ::::
 
@@ -258,7 +258,7 @@ We'll pass `blockstate_level_0.b` (block assignments) to `sfdp_layout()`. The `.
 
 ##
 
-![Let's rotate the graph and then re-draw it.](../notebooks/4-computational-network-analysis/output/polblogs_4.png){width=45% #fig-polblogs_4}
+![Let's rotate the graph and then re-draw it.](../notebooks/output/polblogs_4.png){width=45% #fig-polblogs_4}
 
 ```python
 pos_refined = rotate_positions(pos_refined, 45)
@@ -267,7 +267,7 @@ pos_refined = rotate_positions(pos_refined, 45)
 
 ##
 
-![😌 Look at that!](../notebooks/4-computational-network-analysis/output/polblogs_5.png){width=60% #fig-polblogs_5}
+![😌 Look at that!](../notebooks/output/polblogs_5.png){width=60% #fig-polblogs_5}
 
 
 ##
@@ -308,7 +308,7 @@ blockstate.draw(
 :::
 
 ::: {.column width="35%"}
-![We could still improve this...](../notebooks/4-computational-network-analysis/output/polblogs_7.png){#fig-polblogs_7}
+![We could still improve this...](../notebooks/output/polblogs_7.png){#fig-polblogs_7}
 :::
 ::::
 
@@ -353,7 +353,7 @@ blockstate.draw(
 :::
 
 ::: {.column width="35%"}
-![Much better!](../notebooks/4-computational-network-analysis/output/polblogs_8.png){#fig-polblogs_8}
+![Much better!](../notebooks/output/polblogs_8.png){#fig-polblogs_8}
 :::
 ::::
 

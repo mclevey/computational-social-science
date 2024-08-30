@@ -274,7 +274,7 @@ Reducing physical contact reduces the **effective transmission rate** of a disea
 
 
 <!--
-```{python}
+```python
 #| echo: false
 import yaml
 with open('_variables.yml', 'r') as file:

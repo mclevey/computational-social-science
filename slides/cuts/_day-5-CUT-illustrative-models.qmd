@@ -1,6 +1,6 @@
 ## Model 3
 
-```{python}
+```python
 model_3_params = params.get('model_3')
 pprint(model_3_params['max_agent_step_size'])
 
@@ -15,7 +15,7 @@ pprint(model_6_params['max_agent_step_size'])
 ```
 
 
-```{python}
+```python
 model_3 = SIRModel(
     n_initial_infections = model_3_params['n_initial_infections'],
     grid_width = model_3_params['grid_width'],
@@ -34,7 +34,7 @@ m3res = model_3.datacollector.get_model_vars_dataframe()
 
 ##
 
-```{python}
+```python
 model_4 = SIRModel(
     n_initial_infections = model_4_params['n_initial_infections'],
     grid_width = model_4_params['grid_width'],
@@ -54,7 +54,7 @@ m4res = model_4.datacollector.get_model_vars_dataframe()
 
 ##
 
-```{python}
+```python
 model_5 = SIRModel(
     n_initial_infections = model_5_params['n_initial_infections'],
     grid_width = model_5_params['grid_width'],
@@ -73,7 +73,7 @@ m5res = model_5.datacollector.get_model_vars_dataframe()
 
 ##
 
-```{python}
+```python
 model_6 = SIRModel(
     n_initial_infections = model_6_params['n_initial_infections'],
     grid_width = model_6_params['grid_width'],
@@ -94,7 +94,7 @@ m6res = model_6.datacollector.get_model_vars_dataframe()
 
 Plot the results
 
-```{python}
+```python
 fig, ax = plt.subplots()
 ax.plot(m3res['Infected'], label=f'Max Agent Steps: {model_3_params['max_agent_step_size']}')
 ax.plot(m4res['Infected'], label=f'Max Agent Steps: {model_4_params['max_agent_step_size']}')
@@ -110,7 +110,7 @@ plt.savefig('media/sir_compare_models_3-6.png')
 
 <!-- UPDATE _VARIABLES -->
 
-```{python}
+```python
 #| echo: false
 from icsspy.utils import update_quarto_variables
 

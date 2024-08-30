@@ -168,7 +168,7 @@ You can't read the labels, but there is some apparent clustering of job titles i
 :::
 
 ::: {.column width="30%"}
-![Model 1 Hierarchical Structure](../notebooks/4-computational-network-analysis/output/enron_model_1.png){width=100% #fig-enron_model_1}
+![Model 1 Hierarchical Structure](../notebooks/output/enron_model_1.png){width=100% #fig-enron_model_1}
 :::
 ::::
 
@@ -205,7 +205,7 @@ vertex_data.head(10)
 
 :::: {.columns}
 ::: {.column width="49%"}
-{{< include ../notebooks/4-computational-network-analysis/output/vertex_data_1.md >}}
+{{< include ../notebooks/output/vertex_data_1.md >}}
 
 ...
 :::
@@ -273,7 +273,7 @@ Given that this data is over-dispersed (i.e., the variance is greater than the m
 :::
 
 ::: {.column width="45%"}
-![As you can see, the edge weights are highly skewed with a heavy tail. Since these are *directed edges*, each edge is a count of the number of times $i$ sent an email to $j$. This means that most Enron employees in the dataset (~90%) did not send more than ~125 emails to any given person, but a minority of employees sent as many as ~2,000 emails to the same person!](../notebooks/4-computational-network-analysis/output/enron_edge_weight_ecdf.png){width=100% #fig-enron_edge_weight_ecdf}
+![As you can see, the edge weights are highly skewed with a heavy tail. Since these are *directed edges*, each edge is a count of the number of times $i$ sent an email to $j$. This means that most Enron employees in the dataset (~90%) did not send more than ~125 emails to any given person, but a minority of employees sent as many as ~2,000 emails to the same person!](../notebooks/output/enron_edge_weight_ecdf.png){width=100% #fig-enron_edge_weight_ecdf}
 :::
 ::::
 
@@ -329,7 +329,7 @@ draw_state(model_2, g, hvprops, heprops)
 :::
 
 ::: {.column width="30%"}
-![Model 2 Hierarchical Structure](../notebooks/4-computational-network-analysis/output/enron_model_2.png){width=100% #fig-enron_model_2}
+![Model 2 Hierarchical Structure](../notebooks/output/enron_model_2.png){width=100% #fig-enron_model_2}
 :::
 ::::
 
@@ -396,7 +396,7 @@ plot_line_comparison(
 
 <br>
 
-![Models 1 and 2 MDL Comparison](../notebooks/4-computational-network-analysis/output/model_comparison_mdl_M1_M2.png){width=60% #fig-model_comparison_mdl_M1_M2}
+![Models 1 and 2 MDL Comparison](../notebooks/output/model_comparison_mdl_M1_M2.png){width=60% #fig-model_comparison_mdl_M1_M2}
 
 
 ## Model 2: A Nested SBM with Edge Weights
@@ -437,7 +437,7 @@ plot_line_comparison(
 
 <br>
 
-![Models 1 and 2 homogeneity scores](../notebooks/4-computational-network-analysis/output/model_comparison_homogeneity_M1_M2.png){width=60% #fig-model_comparison_homogeneity_M1_M2}
+![Models 1 and 2 homogeneity scores](../notebooks/output/model_comparison_homogeneity_M1_M2.png){width=60% #fig-model_comparison_homogeneity_M1_M2}
 
 ## Model 3: Weighted, Poisson-distributed, Refined
 
@@ -504,7 +504,7 @@ How thoroughly we search the posterior distribution depends on all three of thes
 
 :::: {.columns}
 ::: {.column width="40%"}
-![Model 3 Hierarchical Structure](../notebooks/4-computational-network-analysis/output/enron_model_3.png){width=100% #fig-enron_model_3}
+![Model 3 Hierarchical Structure](../notebooks/output/enron_model_3.png){width=100% #fig-enron_model_3}
 :::
 
 ::: {.column width="5%"}
@@ -547,7 +547,7 @@ plot_line_comparison(
 
 <br>
 
-![Models 1-3 MDL Comparison](../notebooks/4-computational-network-analysis/output/model_comparison_mdl_M1_M2_M3.png){width=50% #fig-model_comparison_mdl_M1_M2_M3}
+![Models 1-3 MDL Comparison](../notebooks/output/model_comparison_mdl_M1_M2_M3.png){width=50% #fig-model_comparison_mdl_M1_M2_M3}
 
 
 ## Model 3: Weighted, Poisson-distributed, Refined
@@ -571,7 +571,7 @@ plot_line_comparison(
 
 <br>
 
-![Models 1-3 Homogeneity Comparison](../notebooks/4-computational-network-analysis/output/model_comparison_homogeneity_M1_M2_M3.png){width=50% #fig-model_comparison_homogeneity_M1_M2_M3}
+![Models 1-3 Homogeneity Comparison](../notebooks/output/model_comparison_homogeneity_M1_M2_M3.png){width=50% #fig-model_comparison_homogeneity_M1_M2_M3}
 
 ## Posterior Inference
 
@@ -630,7 +630,7 @@ plot_line_comparison(
     filename = 'output/model_comparison_mdl_M1_M2_M3_M4.png')
 ```
 
-![Models 1-4 MDL Comparison](../notebooks/4-computational-network-analysis/output/model_comparison_mdl_M1_M2_M3_M4.png){width=50% #fig-model_comparison_mdl_M1_M2_M3_M4}
+![Models 1-4 MDL Comparison](../notebooks/output/model_comparison_mdl_M1_M2_M3_M4.png){width=50% #fig-model_comparison_mdl_M1_M2_M3_M4}
 
 
 ##
@@ -682,7 +682,7 @@ vertex_data['MargProbsConsPart'] = vertex_data['VertexID'].map(m4_vertex_margina
 
 ### Model 4: Weighted, Poisson-distributed, Consensus Partition
 
-{{< include ../notebooks/4-computational-network-analysis/output/vertex_data_M1-M4.md >}}
+{{< include ../notebooks/output/vertex_data_M1-M4.md >}}
 
 
 
@@ -710,7 +710,7 @@ plot_line_comparison(
     filename = 'output/model_comparison_homogeneity_M1_M2_M3_M4.png')
 ```
 
-![Models 1-4 Homogeneity Comparison](../notebooks/4-computational-network-analysis/output/model_comparison_homogeneity_M1_M2_M3_M4.png){width=50% #fig-model_comparison_homogeneity_M1_M2_M3_M4}
+![Models 1-4 Homogeneity Comparison](../notebooks/output/model_comparison_homogeneity_M1_M2_M3_M4.png){width=50% #fig-model_comparison_homogeneity_M1_M2_M3_M4}
 
 
 
@@ -735,7 +735,7 @@ model_4.draw(
 
 ##
 
-![Models 4 with marginal probabilities of block assignments. If you look at the nodes in the observed network, you'll see that most are a solid color, not pie fractions. That is because our model is *very* confident that most nodes are classified into the best partition. In general, this is looking good.](../notebooks/4-computational-network-analysis/output/enron_model_4.png){width=45% #fig-enron_model_4}
+![Models 4 with marginal probabilities of block assignments. If you look at the nodes in the observed network, you'll see that most are a solid color, not pie fractions. That is because our model is *very* confident that most nodes are classified into the best partition. In general, this is looking good.](../notebooks/output/enron_model_4.png){width=45% #fig-enron_model_4}
 
 
 ##

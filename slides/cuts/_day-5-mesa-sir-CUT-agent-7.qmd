@@ -1,6 +1,6 @@
 
 <!-- Hidden code below produces the grid walk figure earlier in the lecture. -->
-```{python}
+```python
 #| echo: false
 
 # get agent 7 (low step size)

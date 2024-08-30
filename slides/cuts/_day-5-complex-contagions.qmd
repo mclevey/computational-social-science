@@ -20,7 +20,7 @@
 
 ## Imports
 
-```{python}
+```python
 import networkx as nx
 import numpy as np
 import pandas as pd
@@ -75,13 +75,13 @@ Example ODD Protocol for Threshold Model<br>$\longleftarrow$
 
 ## [(A Bad)]{.nord-light} Simulated Network Society
 
-```{python}
+```python
 G = nx.connected_watts_strogatz_graph(n=100, k=6, p=0.5, seed=42)
 ```
 
 Visualize
 
-```{python}
+```python
 fig, axes = plt.subplots(1, 2, figsize=(15, 7))
 
 # Subplot 1: Graph
@@ -118,7 +118,7 @@ plt.savefig("media/G_subplots.png", dpi=300)
 
 <!-- from _day-5-copenhagen-networks-study-sbm.qmd -->
 
-```{python}
+```python
 df = pd.read_csv('output/cns_sms_edgelist.csv')
 G = nx.from_pandas_edgelist(df, 'source', 'target')
 G = G.to_undirected()
@@ -140,7 +140,7 @@ len(G.nodes()), len(G.edges())
 
 ## Understanding Threshold Distributions
 
-```{python}
+```python
 threshold_pairs = [
     (2, 2), (2, 4), (2, 6), (2, 8), (2, 10),
     (2, 12), (2, 14), (2, 16), (4, 2), (6, 2),
@@ -182,7 +182,7 @@ plt.savefig("media/thresholds.png", dpi=300)
 
 Parameters for the [(custom)]{.nord-light} batch run. Put this in the \_variables.qmd?
 
-```{python}
+```python
 # num_initial_agree_values
 num_initial_agree_values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25]
 # num_initial_agree_values = range(1, 50, 2)
@@ -201,7 +201,7 @@ saturation_point = 0.95
 
 Using `run_threshold_model_experiment()` from the course package because `run_batch()` doesn't work well with NetworkGrids (likely a bug).
 
-```{python}
+```python
 results_df = run_threshold_model_experiment(
     G,
     num_initial_agree_values,
@@ -215,7 +215,7 @@ results_df = run_threshold_model_experiment(
 results_df
 ```
 
-```{python}
+```python
 #| echo: false
 from icsspy.utils import markdown_table
 md = markdown_table(results_df.head(10), 'tables/_threshold_models.md')
@@ -226,7 +226,7 @@ print(md)
 
 ## Experiment 1
 
-```{python}
+```python
 # no. subplots based on no. of unique 'num_initial_agree' values
 unique_initial_agrees = results_df['num_initial_agree'].unique()
 num_plots = len(unique_initial_agrees)
@@ -294,7 +294,7 @@ In this plot, we're examining the effect of varying the number of initially agre
 
 ## Experiment 2
 
-```{python}
+```python
 # num_initial_agree_values
 num_initial_agree_values = [10, 20, 30, 40, 50, 60, 70, 80, 90]
 
@@ -312,7 +312,7 @@ saturation_point = 0.95
 
 ## Experiment 2
 
-```{python}
+```python
 results_df = run_threshold_model_experiment(
     G,
     num_initial_agree_values,
@@ -327,7 +327,7 @@ results_df = run_threshold_model_experiment(
 
 ## Experiment 2
 
-```{python}
+```python
 # create a column to represent each combination of (alpha, beta)
 results_df['alpha_beta'] = results_df.apply(lambda row: f"α={row['threshold_alpha']}, β={row['threshold_beta']}", axis=1)
 

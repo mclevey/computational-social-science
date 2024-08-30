@@ -6,7 +6,7 @@
 
 ##
 
-```{python}
+```python
 import icsspy
 import seaborn as sns
 import random
@@ -21,14 +21,14 @@ import icsspy.plotting as plotting
 icsspy.set_style()
 ```
 
-```{python}
+```python
 #| echo: false
 from icsspy.utils import markdown_table
 pd.set_option('display.float_format', lambda x: '%.0f' % x)
 # plt.rcParams['text.usetex'] = True
 ```
 
-```{python}
+```python
 bluetooth_contact = icsspy.load_data('cns_bluetooth_filtered')
 
 # RSSI values are negative; drop 1 incorrectly recorded observation
@@ -37,7 +37,7 @@ bluetooth_contact.head(10)
 type(bluetooth_contact['# timestamp'])
 ```
 
-```{python}
+```python
 #| echo: false
 bluetooth_contact['# timestamp'].astype(str)
 md = markdown_table(bluetooth_contact.head(10), 'tables/_cns_bluetooth_df.md')
@@ -52,7 +52,7 @@ print(md)
 - The timestamps are relative; we need to provide an arbitrary start date so we can more easily work with datetime objects, etc.
 - or maybe easier to just use these values?
 
-```{python}
+```python
 # arbitrarily the study started on January 1, 2019, at midnight
 arbitrary_start_date = pd.to_datetime('2019-01-01')
 
@@ -68,11 +68,11 @@ bluetooth_contact.sample(10)
 
 Let's convert the RSSI values to an estimated distance (meters). We'll use the Log-Distance Path Loss Model [@rappaport2002wireless] to do this, but it will be imperfect because we can't adjust the parameters based on the environmental context (indoors, outdoors, etc.) since we don't know that information. The conversion to meters is done using the model below.
 
-```{python}
+```python
 bluetooth_contact['estimated_meters'] = estimate_meters_from_rssi(bluetooth_contact, 'rssi')
 ```
 
-```{python}
+```python
 sns.ecdfplot(bluetooth_contact['estimated_meters'])
 plt.xticks(range(0, 11))
 plt.grid(True, which='both', axis='x')
@@ -87,7 +87,7 @@ plt.savefig('media/cns_ecdf_rssi_edges.png', dpi=300)
 
 Let's pick a pair of participants who spent a lot of time together. We'll convert their RSSI values to estimated distance (meters) and plot their physical proximity to one another every 5 minutes over a 2 week stretch (1/2 the study).
 
-```{python}
+```python
 bluetooth_contact['user_pair'] = bluetooth_contact.apply(
     lambda row: tuple(sorted([row['user_a'], row['user_b']])), axis=1
 )
@@ -99,7 +99,7 @@ pair_counts.head(10)
 
 We'll work with the top pair.
 
-```{python}
+```python
 frequent_pair = pair_counts.iloc[0]
 user1, user2 = frequent_pair['user_pair']
 print(f"Selected users with frequent interactions: {user1} and {user2}")
@@ -109,7 +109,7 @@ print(f"Selected users with frequent interactions: {user1} and {user2}")
 
 Filter the dataframe to their interactions.
 
-```{python}
+```python
 pair_proximity = bluetooth_contact[
     ((bluetooth_contact['user_a'] == user1) & (bluetooth_contact['user_b'] == user2)) |
     ((bluetooth_contact['user_a'] == user2) & (bluetooth_contact['user_b'] == user1))
@@ -124,7 +124,7 @@ pair_proximity.head()
 
 Create a timeseries with 5-minute intervals; NaN if not present.
 
-```{python}
+```python
 time_range = pd.date_range(
     start=pair_proximity['processed_timestamp'].min().floor('min'),
     end=pair_proximity['processed_timestamp'].max().ceil('min'),
@@ -152,7 +152,7 @@ Now let's plot the estimated distances between these two users over time.
 
 We'll use the `plot_distance_per_day()` function from the course package, since the code to produce this figure is fairly complex and the specifics are beyond the scope of this course (and irrelevant to the task at hand anyway).
 
-```{python}
+```python
 plotting.plot_distance_per_day(
     merged_df,
     time_col='processed_timestamp',
@@ -191,7 +191,7 @@ We can sample from **any** probability distribution, however simple [(e.g., Gaus
 
 <br>
 
-```{python}
+```python
 import numpy as np
 
 mu = 0
@@ -223,7 +223,7 @@ Bayesian Data Analysis (BDA) in Python with [PyMC]{.kn-blue}, [ArViz]{.kn-blue},
 - construct relations at time points
 - then after that, simulate
 
-```{python}
+```python
 bt_symmetric = icsspy.load_data('CNS-figshare/bt_symmetric')
 bt_symmetric
 ```
@@ -239,7 +239,7 @@ Notes:
 Empty scans are marked with user B = -1 and RSSI = 0
 Scans of devices outside of the experiment are marked with user B = -2. All non-experiment devices are given the same ID. -->
 
-```{python}
+```python
 # pre-process the bt data
 # Empty scans are marked with user B = -1 and RSSI = 0
 # Scans of devices outside of the experiment are marked with user B = -2. All non-experiment devices are given the same ID.
@@ -251,7 +251,7 @@ bt_symmetric
 
 - Have to go to meetings; pick up back here.
 
-```{python}
+```python
 
 ```
 
@@ -281,7 +281,7 @@ bt_symmetric
 :::
 
 ::: {.column width="40%"}
-```{python}
+```python
 g_bt = gt.collection.ns["copenhagen/bt"]
 g_sms = gt.collection.ns["copenhagen/sms"]
 g_calls = gt.collection.ns["copenhagen/calls"]
@@ -291,7 +291,7 @@ g_fb_friends = gt.collection.ns["copenhagen/fb_friends"]
 ::::
 <!--
 
-```{python}
+```python
 bt_edges = []
 
 for e in g_bt.edges():
@@ -299,7 +299,7 @@ for e in g_bt.edges():
     print(ids, e, g_bt.ep.timestamp[e])
 ```
 
-```{python}
+```python
 for prop_name, prop_map in g_bt.edge_properties.items():
     print(f"Property name: {prop_name}, Property type: {prop_map}")
 
@@ -309,7 +309,7 @@ for prop_name, prop_map in g_bt.vertex_properties.items():
 
 -->
 
-```{python}
+```python
 import graph_tool.all as gt
 g_fb_friends = gt.collection.ns["copenhagen/fb_friends"]
 
@@ -335,7 +335,7 @@ state.draw(
 ```
 
 
-```{python}
+```python
 g_fb_friends = gt.Graph(g_fb_friends, directed=False)
 state = gt.minimize_nested_blockmodel_dl(g_fb_friends)
 
@@ -351,7 +351,7 @@ state.draw(
 )
 ```
 
-```{python}
+```python
 hvprops = {
     "fill_color": "#2e3440",
     "size": 30,
@@ -375,7 +375,7 @@ state.draw(
 
 SMS
 
-```{python}
+```python
 for prop_name, prop_map in g_sms.ep.items():
     print(f"Vertex Property: {prop_name}")
 ```
@@ -383,7 +383,7 @@ for prop_name, prop_map in g_sms.ep.items():
 
 FILTERED SMS
 
-```{python}
+```python
 start_time = 1_000_000
 end_time = 2_500_000
 
@@ -394,11 +394,11 @@ print(f"The range covers approximately {days:.2f} days.")
 ```
 
 
-```{python}
+```python
 g_sms
 ```
 
-```{python}
+```python
 # Access the timestamp edge property
 timestamp_property = g_sms.ep["timestamp"]
 
@@ -417,7 +417,7 @@ for e in g_sms.edges():
 ```
 
 
-```{python}
+```python
 # Apply the edge filter to create a subgraph view
 filtered_graph = gt.GraphView(g_sms, efilt=edge_filter)
 filtered_graph = gt.extract_largest_component(filtered_graph, prune=True)
@@ -428,22 +428,22 @@ filtered_graph = gt.extract_largest_component(filtered_graph, prune=True)
 # Now you can work with `filtered_graph` as a subgraph containing only the edges within the desired timestamp range
 ```
 
-```{python}
+```python
 filtered_graph = gt.Graph(filtered_graph, directed=False)
 ```
 
 
-```{python}
+```python
 state = gt.minimize_blockmodel_dl(filtered_graph)
 ```
 
-```{python}
+```python
 state.draw(output='media/cns_sms_filtered.png')
 state.draw()
 ```
 
 
-```{python}
+```python
 # Open a file to write the edgelist
 with open("output/cns_sms_edgelist.csv", "w") as f:
     # Optionally, write the header
@@ -462,7 +462,7 @@ with open("output/cns_sms_edgelist.csv", "w") as f:
 Generate Synthetic Networks from this Filtered CNS SMS Network
 
 ::: {.column width="50%"}
-```{python}
+```python
 synthetic_filtered_graph = gt.generate_sbm(
   state.b.a,
   state.get_matrix(),
