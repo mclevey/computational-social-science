@@ -82,11 +82,11 @@ cd slides
 - Lecture 5 Slides: `quarto preview day-5.qmd`
 - Lecture 6 Slides: `quarto preview day-6.qmd`
 
-Quarto will compile the source code and open the slides in a browser tab. Note that some lectures may take a while to compile, especially if you have code execution on. If you do have code execution on, you'll need to activate the course virtual environment before running the Quarto commands. More information about this is available in [the setup guide](notebooks/2024-GESIS-1-setup.qmd).
+Quarto will compile the source code and open the slides in a browser tab. Note that some lectures may take a while to compile, especially if you have code execution on. If you do have code execution on, you'll need to activate the course virtual environment before running the Quarto commands. More information about this is available in [the setup guide](setup/setup-guide.md).
 
 # Required Software
 
-See the [setup guide](notebooks/2024-GESIS-1-setup.qmd) for detailed instructions on how to setup the required software for this course.
+See the [setup guide](setup/setup-guide.md) for detailed instructions on how to setup the required software for this course.
 
 - [VS Code](https://code.visualstudio.com) (text editor / IDE)
 - Python 3.11+ (via [Miniconda](https://docs.anaconda.com/miniconda/))
@@ -94,13 +94,7 @@ See the [setup guide](notebooks/2024-GESIS-1-setup.qmd) for detailed instruction
 
 # Course Virtual Environment
 
-There is a virtual environment you can use to easily access all the packages we will use in this course. If you are familiar with virtual environments, you can install and activate the environment as follows. More detailed instructions are provided in the lecture videos.
-
-```{zsh}
-cd computational-social-science
-conda env create -f setup/graphtool.yaml
-conda activate gt
-```
+There is a virtual environment you can use to easily access all the packages we will use in this course. Please follow the instructions in the [setup guide](setup/setup-guide.md).
 
 # Contributing to the Course Development
 
