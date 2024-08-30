@@ -28,7 +28,7 @@ August 30 - September 6, 2024
 | ----- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ----------- |
 | Day 1 | Introduction to Computational Social Science | [1.1](setup/setup-guide.md)                                                                                                      | Moodle Site |
 | Day 2 | Obtaining Data                               | [2.1](notebooks/2024-GESIS-2-1-obtaining-data-scraping.qmd), [2.2](notebooks/2024-GESIS-2-2-obtaining-data-apis.qmd)             | Moodle Site |
-| Day 3 | Computational Text Analysis                  | [3.1](notebooks/2024-GESIS-3-1-text-analysis-foundations.qmd), [3.2](notebooks/2024-GESIS-3-2-text-analysis-transformers.qmd)    | Moodle Site |
+| Day 3 | Computational Text Analysis                  | [3.1](notebooks/2024-GESIS-3-1-text-modelling-sentinment.qmd), [3.2](notebooks/2024-GESIS-3-2-text-modelling-topics.qmd)         | Moodle Site |
 | Day 4 | Computational Network Analysis               | [4.1](notebooks/2024-GESIS-4-1-network-analysis-political-blogs.qmd), [4.2](notebooks/2024-GESIS-4-2-network-analysis-enron.qmd) | Moodle Site |
 | Day 5 | Social Simulation & Agent-based Models       | [5.1](notebooks/2024-GESIS-5-1-abms.qmd)                                                                                         | Moodle Site |
 | Day 6 | Project Work Day and Outlook                 | [6.1](notebooks/2024-GESIS-6-1-project.qmd)                                                                                      | Moodle Site |
