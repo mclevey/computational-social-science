@@ -1,32 +1,8 @@
----
-title: "Setup Guide"
-description: "Introduction to Computational Social Science (Python), GESIS Fall Seminar 2024"
-author:
-  - name: John McLevey
-    url: https://johnmclevey.com
-    email: john.mclevey@uwaterloo.ca
-    corresponding: true
-    affiliations:
-      - name: University of Waterloo
-date: "08/26/2024"
-date-modified: last-modified
-categories:
-  - Python
-  - GESIS
-  - computational social science
-  - data science
-tags:
-  - Python
-  - GESIS
-  - computational social science
-  - data science
-bibliography: references.bib
-reference-location: margin
-citation-location: margin
-toc: true
-freeze: true
-license: "CC BY-SA"
----
+# Setup Guide
+
+- John McLevey
+- University of Waterloo
+- GESIS Fall Seminar, 2024
 
 To set up your computing environment for this course, you will need to complete the following steps:
 
@@ -56,7 +32,6 @@ Step-by-Step Instructions:
    - **Windows:** Run the downloaded `.exe` file. Follow the installation prompts.
 
 If your installer asks you if you want to add VS Code to your PATH, say yes. :)
-
 
 3. **Open VS Code:**
 
@@ -185,7 +160,6 @@ Step-by-Step Instructions:
      ```
    - **Windows:** Run the downloaded `.exe` file and follow the installation prompts.
 
-
 3. **Verify Installation:**
 
    - Check that Quarto is installed by typing:
@@ -199,7 +173,6 @@ Step-by-Step Instructions:
 # Set up the Course Virtual Environment
 
 Now that you have all the necessary tools installed, the final step is to set up the virtual environment for this course. This virtual environment will contain all the Python packages you'll need, ensuring that everyone in the course has a consistent setup.
-
 
 Step-by-Step Instructions:
 
@@ -229,6 +202,7 @@ This process was different in an earlier version of these course materials. Plea
      ```
 
 3. **Activate the Conda Environment:**
+
    - Activate your new environment:
      ```bash
      conda activate gt
@@ -240,12 +214,11 @@ This process was different in an earlier version of these course materials. Plea
 Complete these steps with your `gt` conda environment activated!
 :::
 
-   - From the root of the course materials directory (`cd computational-social-science`):
-     ```bash
-     poetry install
-     ```
-   - This command will install all the required dependencies into your activated `gt` environment.
-
+- From the root of the course materials directory (`cd computational-social-science`):
+  ```bash
+  poetry install
+  ```
+- This command will install all the required dependencies into your activated `gt` environment.
 
 If you encounter any issues, ensure that your environment is activated and that all packages are installed correctly.
 
