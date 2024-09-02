@@ -32,3 +32,12 @@ August 30 - September 6, 2024
 | Day 4 | Computational Network Analysis               | [4.1](notebooks/2024-GESIS-4-1-network-analysis-political-blogs.qmd), [4.2](notebooks/2024-GESIS-4-2-network-analysis-enron.qmd) | Moodle Site |
 | Day 5 | Social Simulation & Agent-based Models       | [5.1](notebooks/2024-GESIS-5-1-abms.qmd)                                                                                         | Moodle Site |
 | Day 6 | Project Work Day and Outlook                 | [6.1](notebooks/2024-GESIS-6-1-project.qmd)                                                                                      | Moodle Site |
+
+
+# Access the Course Materials (GitHub CodeSpaces)
+
+> **Please consult the detailed [setup guide](setup/setup-guide.md) for more information.** If you run into any problems, I'll help you get them sorted in the live sessions or on the course forums on the Moodle site.
+
+# Required Accounts and Software
+
+You will need a GitHub account to use the course materials in GitHub CodeSpaces. That's all you need, but you may want to download and install VS Code on your machine instead of working with VS Code in your browser. See the [setup guide](setup/setup-guide.md) for detailed instructions.
