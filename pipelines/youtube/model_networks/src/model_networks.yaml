@@ -1,0 +1,10 @@
+# Add more later... :/
+one_mode_channel_networks:
+  'channels_MicrosoftResearch_entity_entity_[videos]': 'channels_MicrosoftResearch_entity_entity_[videos]'
+  'channels_datasocietyresearchinstitu1085_entity_entity_[videos]': 'channels_datasocietyresearchinstitu1085_entity_entity_[videos]'
+  'channels_PyData_entity_entity_[videos]': 'channels_PyData_entity_entity_[videos]'
+  'channels_EuroPythonConference_entity_entity_[videos]': 'channels_EuroPythonConference_entity_entity_[videos]'
+  'channels_talksatgoogle_entity_entity_[videos]': 'channels_talksatgoogle_entity_entity_[videos]'
+two_mode_channel_networks:
+one_mode_comment_networks:
+two_mode_comment_networks:

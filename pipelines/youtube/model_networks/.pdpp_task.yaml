@@ -1,0 +1,30 @@
+!!python/object:pdpp.tasks.standard_task.StandardTask
+dep_files:
+  construct_channel_networks: !!python/object:pdpp.templates.dep_dataclass.dep_dataclass
+    dir_list: []
+    file_list:
+    - channels_talksatgoogle_[bipartite]_entity_topic_network.gt
+    - channels_EuroPythonConference_entity_entity_[videos].gt
+    - channels_EuroPythonConference_[bipartite]_entity_topic_network.gt
+    - channels_datasocietyresearchinstitu1085_[bipartite]_entity_topic_network.gt
+    - channels_talksatgoogle_entity_entity_[topics].gt
+    - channels_all_entity_entity_wels_[topics].csv
+    - channels_PyData_[bipartite]_entity_topic_network.gt
+    - channels_EuroPythonConference_entity_entity_[topics].gt
+    - channels_datasocietyresearchinstitu1085_entity_entity_[videos].gt
+    - channels_MicrosoftResearch_entity_entity_[topics].gt
+    - channels_MicrosoftResearch_entity_entity_[videos].gt
+    - channels_datasocietyresearchinstitu1085_entity_entity_[topics].gt
+    - channels_MicrosoftResearch_[bipartite]_entity_topic_network.gt
+    - channels_PyData_entity_entity_[topics].gt
+    - channels_[bipartite]_all_entity_entity_wels.csv
+    - channels_talksatgoogle_entity_entity_[videos].gt
+    - channels_PyData_entity_entity_[videos].gt
+    - channels_all_entity_entity_wels_[videos].csv
+    task_name: construct_channel_networks
+    task_out: output
+enabled: true
+language: Python
+src_files:
+- model_networks.py
+target_dir: model_networks

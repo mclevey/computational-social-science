@@ -1,0 +1,19 @@
+!!python/object:pdpp.tasks.standard_task.StandardTask
+dep_files:
+  _import_: !!python/object:pdpp.templates.dep_dataclass.dep_dataclass
+    dir_list: []
+    file_list:
+    - config.yaml
+    task_name: _import_
+    task_out: ./
+  collect_channel_ids: !!python/object:pdpp.templates.dep_dataclass.dep_dataclass
+    dir_list: []
+    file_list:
+    - channel_ids.csv
+    task_name: collect_channel_ids
+    task_out: output
+enabled: true
+language: Python
+src_files:
+- collect_channel_data.py
+target_dir: collect_channel_data

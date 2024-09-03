@@ -1,0 +1,13 @@
+!!python/object:pdpp.tasks.standard_task.StandardTask
+dep_files:
+  filter_or_translate_comments: !!python/object:pdpp.templates.dep_dataclass.dep_dataclass
+    dir_list: []
+    file_list:
+    - comments_processed_english.csv
+    task_name: filter_or_translate_comments
+    task_out: output
+enabled: true
+language: Python
+src_files:
+- label_comment_topics.py
+target_dir: label_comment_topics

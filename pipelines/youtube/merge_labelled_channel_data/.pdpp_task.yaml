@@ -1,0 +1,26 @@
+!!python/object:pdpp.tasks.standard_task.StandardTask
+dep_files:
+  label_channel_entities: !!python/object:pdpp.templates.dep_dataclass.dep_dataclass
+    dir_list: []
+    file_list:
+    - channels_entities.csv
+    task_name: label_channel_entities
+    task_out: output
+  label_channel_sentiment: !!python/object:pdpp.templates.dep_dataclass.dep_dataclass
+    dir_list: []
+    file_list:
+    - channels_sentiment.csv
+    task_name: label_channel_sentiment
+    task_out: output
+  label_channel_topics: !!python/object:pdpp.templates.dep_dataclass.dep_dataclass
+    dir_list: []
+    file_list:
+    - channels_topic_info.csv
+    - channels_topics.csv
+    task_name: label_channel_topics
+    task_out: output
+enabled: true
+language: Python
+src_files:
+- merge_labelled_channel_data.py
+target_dir: merge_labelled_channel_data
